@@ -16,10 +16,15 @@ use cases:
 - Kindle PDF Output
 */
 
-let lab = import("./setup-lab.js");
+import lab from "./setup-lab.js";
+
+import {sloan, landolt, auckland, vernier, random, quest} from "./src/index.js";
 
 // this is a complete configuration
-{
+export default {
+  
+  name: "HR Display Experiment 1",
+  
   devices: lab.devices,
   
   roles: lab.roles,
@@ -30,30 +35,30 @@ let lab = import("./setup-lab.js");
     sloan({
       size: ";10arcmin-2arcmin:*0.8",
       letter: random(5),
-      exit: results => { if !results return true; }
+      exit: results => { if (!results) return true; }
     }),
     landolt({
-      size: ";10arcmin-2arcmin:*0.8"
+      size: ";10arcmin-2arcmin:*0.8",
       orientation: random("0,90,180,270", 6)
     }),
     auckland({
       duration: 500,
-      size: staircase.quest({ ... })
-    },
+      size: quest({})
+    }),
     auckland({
       duration: 500,
       stroke: "none",
       fill: "#000000",
-      size: staircase.quest({ ... })
-    },
+      size: quest({})
+    }),
     auckland({
       duration: 500,
       vanishing: true,
-      size: staircase.quest({ ... })
-    },
+      size: quest({})
+    }),
     vernier({
-      orientation:
-      size:
+      size: 0,
+      gap: 0
     })
   ]
   

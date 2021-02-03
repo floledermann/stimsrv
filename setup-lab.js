@@ -1,4 +1,4 @@
-let screen = require("stimsrv.devices.screen");
+import { screen, currentIP } from "./src/index.js";
 
 export default {
   
@@ -6,7 +6,9 @@ export default {
     {
       name: "Main PC",
       id: "main",
-      ip: stimsrv.currentIP,
+      ip: ".",
+      fingerprint: "",
+      mac: "",
       outputs: [
         "screen1",
         "screen2",
@@ -57,6 +59,7 @@ export default {
     {
       name: "Google Pixel2",
       id: "pixel2",
+      ip: "192.168.0.37",
       outputs: [
         screen({
           pixelsize: "phd",
@@ -79,6 +82,10 @@ export default {
     },
     {
       id: "kindle",
+      role: "display"
+    },
+    {
+      id: "pixel2",
       role: "display"
     },
     {

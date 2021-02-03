@@ -1,0 +1,29 @@
+{
+  "name": "stimsrv",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "module": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve-dev": "nodemon -e js,json,html server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/floledermann/stimsrv.git"
+  },
+  "author": "Florian Ledermann <florian.ledermann@tuwien.ac.at>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/floledermann/stimsrv/issues"
+  },
+  "homepage": "https://github.com/floledermann/stimsrv#readme",
+  "dependencies": {
+    "express": "4.17.1",
+    "nunjucks": "3.2.2",
+    "socket.io": "3.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.7"
+  }
+}

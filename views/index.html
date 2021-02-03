@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}stimsrv index{% endblock %}
+
+{% block body %}
+<style>
+#bangbox {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #000;
+}
+</style>
+
+<h1>Welcome!</h1>
+
+<p>
+Your IP: {{ ip }}
+</p>
+
+{% if activeRoles %}
+<h2>Active Roles</h2>
+<ul>
+{% for role in activeRoles %}
+<li>{{ role }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<h2>Potential Roles</h2>
+<ul>
+{% for role in potentialRoles %}
+<li>{{ role }}</li>
+{% endfor %}
+</ul>
+
+<button id="bang">Bang</button>
+<div id="bangbox"></id>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io.connect();
+
+let bangbox = document.querySelector("#bangbox");
+
+document.querySelector("#bang").addEventListener("mousedown", () => {
+  socket.emit("bang", {});
+});
+
+socket.on("bang", (data) => {
+  bangbox.style.backgroundColor = "#ff0000";
+  setTimeout(function() {
+    bangbox.style.backgroundColor = "#ffffff";
+  }, 100);
+});
+</script>
+{% endblock %}
