@@ -15,29 +15,36 @@
 <h1>{{ experiment.name }} – Setup</h1>
 
 <form action="/selectrole">
+{% if device %}
+<h2>Recognized Device: {{ device.name }}</h2>
+{% else %}
+<h2>Device not recognized</h2>
+<p>For persistent configuration, add this device to the devices list using
+one of the following identifiers:</p>
+{% endif %}
+
 <p>
 Your IP Address: <input type="text" class="code" value="{{ ip }}" size="40" disabled></input>
 </p><p>
 Your Client ID: <input type="text" name="clientid" class="code" value="{{ clientid }}" size="40"></input>
 </p>
 
-{% if device %}
-<h2>Recognized Device: {{ device.name }}</h2>
-{% endif %}
 
 {% if activeRole %}
 <h2>Assigned Role</h2>
-<ul>
-<li>{{ activeRole.role }}</li>
-</ul>
+<div class="radio-row">
+<input type="radio" name="role" value="{{ activeRole.role }}" checked><label>{{ activeRole.role }}</label>
+</div>
 {% endif %}
 
 <h2>Potential Roles</h2>
-<ul>
+
 {% for role in potentialRoles %}
-<li>{{ role.role }}</li>
+<div class="radio-row">
+<input type="radio" name="role" value="{{ role.role }}"><label>{{ role.role.join(" + ") }}</label>
+</div>
 {% endfor %}
-</ul>
+
 
 <button type="submit">Start</button>
 </form>

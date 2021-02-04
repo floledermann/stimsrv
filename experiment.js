@@ -18,7 +18,7 @@ use cases:
 
 const lab = require("./setup-lab.js");
 
-const {sloan, landolt, auckland, vernier, random, quest, pause} = require("./src/index.js");
+const {sloan, landolt, auckland, vernier, random, staircase, pause} = require("./src/index.js");
 
 // this is a complete configuration
 module.exports = {
@@ -49,18 +49,18 @@ module.exports = {
     }),
     auckland({
       duration: 500,
-      size: quest({})
+      size: staircase.quest({})
     }),
     auckland({
       duration: 500,
       stroke: "none",
       fill: "#000000",
-      size: quest({})
+      size: staircase.quest({})
     }),
     auckland({
       duration: 500,
       vanishing: true,
-      size: quest({})
+      size: staircase.quest({})
     }),
     vernier({
       size: 0,

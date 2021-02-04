@@ -10,6 +10,7 @@ module.exports = {
   vernier: require("./experiments/vernier.js"),
   auckland: require("./experiments/auckland.js"),
 
-  quest: require("./staircase/quest.js"),
-
+  staircase: {
+    quest: require("./staircase/quest.js")
+  }
 }
