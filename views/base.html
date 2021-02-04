@@ -3,10 +3,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="/static/stimsrv.css">
 <title>{% block title %}{% endblock %}</title>
 {% block head %}{% endblock %}
 </head>
-<body>
+<body class="{% block bodyclass %}{% endblock %}">
 {% block body %}{% endblock %}
 </body>
 </html>

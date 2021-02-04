@@ -1,28 +1,46 @@
-import express from "express";
-import nunjucks from "nunjucks";
-import { Server as SocketIO } from "socket.io";
+const path = require("path");
+
+const express = require("express");
+const nunjucks = require("nunjucks");
+const socketio = require("socket.io");
+const session = require("express-session");
+
+const experiment = require("./experiment.js");
 
 const app = express();
 
-import experiment from "./experiment.js";
+app.locals.experimentTimestamp = Date.now();
+
+app.use(session({
+  secret: 'stimsrv',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // store for one week - session invalidation is done by server logic
+  }
+}));
 
 nunjucks.configure('views', {
   express: app,
   autoescape: true
 });
 
-app.use(express.static("static"));
+app.use('/static', express.static(path.join(__dirname, "static")));
 
 let server = app.listen(8080);
 
-let io = new SocketIO(server);
+let io = socketio(server);
 
 io.on("connection", (socket) => {
   console.log("New user connected");
   
   socket.on("bang", (data) => {
-    console.log("Bang!");
     io.sockets.emit("bang", {});
+  });
+  
+  socket.on("disconnect", (data) => {
+    console.log("Client disconnected!");
+    
   });
 });
 
@@ -34,37 +52,63 @@ experiment.devices.forEach( d => {
 });
 
 app.get("/", (req, res) => {
-  // figure out which role the client has
-  let ip = req.socket.remoteAddress;
-  
-  let activeRoles = new Set();
-  let potentialRoles = new Set();
-  
-  experiment.roles.forEach( r => {  
-    let roles = r.role;
-    if (!Array.isArray(roles)) {
-      roles = [roles];
-    }      
-    if (r.id == "*") {
-      roles.forEach(r => potentialRoles.add(r));
-    }
-    else {
-      let device = devicesById[r.id];
-      if (device && matchDevice(req, device)) {
-        roles.forEach(r => activeRoles.add(r));
+  if (!req.session.roles || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
+    
+    req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
+    req.session.roles = ["display"];
+    
+    // figure out which role the client has
+    let ip = req.socket.remoteAddress;
+    
+    let activeRole = null;
+    let potentialRoles = [];
+    
+    for (let d of experiment.devices) {
+      if (matchDevice(req, d)) {
+        req.session.device = d;
+        break;
       }
     }
-  })
-  
-  activeRoles.forEach( r => {
-    potentialRoles.delete(r);
+    
+    experiment.roles.forEach( rolespec => { 
+    
+      if (!Array.isArray(rolespec.role)) {
+        rolespec.role = [rolespec.role];
+      }
+      
+      let roles = rolespec.role;
+      
+      if (rolespec.device == "*") {
+        potentialRoles.push(rolespec);
+      }
+      else {
+        let device = devicesById[rolespec.device];
+        if (device && device.id == req.session?.device?.id) {
+          if (!activeRole) {
+            activeRole = rolespec;
+          }
+          else {
+            potentialRoles.push(rolespec);
+          }
+        }
+      }
+    })
+    
+    res.render("select_role.html", {
+      experiment: experiment,
+      ip: ip,
+      potentialRoles: potentialRoles,
+      activeRole: activeRole,
+      device: req.session.device
+    });
+    
+    return;
+  }
+  res.render("experiment.html", {
+    experiment: experiment,
+    roles: req.session.roles
   });
   
-  res.render("index.html", {
-    ip: ip,
-    potentialRoles: potentialRoles,
-    activeRoles: activeRoles
-  });
 });
 
 function matchDevice(req, device) {

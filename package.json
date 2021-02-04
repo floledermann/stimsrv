@@ -2,8 +2,7 @@
   "name": "stimsrv",
   "version": "0.0.1",
   "description": "",
-  "type": "module",
-  "module": "src/index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve-dev": "nodemon -e js,json,html server"
@@ -20,6 +19,7 @@
   "homepage": "https://github.com/floledermann/stimsrv#readme",
   "dependencies": {
     "express": "4.17.1",
+    "express-session": "1.17.1",
     "nunjucks": "3.2.2",
     "socket.io": "3.1.0"
   },

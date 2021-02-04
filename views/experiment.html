@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}stimsrv index{% endblock %}
+{% block title %}{{ experiment.name }}{% endblock %}
+
+{% block bodyclass %}{% for role in roles %}has-role-{{role}} {% endfor %}{% endblock %}
 
 {% block body %}
 <style>
@@ -11,27 +13,7 @@
 }
 </style>
 
-<h1>Welcome!</h1>
-
-<p>
-Your IP: {{ ip }}
-</p>
-
-{% if activeRoles %}
-<h2>Active Roles</h2>
-<ul>
-{% for role in activeRoles %}
-<li>{{ role }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-
-<h2>Potential Roles</h2>
-<ul>
-{% for role in potentialRoles %}
-<li>{{ role }}</li>
-{% endfor %}
-</ul>
+<section class="role-display">
 
 <button id="bang">Bang</button>
 <div id="bangbox"></id>
@@ -53,4 +35,6 @@ socket.on("bang", (data) => {
   }, 100);
 });
 </script>
+
+</section>
 {% endblock %}

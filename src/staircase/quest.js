@@ -1,2 +1,1 @@
-export default function() {
-}
+module.exports = d => d

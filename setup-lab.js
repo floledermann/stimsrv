@@ -1,6 +1,6 @@
-import { screen, currentIP } from "./src/index.js";
+const { screen } = require("./src/index.js");
 
-export default {
+module.exports = {
   
   devices: [
     {
@@ -77,24 +77,30 @@ export default {
   
   roles: [
     {
-      id: "main",
-      role: ["server","controller"]
+      device: "main",
+      screen: "screen1",
+      role: "monitor"
     },
     {
-      id: "kindle",
+      device: "main",
+      screen: "screen2",
+      role: ["control", "display"]
+    },
+    {
+      device: "kindle",
       role: "display"
     },
     {
-      id: "pixel2",
-      role: "display"
+      device: "pixel2",
+      role: "input"
     },
     {
       role: "display",
-      id: "*" // anyone who connects
+      device: "*" // anyone who connects
     },
     {
       role: "buttons",
-      id: "*" // anyone who connects
+      device: "*" // anyone who connects
     }
   ]
   

@@ -1,1 +1,1 @@
-export default d => d
+module.exports = d => d

@@ -16,12 +16,12 @@ use cases:
 - Kindle PDF Output
 */
 
-import lab from "./setup-lab.js";
+const lab = require("./setup-lab.js");
 
-import {sloan, landolt, auckland, vernier, random, quest} from "./src/index.js";
+const {sloan, landolt, auckland, vernier, random, quest, pause} = require("./src/index.js");
 
 // this is a complete configuration
-export default {
+module.exports = {
   
   name: "HR Display Experiment 1",
   
@@ -32,6 +32,12 @@ export default {
   // participant management etc.
   
   experiments: [
+    pause({
+      controller: "control",
+      message: "Press Start or hit any key to start the experiment.",
+      displaymessage: "Waiting for the experiment to start...",
+      buttonlabel: "Start"
+    }),
     sloan({
       size: ";10arcmin-2arcmin:*0.8",
       letter: random(5),
