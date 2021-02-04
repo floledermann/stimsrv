@@ -79,29 +79,36 @@ module.exports = {
     {
       device: "main",
       screen: "screen1",
-      role: "monitor"
+      role: ["monitor", "control"],
+      description: "Supervisor screen and experiment control"
     },
     {
       device: "main",
       screen: "screen2",
-      role: ["control", "display"]
+      role: "answer",
+      description: "On-screen interface for subject feedback"
     },
     {
       device: "kindle",
-      role: "display"
+      role: "display",
+      description: "Stimulus display on Kindle Oasis e-reader"
     },
     {
       device: "pixel2",
-      role: "input"
+      role: "display",
+      description: "Stimulus display on Pixel2 phone"
     },
     {
+      device: "xperia",
       role: "display",
-      device: "*" // anyone who connects
+      description: "Stimulus display on Xperia Z5-P phone"
     },
+    /*
     {
       role: "buttons",
       device: "*" // anyone who connects
     }
+    */
   ]
   
 }

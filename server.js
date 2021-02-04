@@ -4,12 +4,23 @@ const express = require("express");
 const nunjucks = require("nunjucks");
 const socketio = require("socket.io");
 const session = require("express-session");
+const Hashids = require("hashids/cjs");
+
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 
 const experiment = require("./experiment.js");
 
 const app = express();
 
+const hashids = new Hashids();
+
 app.locals.experimentTimestamp = Date.now();
+
+app.use(cookieParser());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
   secret: 'stimsrv',
@@ -38,6 +49,14 @@ io.on("connection", (socket) => {
     io.sockets.emit("bang", {});
   });
   
+  /* Caveat: disable "use network provided time" for phones 
+     and "set time automatically" for PCs - otherwise the time may
+     be changes mid-experiment!
+  */
+  socket.on("calibrate time", (data) => {
+    socket.emit("calibrate time response", {serverTimestamp: Date.now()});
+  });
+  
   socket.on("disconnect", (data) => {
     console.log("Client disconnected!");
     
@@ -52,7 +71,15 @@ experiment.devices.forEach( d => {
 });
 
 app.get("/", (req, res) => {
-  if (!req.session.roles || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
+  
+  let clientId = req.cookies["stimsrv-clientid"];
+  if (!clientId) {
+    // shorten the timestamp a bit for shorter auto-generated ids
+    clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
+    setClientIdCookie(res, clientId);
+  }
+  
+  if (true || !req.session.roles || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
     
     req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
     req.session.roles = ["display"];
@@ -97,6 +124,7 @@ app.get("/", (req, res) => {
     res.render("select_role.html", {
       experiment: experiment,
       ip: ip,
+      clientid: clientId,
       potentialRoles: potentialRoles,
       activeRole: activeRole,
       device: req.session.device
@@ -111,7 +139,19 @@ app.get("/", (req, res) => {
   
 });
 
+app.post("/selectrole", (req, res) => {
+  if (req.body.clientid) {
+    setClientIdCookie(res, req.body.clientid);    
+  }
+  res.redirect("/");
+});
+
+function setClientIdCookie(res, clientId) {
+  res.cookie('stimsrv-clientid', clientId, {expires: new Date("2038-01-01T00:00:00")})
+}
+
 function matchDevice(req, device) {
+  // IP trumps clientID setting
   if (device.ip) {
     if (device.ip == ".") {
       //console.log(req.socket.address().address);

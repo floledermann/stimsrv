@@ -14,7 +14,7 @@
 <section class="panel config">
 <h1>{{ experiment.name }} – Setup</h1>
 
-<form action="/selectrole">
+<form action="/selectrole" method="post">
 {% if device %}
 <h2>Recognized Device: {{ device.name }}</h2>
 {% else %}
@@ -25,15 +25,22 @@ one of the following identifiers:</p>
 
 <p>
 Your IP Address: <input type="text" class="code" value="{{ ip }}" size="40" disabled></input>
-</p><p>
+</p>
+<p>
 Your Client ID: <input type="text" name="clientid" class="code" value="{{ clientid }}" size="40"></input>
+</p>
+<p>
+Roundtrip Time: <input id="delay-value" type="text" class="code" value="&lt;measuring...&gt;" size="14" disabled></input> ms
+</p>
+<p>
+Timestamp adjustment: <input id="timestamp-adjust-value" name="timestamp-adjust" type="text" class="code" value="&lt;measuring...&gt;" size="14" disabled></input> ms
 </p>
 
 
 {% if activeRole %}
 <h2>Assigned Role</h2>
 <div class="radio-row">
-<input type="radio" name="role" value="{{ activeRole.role }}" checked><label>{{ activeRole.role }}</label>
+<input type="radio" name="role" value="{{ activeRole.role }}" checked><label>{{ activeRole.description }} [{{ activeRole.role }}]</label>
 </div>
 {% endif %}
 
@@ -41,7 +48,7 @@ Your Client ID: <input type="text" name="clientid" class="code" value="{{ client
 
 {% for role in potentialRoles %}
 <div class="radio-row">
-<input type="radio" name="role" value="{{ role.role }}"><label>{{ role.role.join(" + ") }}</label>
+<input type="radio" name="role" value="{{ role.role }}"><label>{{ role.description }} [{{ role.role }}]</label>
 </div>
 {% endfor %}
 
@@ -49,5 +56,36 @@ Your Client ID: <input type="text" name="clientid" class="code" value="{{ client
 <button type="submit">Start</button>
 </form>
 </section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+const socket = io.connect();
+let numMeasures = 3;
+let durations = [];
+let lastTimestamp = null;
+let timestampAdjust = 0;
+
+function sendTime() {
+  lastTimestamp = Date.now();
+  socket.emit("calibrate time", {clientTimestamp: lastTimestamp});
+}
+
+socket.on("calibrate time response", (data) => {
+  let duration = Date.now() - lastTimestamp;
+  durations.push(duration);
+  if (--numMeasures > 0) {
+    window.setTimeout(sendTime, 1000);
+  }
+  else {
+    timestampAdjust = data.serverTimestamp - lastTimestamp - Math.round(duration / 2);
+    document.querySelector("#timestamp-adjust-value").value = timestampAdjust;
+  }
+  document.querySelector("#delay-value").value = (durations.reduce((a,b) => a+b, 0) / durations.length).toFixed(2);
+});
+
+window.setTimeout(sendTime, 3000);
+
+</script>
 
 {% endblock %}
