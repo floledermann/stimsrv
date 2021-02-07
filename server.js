@@ -1,21 +1,31 @@
 const path = require("path");
 
+const mri = require("mri");
 const express = require("express");
 const nunjucks = require("nunjucks");
 const socketio = require("socket.io");
 const session = require("express-session");
-const Hashids = require("hashids/cjs");
 
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
-const experiment = require("./experiment.js");
+const clients = require("./src/clients/index.js");
+const clientRoleMiddleware = require("./src/server/clientRoleMiddleware.js");
+
+let options = mri(process.argv.slice(2));
+
+let experimentFileName = options._[0];
+if (!experimentFileName) {
+  console.error("No experiment file specified - exiting!");
+  process.exit(1);
+}
+const experiment = require(experimentFileName);
 
 const app = express();
 
-const hashids = new Hashids();
-
 app.locals.experimentTimestamp = Date.now();
+app.locals.clients = {};
+app.locals.roles = {};
 
 app.use(cookieParser());
 
@@ -30,6 +40,8 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 * 7 // store for one week - session invalidation is done by server logic
   }
 }));
+
+app.use(clientRoleMiddleware(experiment.roles));
 
 nunjucks.configure('views', {
   express: app,
@@ -49,10 +61,6 @@ io.on("connection", (socket) => {
     io.sockets.emit("bang", {});
   });
   
-  /* Caveat: disable "use network provided time" for phones 
-     and "set time automatically" for PCs - otherwise the time may
-     be changes mid-experiment!
-  */
   socket.on("calibrate time", (data) => {
     socket.emit("calibrate time response", {serverTimestamp: Date.now()});
   });
@@ -72,17 +80,10 @@ experiment.devices.forEach( d => {
 
 app.get("/", (req, res) => {
   
-  let clientId = req.cookies["stimsrv-clientid"];
-  if (!clientId) {
-    // shorten the timestamp a bit for shorter auto-generated ids
-    clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
-    setClientIdCookie(res, clientId);
-  }
   
-  if (true || !req.session.roles || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
+  if (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
     
     req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
-    req.session.roles = ["display"];
     
     // figure out which role the client has
     let ip = req.socket.remoteAddress;
@@ -119,12 +120,18 @@ app.get("/", (req, res) => {
           }
         }
       }
-    })
+    });
+    
+    // make first role active if not otherwise determined
+    if (!activeRole && potentialRoles.length) {
+      activeRole = potentialRoles[0];
+      potentialRoles.splice(0,1);
+    }
     
     res.render("select_role.html", {
       experiment: experiment,
       ip: ip,
-      clientid: clientId,
+      clientid: req.clientId,
       potentialRoles: potentialRoles,
       activeRole: activeRole,
       device: req.session.device
@@ -139,16 +146,20 @@ app.get("/", (req, res) => {
   
 });
 
+
 app.post("/selectrole", (req, res) => {
   if (req.body.clientid) {
-    setClientIdCookie(res, req.body.clientid);    
-  }
-  res.redirect("/");
+    clientRoleMiddleware.setClientIdCookie(res, req.body.clientid); 
+  }  
+  
+  let platform = "browser";
+  let client = clients[platform];
+
+  let selectedRole = req.body.role;
+  
+  res.redirect("/?role=" + req.body.role);
 });
 
-function setClientIdCookie(res, clientId) {
-  res.cookie('stimsrv-clientid', clientId, {expires: new Date("2038-01-01T00:00:00")})
-}
 
 function matchDevice(req, device) {
   // IP trumps clientID setting

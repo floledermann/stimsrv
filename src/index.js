@@ -3,7 +3,8 @@ module.exports = {
   screen: require("./devices/screen.js"),
 
   random: x => x,
-  pause: x => x,
+  
+  pause: require("./experiments/pause.js"),
 
   sloan: require("./experiments/sloan.js"),
   landolt: require("./experiments/landolt.js"),

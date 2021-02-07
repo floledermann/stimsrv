@@ -34,7 +34,7 @@ module.exports = {
   experiments: [
     pause({
       controller: "control",
-      message: "Press Start or hit any key to start the experiment.",
+      controlmessage: "Press Start or hit any key to start the experiment.",
       displaymessage: "Waiting for the experiment to start...",
       buttonlabel: "Start"
     }),

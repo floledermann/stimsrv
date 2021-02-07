@@ -5,9 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve-dev": "nodemon -e js,json,html server"
+    "serve-dev": "nodemon -e js,json,html server.js ./experiment-simple.js"
   },
-  "repository": {
+  "repository": { 
     "type": "git",
     "url": "git+https://github.com/floledermann/stimsrv.git"
   },
@@ -18,11 +18,12 @@
   },
   "homepage": "https://github.com/floledermann/stimsrv#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.5",
+    "body-parser": "1.19.0",
+    "cookie-parser": "1.4.5",
     "express": "4.17.1",
     "express-session": "1.17.1",
-    "hashids": "^2.2.8",
+    "hashids": "2.2.8",
+    "mri": "1.1.6",
     "nunjucks": "3.2.2",
     "socket.io": "3.1.0"
   },
