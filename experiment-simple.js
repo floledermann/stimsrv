@@ -60,7 +60,13 @@ module.exports = {
       role: "experiment-debug",
       interfaces: ["display","response","debug"],
       description: "Experiment screen with debugging output"
-    }
+    },
+    {
+      device: "pixel2",
+      role: "experiment",
+      interfaces: ["display","response"],
+      description: "Experiment screen for stimulus display and participant response"
+    },
   ],  
   // participant management etc.
   

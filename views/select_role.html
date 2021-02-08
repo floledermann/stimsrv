@@ -77,20 +77,12 @@ Caveat: For timing-sensitive experiments, disable "use network provided time" fo
 -->
 </section>
 
-<!--
-<script src="/state.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/static/client-browser.js"></script>
+
+<!--<script src="/state.js"></script>-->
 <script>
-
-const socket = io.connect();
-
-timing(socket).calibrate({
-  updateCallback: (durations, average) => document.querySelector("#delay-value").value = average.toFixed(2)
-})
-.then(timestampAdjust => document.querySelector("#timestamp-adjust-value").value = timestampAdjust);
-
-StimSrvClient.connect();
-
+client.connect();
 </script>
--->
+
 {% endblock %}
