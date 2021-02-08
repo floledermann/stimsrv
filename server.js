@@ -26,6 +26,7 @@ const app = express();
 app.locals.experimentTimestamp = Date.now();
 app.locals.clients = {};
 app.locals.roles = {};
+app.locals.experiment = experiment;
 
 app.use(cookieParser());
 
@@ -41,14 +42,14 @@ app.use(session({
   }
 }));
 
-app.use(clientRoleMiddleware(experiment.roles));
-
 nunjucks.configure('views', {
   express: app,
   autoescape: true
 });
 
 app.use('/static', express.static(path.join(__dirname, "static")));
+
+app.use(clientRoleMiddleware(experiment.roles, experiment.devices));
 
 let server = app.listen(8080);
 
@@ -71,74 +72,7 @@ io.on("connection", (socket) => {
   });
 });
 
-
-let devicesById = {};
-
-experiment.devices.forEach( d => {
-  if (d.id) devicesById[d.id] = d
-});
-
 app.get("/", (req, res) => {
-  
-  
-  if (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp) {
-    
-    req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
-    
-    // figure out which role the client has
-    let ip = req.socket.remoteAddress;
-    
-    let activeRole = null;
-    let potentialRoles = [];
-    
-    for (let d of experiment.devices) {
-      if (matchDevice(req, d)) {
-        req.session.device = d;
-        break;
-      }
-    }
-    
-    experiment.roles.forEach( rolespec => { 
-    
-      if (!Array.isArray(rolespec.role)) {
-        rolespec.role = [rolespec.role];
-      }
-      
-      let roles = rolespec.role;
-      
-      if (rolespec.device == "*") {
-        potentialRoles.push(rolespec);
-      }
-      else {
-        let device = devicesById[rolespec.device];
-        if (device && device.id == req.session?.device?.id) {
-          if (!activeRole) {
-            activeRole = rolespec;
-          }
-          else {
-            potentialRoles.push(rolespec);
-          }
-        }
-      }
-    });
-    
-    // make first role active if not otherwise determined
-    if (!activeRole && potentialRoles.length) {
-      activeRole = potentialRoles[0];
-      potentialRoles.splice(0,1);
-    }
-    
-    res.render("select_role.html", {
-      experiment: experiment,
-      ip: ip,
-      clientid: req.clientId,
-      potentialRoles: potentialRoles,
-      activeRole: activeRole,
-      device: req.session.device
-    });
-    
-    return;
-  }
   res.render("experiment.html", {
     experiment: experiment,
     roles: req.session.roles
@@ -147,10 +81,14 @@ app.get("/", (req, res) => {
 });
 
 
-app.post("/selectrole", (req, res) => {
+app.post("/setclientid", (req, res) => {
   if (req.body.clientid) {
     clientRoleMiddleware.setClientIdCookie(res, req.body.clientid); 
   }  
+  res.redirect(req.body.next || "/");
+});
+
+app.post("/selectrole", (req, res) => {
   
   let platform = "browser";
   let client = clients[platform];
@@ -161,14 +99,3 @@ app.post("/selectrole", (req, res) => {
 });
 
 
-function matchDevice(req, device) {
-  // IP trumps clientID setting
-  if (device.ip) {
-    if (device.ip == ".") {
-      //console.log(req.socket.address().address);
-      return (req.socket.remoteAddress == req.socket.address().address);
-    }
-    return (req.socket.remoteAddress.endsWith(device.ip));
-  }
-  return false;
-}

@@ -2,28 +2,76 @@ const Hashids = require("hashids/cjs");
 
 const hashids = new Hashids();
 
-const cookieName = "stimsrv-clientid";
+const clientIdCookieName = "stimsrv-clientid";
 
-function factory(roles) {
+function factory(roles, devices) {
+  
+  let devicesById = {};
+
+  devices.forEach( d => {
+    if (d.id) devicesById[d.id] = d
+  });
   
   function clientRoleMiddleware(req, res, next) {
   
-    let clientId = req.cookies[cookieName];
+    let clientId = req.cookies[clientIdCookieName];
+    let ip = req.socket.remoteAddress;
+    
     if (!clientId) {
-      // shorten the timestamp a bit for shorter auto-generated ids
-      clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
+
+      // find id by ip  
+      function matchDevice(req, device) {
+        // IP trumps clientID setting
+        if (device.ip) {
+          if (device.ip == ".") {
+            //console.log(req.socket.address().address);
+            return (req.socket.remoteAddress == req.socket.address().address);
+          }
+          return (req.socket.remoteAddress.endsWith(device.ip));
+        }
+        return false;
+      }      
+      
+      clientId = experiment.devices.find(d => matchDevice(req, d))?.id;
+ 
+      if (!clientId) {
+        // still not found -> autogenerate id
+        // shorten the timestamp a bit for shorter auto-generated ids
+        clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
+      }
       setClientIdCookie(res, clientId);
     }
     
     req.clientId = clientId;
     
-    let candidates = roles.filter(r => r.device == clientId && r.role == req.query.role);
+    let potentialRoles = roles.filter(r => r.device == clientId);
+    let activeRole = null;
     
-    if (candidates.length == 1) {
-      req.clientRole = candidates[0].role;
+    if (req.query.role) {
+      activeRole = potentialRoles.find(r => r.role == req.query.role);
+      req.clientRole = activeRole?.role;
     }
-    else {
-      req.clientRole = req.query.clientRole;
+    if (!activeRole) {
+      activeRole = potentialRoles[0];
+    }
+       
+    console.log(req.clientRole);
+        
+    // on new experiment, always show role selection screen
+    if (req.method == "GET" && (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp)) {
+      
+      req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
+      
+      res.render("select_role.html", {
+        experiment: req.app.locals.experiment,
+        ip: ip,
+        clientid: req.clientId,
+        potentialRoles: potentialRoles,
+        activeRole: activeRole,
+        device: devicesById[clientId]
+      });
+      
+      return;
     }
     
     next();
@@ -34,7 +82,7 @@ function factory(roles) {
 }
 
 factory.setClientIdCookie = function(res, clientId) {
-  res.cookie(cookieName, clientId, {expires: new Date("2038-01-01T00:00:00")})
+  res.cookie(clientIdCookieName, clientId, {expires: new Date("2038-01-01T00:00:00")})
 }
 
 

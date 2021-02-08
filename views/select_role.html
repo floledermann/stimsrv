@@ -23,15 +23,47 @@ one of the following identifiers, or change your Client ID token:</p>
 {% endif %}
 
 
-<form action="/selectrole" method="post">
+<form action="/setclientid" method="post">
 <p>
 Your IP Address: <input type="text" class="code" value="{{ ip }}" size="40" disabled></input>
 </p>
 <p>
-Your Client ID: <input type="text" name="clientid" class="code" value="{{ clientid }}" size="40"></input>
+Your Client ID: <input type="text" name="clientid" class="code" value="{{ clientid }}" size="20"></input> <button type="submit">Update</button>
 </p>
 
-{% if activeRole %}
+</form>
+
+<form action="/selectrole" method="post">
+{% if potentialRoles.length > 0 %}
+
+{% if potentialRoles.length > 1 %}
+<h2>Select role of this display</h2>
+{% else %}
+<h2>Assigned role of this display:</h2>
+{% endif %}
+
+{% for role in potentialRoles %}
+<div class="radio-row">
+<input type="radio" name="role" value="{{ role.role }}" {% if role == activeRole %}checked{% endif %}><label>{{ role.description }} <small>[{{ role.role }}]</small></label>
+</div>
+{% endfor %}
+
+{% if potentialRoles.length > 1 %}
+<p><small>(You can <a href="." target="_blank">open another browser window</a> to connect with additional roles)</small></p>
+{% endif %}
+<p><small>(Edit the experiment description to change or add roles for this device)</small></p>
+<button type="submit">Start</button>
+{% else %}
+
+<h2>No participation role is currently available for this device</h2>
+<button type="submit">Update</button>
+
+{% endif %}
+
+</form>
+
+<!--
+<h2>Timing</h2>
 <p>
 Roundtrip Time: <input id="delay-value" type="text" class="code" value="&lt;measuring...&gt;" size="14" disabled></input> ms
 </p>
@@ -42,65 +74,23 @@ Timestamp adjustment: <input id="timestamp-adjust-value" name="timestamp-adjust"
 Caveat: For timing-sensitive experiments, disable "use network provided time" for phones and "set time automatically" for PCs. Otherwise the internal time of devices may change mid-experiment!
 </small></p>
 
-{% if potentialRoles.length %}
-<h2>Select role of this display</h2>
-
-<div class="radio-row">
-<input type="radio" name="role" value="{{ activeRole.role }}" checked><label>{{ activeRole.description }} <small>[{{ activeRole.role }}]</small></label>
-</div>
-
-{% for role in potentialRoles %}
-<div class="radio-row">
-<input type="radio" name="role" value="{{ role.role }}"><label>{{ role.description }} <small>[{{ role.role }}]</small></label>
-</div>
-{% endfor %}
-
-<p><small>(You can <a href="." target="_blank">open another browser window</a> to connect with additional roles)</small></p>
-{% else %}
-<h2>Selected role of this display:</h2>
-<p>{{ activeRole.description }} <small>[{{ activeRole.role }}]</small></p>
-<p><small>(Edit the experiment description to change or add roles for this device)</small></p>
-{% endif %}
-<button type="submit">Start</button>
-{% else %}
-<h2>No participation role is currently available for this device</h2>
-
-<button type="submit">Update</button>
-
-{% endif %}
-
-</form>
+-->
 </section>
 
-<script src="/socket.io/socket.io.js"></script>
+<!--
+<script src="/state.js"></script>
+<script src="/static/client-browser.js"></script>
 <script>
 
 const socket = io.connect();
-let numMeasures = 3;
-let durations = [];
-let lastTimestamp = null;
-let timestampAdjust = 0;
 
-function sendTime() {
-  lastTimestamp = Date.now();
-  socket.emit("calibrate time", {clientTimestamp: lastTimestamp});
-}
+timing(socket).calibrate({
+  updateCallback: (durations, average) => document.querySelector("#delay-value").value = average.toFixed(2)
+})
+.then(timestampAdjust => document.querySelector("#timestamp-adjust-value").value = timestampAdjust);
 
-socket.on("calibrate time response", (data) => {
-  let duration = Date.now() - lastTimestamp;
-  durations.push(duration);
-  if (--numMeasures > 0) {
-    window.setTimeout(sendTime, 1000);
-  }
-  else {
-    timestampAdjust = data.serverTimestamp - lastTimestamp - Math.round(duration / 2);
-    document.querySelector("#timestamp-adjust-value").value = timestampAdjust;
-  }
-  document.querySelector("#delay-value").value = (durations.reduce((a,b) => a+b, 0) / durations.length).toFixed(2);
-});
-
-window.setTimeout(sendTime, 3000);
+StimSrvClient.connect();
 
 </script>
-
+-->
 {% endblock %}
