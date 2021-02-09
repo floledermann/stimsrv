@@ -6,34 +6,24 @@
 
 {% block body %}
 <style>
-#bangbox {
-  width: 100px;
-  height: 100px;
-  border: 1px solid #000;
-}
 </style>
 
-<section class="role-display">
+{# TODO: render ui sections here #}
 
-<button id="bang">Bang</button>
-<div id="bangbox"></id>
+<section id="interface-display">
 
-<script src="/socket.io/socket.io.js"></script>
+</section>
+
+<section id="interface-response">
+
+</section>
+
+<script src="/static/client-browser.js"></script>
+<script src="/static/experiment.js"></script>
 <script>
-const socket = io.connect();
-
-let bangbox = document.querySelector("#bangbox");
-
-document.querySelector("#bang").addEventListener("mousedown", () => {
-  socket.emit("bang", {});
-});
-
-socket.on("bang", (data) => {
-  bangbox.style.backgroundColor = "#ff0000";
-  setTimeout(function() {
-    bangbox.style.backgroundColor = "#ffffff";
-  }, 100);
-});
+{# TODO: add state variables/options here #}
+client.connect();
+client.run(experiment);
 </script>
 
 </section>

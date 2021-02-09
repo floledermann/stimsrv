@@ -53,7 +53,7 @@ app.use(clientRoleMiddleware(experiment.roles, experiment.devices));
 
 let server = app.listen(8080);
 
-let io = socketio(server);
+let io = socketio(server, {serveClient: false});
 
 io.on("connection", (socket) => {
   console.log("New user connected");
