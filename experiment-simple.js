@@ -74,9 +74,9 @@ module.exports = {
   
   experiments: [
     pause({
-      controller: "control",
-      controlmessage: "Press Start or hit any key to start the experiment.",
+      buttondisplay: "control",
       displaymessage: "Waiting for the experiment to start...",
+      monitormessage: "Press Start or hit any key to start the experiment.",
       buttonlabel: "Start"
     }),
     bangbox(),

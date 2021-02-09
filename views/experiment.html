@@ -8,20 +8,19 @@
 <style>
 </style>
 
-{# TODO: render ui sections here #}
-
-<section id="interface-display">
-
-</section>
-
-<section id="interface-response">
-
-</section>
+{# UI sections are rendered by client #}
 
 <script src="/static/client-browser.js"></script>
+{# TODO: package experiment on the fly / on startup #}
 <script src="/static/experiment.js"></script>
 <script>
-{# TODO: add state variables/options here #}
+
+let client = stimsrvClient({
+  clientid: "{{role.device}}",
+  role: "{{role.role}}",
+  interfaces: ["{{role.interfaces | join('","') | safe}}"]
+});
+
 client.connect();
 client.run(experiment);
 </script>

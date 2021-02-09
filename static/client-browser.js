@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.client = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.stimsrvClient = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 
 /**
  * Expose `Backoff`.
@@ -7035,60 +7035,120 @@ module.exports = {
   CALIBRATE_TIME_RESPONSE: "calibrate time response",
   CALIBRATE_TIME_RESULT: "calibrate time result"
 }
-},{}],"client":[function(require,module,exports){
+},{}],"stimsrvClient":[function(require,module,exports){
 
 const socketio = require("socket.io-client");
 
 const timing = require("./browser/timing.js");
 
-function connect() {
+function clientFactory(options) {
   
-  const socket = socketio.connect();
+  options = Object.assign({
+    interfaces: [],
+    root: document.body
+  }, options);
   
-  socket.onAny(handleIncomingEvent);
-
-  timing(socket).calibrate({
-    updateCallback: (durations, average) => console.log("Testing delay to server, average: " + average.toFixed(2) + "ms...")
-  }).then(timestampAdjust => {
-    console.log("Negotiated timestamp adjustment: " + timestampAdjust + "ms.");
-  });
-  
-  
-}
-
-let eventSubscribers = {};
-
-function handleIncomingEvent(eventType, data) {
-  for (let cb of eventSubscribers[eventType]) {
-    cb(data);
+  for (let ui of options.interfaces) {
+    let el = document.createElement("section");
+    el.id = "interface-" + ui;
+    options.root.appendChild(el);
+    options.root.classList.add("has-ui-" + ui);
   }
-}
 
-function event(eventType, data) {
-  socket.emit(eventType, data);
-}
+  let eventSubscribers = {};
 
-function subscribeEvent(eventType, callback) {
-  if (!eventSubscribers[eventType]) {
-    eventSubscribers[eventType] = [];
+  function handleIncomingEvent(eventType, data) {
+    if (eventSubscribers[eventType]) {
+      for (let cb of eventSubscribers[eventType]) {
+        cb(data);
+      }
+    }
   }
-  eventSubscribers[eventType].push(callback);
-}
-
-function next() {
-}
-
-function run(experiment) {
   
+  let experiment = null;
+  let experimentIndex = null;
+  
+  function prepareExperiment(experiment) {
+    for (ui of options.interfaces) {
+      if (experiment.interfaces[ui]) {
+        experiment.interfaces[ui]?.initialize(client, document.getElementById("interface-" + ui), document);
+      }
+    }
+  }
+  
+  function showCondition(experiment, condition) {
+    for (ui of options.interfaces) {
+      if (experiment.interfaces[ui]) {
+        experiment.interfaces[ui]?.render(condition);
+      }
+    }
+  }
+  
+  let socket = null;
+  let clientTimestampAdjust = null;
+
+  let client = {
+    connect: function() {
+    
+      socket = socketio.connect();
+      
+      socket.onAny(handleIncomingEvent);
+
+      timing(socket).calibrate({
+        updateCallback: (durations, average) => console.log("Testing delay to server, average: " + average.toFixed(2) + "ms...")
+      }).then(timestampAdjust => {
+        console.log("Negotiated timestamp adjustment: " + timestampAdjust + "ms.");
+        clientTimestampAdjust = timestampAdjust;
+      });      
+    },
+
+    event: function(eventType, data) {
+      socket?.emit(eventType, data);
+    },
+
+    subscribeEvent: function(eventType, callback) {
+      if (!eventSubscribers[eventType]) {
+        eventSubscribers[eventType] = [];
+      }
+      eventSubscribers[eventType].push(callback);
+    },
+    
+    response: function(data) {
+      data.experimentIndex = experimentIndex;
+      data.clientTimestamp = Date.now();
+      data.clientTimestampAdjust = clientTimestampAdjust;
+      this.event("response", data);
+    },
+
+    nextExperiment: function() {
+      if (experimentIndex === null) {
+        experimentIndex = 0;
+      }
+      else {
+        experimentIndex++;
+      }
+      showExperiment(experiment.experiments[experimentIndex]);
+    },
+
+    run: function(_experiment) {
+      
+      experiment = _experiment;
+      experimentIndex = null;
+      
+      this.subscribeEvent("show condition", data => {
+        let experiment = experiment.experiments[data.experimentIndex];
+        if (data.experimentIndex != experimentIndex) {
+          experimentIndex = data.experimentIndex;
+          prepareExperiment(experiment);
+        }
+        showCondition(experiment, data.condition);
+      });
+    }
+  }
+  
+  return client;
 }
 
-module.exports = {
-  connect: connect,
-  timing: timing,
-  event: event,
-  subscribeEvent: subscribeEvent,
-  next: next,
-  run: run
-}
-},{"./browser/timing.js":45,"socket.io-client":30}]},{},[])("client")
+module.exports = clientFactory
+},{"./browser/timing.js":45,"socket.io-client":30}]},{},[])("stimsrvClient")
 });

@@ -67,15 +67,19 @@ io.on("connection", (socket) => {
   });
   
   socket.on("disconnect", (data) => {
-    console.log("Client disconnected!");
-    
+    console.log("Client disconnected!");  
+  });
+  
+  socket.onAny((messageType, data) => {
+    console.log(messageType);
+    console.log(data);
   });
 });
 
 app.get("/", (req, res) => {
   res.render("experiment.html", {
     experiment: experiment,
-    roles: req.session.roles
+    role: req.clientRole
   });
   
 });

@@ -18,32 +18,33 @@ module.exports = function(labels, options) {
   
   let client = null;
   let document = null;
+  let wrapper = null;
   
   return {
     initialize: function(_client, _parent, _document) {
+      
       client = _client;
       document = _document;
+      
+      wrapper = document.createElement(options.wrapperTag);
+      wrapper.className = options.wrapperClass;
+      _parent.appendChild(wrapper);
     },
     
     render: function(condition) {
       
       let _labels = valOrFunc.array(labels, condition);
-      
-      let wrapper = document.createElement(options.wrapperTag);
-      wrapper.className = options.wrapperClass;
-      
+     
       for (let label of _labels) {
         let el = document.createElement(options.buttonTag);
         el.innerHTML = label;
         
         let _label = label;
         el.addEventListener(options.buttonEvent, function(e) {
-          client.event("response button", {label: _label});
+          client.response({label: _label});
         });
         wrapper.appendChild(el);
       }
-      
-      return wrapper;
     }
   }
 }

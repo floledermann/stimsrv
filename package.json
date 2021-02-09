@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve-dev": "nodemon --ignore static -e js,json,html server.js ./experiment-simple.js",
     "watch-client": "nodemon --watch src -e js --exec 'npm run build-client'",
-    "build-client": "browserify -r ./src/clients/browser/client-browser.js:client -s client -o static/client-browser.js"
+    "build-client": "browserify -r ./src/clients/browser/client-browser.js:stimsrvClient -s stimsrvClient -o static/client-browser.js"
   },
   "repository": {
     "type": "git",

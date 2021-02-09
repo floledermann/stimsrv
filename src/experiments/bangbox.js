@@ -13,17 +13,20 @@ module.exports = function(options) {
   
   let display = {
     initialize: function(client, parent, document) {
+      
       let el = _document.createElement("div");
       el.className = "bangbox";
       el.style.cssText = options.boxstyle;
-      client.subscribeEvent("response button", function(data) {
+      
+      client.subscribeEvent("bang", function(data) {
         if (data.label == options.banglabel) {
           el.style.backgroundColor = options.bangcolor;
           setTimeout(function() {
             el.style.backgroundColor = "transparent";
           }, 100);
         }
-      });        
+      });  
+      
     }
   };
   
@@ -32,10 +35,12 @@ module.exports = function(options) {
   return {
     name: "bangbox",
     clients: ["browser"],
-    display: display,
-    response: buttons,
-    monitor: display,
-    control: buttons,
+    interfaces: {
+      display: display,
+      response: buttons,
+      monitor: display,
+      control: buttons
+    }
   }
 
 

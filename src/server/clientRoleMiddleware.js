@@ -49,7 +49,7 @@ function factory(roles, devices) {
     
     if (req.query.role) {
       activeRole = potentialRoles.find(r => r.role == req.query.role);
-      req.clientRole = activeRole?.role;
+      req.clientRole = activeRole;
     }
     if (!activeRole) {
       activeRole = potentialRoles[0];

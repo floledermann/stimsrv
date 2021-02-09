@@ -5,9 +5,12 @@ module.exports = function(htmlString, options) {
     wrapperTag: "div",
     wrapperClass: null
   });
-      
+  
+  let parent = null;
+  
   return {
     initialize: function(_client, _parent, _document) {
+      parent = _parent;
     },
     
     // contract: if render() returns a string or element, then replace the parent content
@@ -17,7 +20,7 @@ module.exports = function(htmlString, options) {
         start = "<" + options.wrapperTag + (options.wrapperClass ? ' class="' + options.wrapperClass + '"' : "") + ">";
         end = "</" + options.wrapperTag + ">";
       }
-      return start + htmlString + end;
+      parent.innerHTML = start + htmlString + end;
     }
   }
 }
