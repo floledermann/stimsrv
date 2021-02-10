@@ -69,6 +69,12 @@ module.exports = {
       interfaces: ["display","response"],
       description: "Experiment screen for stimulus display and participant response"
     },
+    {
+      device: "xperia",
+      role: "experiment-display",
+      interfaces: ["display"],
+      description: "Experiment screen for stimulus display."
+    },
   ],  
   // participant management etc.
   
