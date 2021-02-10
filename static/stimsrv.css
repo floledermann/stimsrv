@@ -42,12 +42,13 @@ body {
 
 .buttons {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
 }
 
 .buttons button {
-  flex: 1 0 100px;
+  flex: 0 1 100px; /* do *not* grow to available space - interestingly, content still grows the button which is good */
 }
 
 h1 {
