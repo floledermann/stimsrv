@@ -32,14 +32,14 @@ function factory(roles, devices) {
         return false;
       }      
       
-      clientId = experiment.devices.find(d => matchDevice(req, d))?.id;
+      clientId = devices.find(d => matchDevice(req, d))?.id;
  
       if (!clientId) {
         // still not found -> autogenerate id
         // shorten the timestamp a bit for shorter auto-generated ids
         clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
       }
-      setClientIdCookie(res, clientId);
+      factory.setClientIdCookie(res, clientId);
     }
     
     req.clientId = clientId;
