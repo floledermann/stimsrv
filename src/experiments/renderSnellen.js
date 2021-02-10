@@ -6,9 +6,9 @@ module.exports = function(ctx, condition, options) {
     size: 10,
     middleBar: true
     // foregroundColor/backgroundColor are handled by caller!
-  });
+  }, condition);
     
-  ctx.rotate(condition.angle);
+  ctx.rotate(condition.angle / 180 * Math.PI);
     
 /*
 https://de.wikipedia.org/wiki/Snellen-Haken

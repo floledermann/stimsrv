@@ -24,7 +24,8 @@ module.exports = function(options) {
     },
     controller: nextOnResponse({
       // never advance for now
-      filterResponse: l => false
+      filterResponse: l => false,
+      nextCondition: () => ({angle: Math.floor(Math.random() * 4) * 90})
     })
   }
 
