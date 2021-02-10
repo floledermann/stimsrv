@@ -16,7 +16,7 @@ use cases:
 - Kindle PDF Output
 */
 
-const landolt = require("./src/experiments/landolt.js");
+const snellen = require("./src/experiments/snellen.js");
 const bangbox = require("./src/experiments/bangbox.js");
 const pause = require("./src/experiments/pause.js");
 
@@ -86,7 +86,7 @@ module.exports = {
       buttonlabel: "Start"
     }),
     bangbox(),
-    landolt({
+    snellen({
       size: ";10arcmin-2arcmin:*0.8",
       orientation: "0,90,180,270"
     })
