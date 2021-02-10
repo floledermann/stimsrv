@@ -5,9 +5,9 @@ module.exports = function(labels, options) {
   
   options = Object.assign({
     wrapperTag: "div",
-    wrapperClass: null,
+    wrapperClass: "buttons",
     buttonTag: "button",
-    buttonEvent: "mousedown",
+    buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null
   }, options);
   
@@ -44,21 +44,33 @@ module.exports = function(labels, options) {
         let el = document.createElement(options.buttonTag);
         el.innerHTML = valOrFunc(label, condition);
         
-        el.addEventListener(options.buttonEvent, function(e) {
-          
-          client.response({label: label});
-          
-          if (options.broadcastEvents) {
-            if (Array.isArray(options.broadcastEvents)) {
-              let evt = options.broadcastEvents[index];
-              if (evt) {
-                broadcastVal(client, valOrFunc(evt,condition,label,index));
+        let evt = options.buttonEvent;
+        
+        if (!Array.isArray(evt)) {
+          evt = [evt];
+        }
+        
+        evt.forEach(eventType => {
+          el.addEventListener(eventType, function(e) {
+            
+            // to prevent touchstart from also triggering mousedown
+            // should we make this ocnfigruable?
+            e.preventDefault();
+            
+            client.response({label: label});
+            
+            if (options.broadcastEvents) {
+              if (Array.isArray(options.broadcastEvents)) {
+                let evt = options.broadcastEvents[index];
+                if (evt) {
+                  broadcastVal(client, valOrFunc(evt,condition,label,index));
+                }
+              }
+              else {
+                broadcastVal(client, valOrFunc(options.broadcastEvents,condition,label,index));
               }
             }
-            else {
-              broadcastVal(client, valOrFunc(options.broadcastEvents,condition,label,index));
-            }
-          }
+          });
         });
         wrapper.appendChild(el);
       }
