@@ -3,7 +3,7 @@ module.exports = function(htmlString, options) {
   
   options = Object.assign({
     wrapperTag: "div",
-    wrapperClass: null
+    wrapperClass: "content"
   });
   
   let parent = null;
