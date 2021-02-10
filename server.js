@@ -11,6 +11,7 @@ const bodyParser = require("body-parser");
 
 const clients = require("./src/clients/index.js");
 const clientRoleMiddleware = require("./src/server/clientRoleMiddleware.js");
+const nextOnResponse = require("./src/controller/nextOnResponse.js");
 
 let options = mri(process.argv.slice(2));
 
@@ -27,6 +28,12 @@ app.locals.experimentTimestamp = Date.now();
 app.locals.clients = {};
 app.locals.roles = {};
 app.locals.experiment = experiment;
+app.locals.experimentIndex = 0;
+app.locals.currentExperiment = experiment.experiments[0];
+app.locals.currentCondition = app.locals.currentExperiment.controller.nextCondition(null,null,[],[]);
+app.locals.currentResponse = null;
+app.locals.conditions = [];
+app.locals.responses = [];
 
 app.use(cookieParser());
 
@@ -58,8 +65,8 @@ let io = socketio(server, {serveClient: false});
 io.on("connection", (socket) => {
   console.log("New user connected");
   
-  socket.on("bang", (data) => {
-    io.sockets.emit("bang", {});
+  socket.on("broadcast", (data) => {
+    io.sockets.emit("broadcast", data);
   });
   
   socket.on("calibrate time", (data) => {
@@ -71,9 +78,60 @@ io.on("connection", (socket) => {
   });
   
   socket.onAny((messageType, data) => {
-    console.log(messageType);
+    console.log("Received message: " + messageType);
     console.log(data);
+    if (messageType == "response") {
+      app.locals.currentResponse = data;
+      app.locals.responses.push(app.locals.currentResponse);
+      // default controller
+      let controller = app.locals.currentExperiment.controller || nextOnResponse();
+      app.locals.currentCondition = controller.nextCondition(
+        app.locals.currentCondition,
+        app.locals.currentResponse,
+        app.locals.conditions,
+        app.locals.responses
+      );
+      if (app.locals.currentCondition) {
+        app.locals.conditions.push(app.locals.currentCondition);
+        io.sockets.emit("condition", {
+          experimentIndex: app.locals.experimentIndex,
+          condition: app.locals.currentCondition,
+        });
+      }
+      else {
+        app.locals.experimentIndex++;
+        if (app.locals.experimentIndex < app.locals.experiment.experiments.length) {
+          app.locals.currentExperiment = app.locals.experiment.experiments[app.locals.experimentIndex];
+          app.locals.responses = [];
+          app.locals.conditions = [];
+          app.locals.currentResponse = null;
+          // default controller
+          let controller = app.locals.currentExperiment.controller || nextOnResponse();
+          app.locals.currentCondition = controller.nextCondition(
+            app.locals.currentCondition,
+            app.locals.currentResponse,
+            app.locals.conditions,
+            app.locals.responses
+          );
+          io.sockets.emit("experiment start", {
+            experimentIndex: app.locals.experimentIndex,
+            condition: app.locals.currentCondition
+          });
+        }
+        else {
+          // end of experiment
+          io.sockets.emit("experiment end");
+        }
+      }
+      // send raw response to all clients?
+    }
   });
+  
+  socket.emit("experiment start", {
+    experimentIndex: app.locals.experimentIndex,
+    condition: app.locals.currentCondition
+  });
+  
 });
 
 app.get("/", (req, res) => {

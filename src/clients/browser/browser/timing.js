@@ -24,6 +24,7 @@ function clientFactory(socket) {
         socket.on(protocol.CALIBRATE_TIME_RESPONSE, (data) => {
           let duration = Date.now() - lastTimestamp;
           durations.push(duration);
+          let averageDelay = Math.round(durations.reduce((a,b) => a+b, 0) / durations.length / 2);
           if (--options.iterations > 0) {
             setTimeout(sendTime, options.interval);
           }
@@ -31,10 +32,13 @@ function clientFactory(socket) {
             let timestampAdjust = data.serverTimestamp - lastTimestamp - Math.round(duration / 2);
             clientFactory.timestampAdjust = timestampAdjust;
             resolve(timestampAdjust);
-            socket.emit(protocol.CALIBRATE_TIME_RESULT, {clientTimestampAdjust: timestampAdjust});
+            socket.emit(protocol.CALIBRATE_TIME_RESULT, {
+              clientTimestampAdjust: timestampAdjust,
+              clientAverageDelay: averageDelay
+            });
           }
           if (options.updateCallback) {
-            options.updateCallback(durations, durations.reduce((a,b) => a+b, 0) / durations.length)
+            options.updateCallback(durations, averageDelay);
           }
         });
 

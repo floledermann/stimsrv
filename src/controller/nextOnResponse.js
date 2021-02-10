@@ -9,11 +9,16 @@ module.exports = function(options) {
   }, options);
   
   // return next condition, or null for end of experiment
-  return function(lastCondition, lastResponse, conditions, responses) {
-    
-    if (!options.filterResponse || options.filterResponse(lastResponse, lastCondition, responses, conditions)) {
-      return null; // end of experiment
+  return {
+    nextCondition: function(lastCondition, lastResponse, conditions, responses) {
+      
+      // end experiment if a response has been given and it matches the filter criteria
+      if (lastResponse && (!options.filterResponse || options.filterResponse(lastResponse, lastCondition, responses, conditions))) {
+        return null; // end of experiment
+      }
+      
+      // else return next condition
+      return valOrFunc(options.nextCondition, lastCondition, lastResponse, conditions, responses);
     }
-    return valOrFunc(options.nextCondition, lastCondition, lastResponse, conditions, responses);
   }
 }

@@ -1,5 +1,7 @@
+
 const htmlContent = require("../ui/htmlContent.js");
 const htmlButtons = require("../ui/htmlButtons.js");
+const nextOnResponse = require("../controller/nextOnResponse.js");
 
 module.exports = function(options) {
   
@@ -14,27 +16,30 @@ module.exports = function(options) {
   let display = {
     initialize: function(client, parent, document) {
       
-      let el = _document.createElement("div");
+      let el = document.createElement("div");
       el.className = "bangbox";
       el.style.cssText = options.boxstyle;
+      parent.appendChild(el);
       
-      client.subscribeEvent("bang", function(data) {
-        if (data.label == options.banglabel) {
-          el.style.backgroundColor = options.bangcolor;
-          setTimeout(function() {
-            el.style.backgroundColor = "transparent";
-          }, 100);
-        }
-      });  
-      
+      client.subscribeBroadcast("bang", function(data) {
+        el.style.backgroundColor = options.bangcolor;
+        setTimeout(function() {
+          el.style.backgroundColor = "transparent";
+        }, 100);
+      });      
     }
   };
   
-  let buttons = htmlButtons([options.banglabel, options.nextlabel])
+  let buttons = htmlButtons([options.banglabel, options.nextlabel], {
+    broadcastEvents: ["bang"]
+  });
   
   return {
     name: "bangbox",
     clients: ["browser"],
+    controller: nextOnResponse({
+      filterResponse: response => response.label == options.nextlabel
+    }),
     interfaces: {
       display: display,
       response: buttons,

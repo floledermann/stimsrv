@@ -8,8 +8,8 @@ module.exports = function(labels, options) {
     wrapperClass: null,
     buttonTag: "button",
     buttonEvent: "mousedown",
-    response: function() {client.next();}
-  });
+    broadcastEvents: null
+  }, options);
   
   // single string -> convert to array
   if (typeof labels != 'function' && !Array.isArray(labels)) {
@@ -27,24 +27,54 @@ module.exports = function(labels, options) {
       document = _document;
       
       wrapper = document.createElement(options.wrapperTag);
-      wrapper.className = options.wrapperClass;
+      if (options.wrapperClass) {
+        wrapper.className = options.wrapperClass;
+      }
       _parent.appendChild(wrapper);
     },
     
     render: function(condition) {
       
       let _labels = valOrFunc.array(labels, condition);
-     
-      for (let label of _labels) {
-        let el = document.createElement(options.buttonTag);
-        el.innerHTML = label;
+      
+      //TODO: check if change/rerender is needed
+      wrapper.innerHTML = "";
+      for (let [index, label] of _labels.entries()) {
         
-        let _label = label;
+        let el = document.createElement(options.buttonTag);
+        el.innerHTML = valOrFunc(label, condition);
+        
         el.addEventListener(options.buttonEvent, function(e) {
-          client.response({label: _label});
+          
+          client.response({label: label});
+          
+          if (options.broadcastEvents) {
+            if (Array.isArray(options.broadcastEvents)) {
+              let evt = options.broadcastEvents[index];
+              if (evt) {
+                broadcastVal(client, valOrFunc(evt,condition,label,index));
+              }
+            }
+            else {
+              broadcastVal(client, valOrFunc(options.broadcastEvents,condition,label,index));
+            }
+          }
         });
         wrapper.appendChild(el);
       }
     }
   }
+}
+
+function broadcastVal(client, evt) {
+  let type = null;
+  let data = {};
+  if (typeof evt == 'string') {
+    type = evt;
+  }
+  else {
+    type = evt.type;
+    data = evt.data;
+  }
+  client.broadcastEvent(type, data);
 }
