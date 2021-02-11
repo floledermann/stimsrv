@@ -8,7 +8,8 @@
     "serve-dev": "nodemon --ignore static -e js,json,html server.js ./experiment-simple.js",
     "debug-server": "node --inspect-brk server.js ./experiment-simple.js",
     "watch-client": "nodemon --watch src -e js --exec 'npm run build-client'",
-    "build-client": "browserify -r ./src/clients/browser/client-browser.js:stimsrvClient -s stimsrvClient -o static/client-browser.js"
+    "build-client": "browserify -r ./src/clients/browser/client-browser.js:stimsrvClient -s stimsrvClient -o static/client-browser.js",
+    "build-experiment": "browserify -r ./experiment-simple.js:experiment -s experiment -o static/experiment.js"
   },
   "repository": {
     "type": "git",
