@@ -1,11 +1,11 @@
 
 const htmlButtons = require("../ui/htmlButtons.js");
-const nextOnResponse = require("../controller/nextOnResponse.js");
+const permutateParameters = require("../controller/permutateParameters.js");
 
 const canvasRenderer = require("./canvasRenderer.js");
 const renderSnellen = require("./renderSnellen.js");
 
-module.exports = function(options) {
+module.exports = function(parameters, options) {
   
   options = Object.assign({
     
@@ -22,11 +22,7 @@ module.exports = function(options) {
       monitor: renderer,
       control: null,
     },
-    controller: nextOnResponse({
-      // never advance for now
-      filterResponse: l => false,
-      nextCondition: () => ({angle: Math.floor(Math.random() * 4) * 90})
-    })
+    controller: permutateParameters(parameters, options)
   }
 
 

@@ -85,10 +85,10 @@ module.exports = {
       monitormessage: "Press Start or hit any key to start the experiment.",
       buttonlabel: "Start"
     }),
-    bangbox(),
+    //bangbox(),
     snellen({
-      size: ";10arcmin-2arcmin:*0.8",
-      orientation: "0,90,180,270"
+      angle: [0,90,180,270],
+      size: [20,18,16,14,12,10]
     })
   ]
   
