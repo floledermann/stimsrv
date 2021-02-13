@@ -38,12 +38,6 @@ https://github.com/psychopy/psychopy/blob/release/psychopy/contrib/quest.py
 */
 
 
-import copy
-import random
-
-import numpy as num
-
-
 function sum(arr) {
   return arr.reduce((a,b) => a+b, 0);
 }
@@ -69,7 +63,7 @@ function last(arr) {
   return arr[arr.length-1];
 }
 
-function range(start, stop, step) {
+function rangeArr(start, stop, step) {
   
   step = step || 1;
   
@@ -100,11 +94,13 @@ function arrayOp(scalarOp) {
   }
 }
 
-let multA = arrayOp((a,b) => a * b);
+let mulA = arrayOp((a,b) => a * b);
 let divA = arrayOp((a,b) => a / b);
+let addA = arrayOp((a,b) => a + b);
+let subA = arrayOp((a,b) => a - b);
 let expA = arrayOp((a,b) => a ** b);
 
-function interp(x, xValues, yValues) {
+function interpolate(x, xValues, yValues) {
   
   if (x < xValues[0]) return yValues[0];
   if (x > last(xValues)) return last(yValues);
@@ -116,6 +112,21 @@ function interp(x, xValues, yValues) {
   return yValues[i] + (yValues[i+1] - yValues[i]) * (x - xValues[i]) / (xValues[i+1] - xValues[i]);
 }
 
+function cumsum(arr) {
+  let sum = 0;
+  let result = [];
+  
+  for (let x of arr) {
+    sum += x;
+    result.push(sum);
+  }
+  return result;
+}
+
+function pick(arr, indexArr) {
+  return indexArr.map(i => arr[i]);
+}
+
 /*
 Measure threshold using a Weibull psychometric function.
 
@@ -124,7 +135,7 @@ usually corresponds to log10 contrast.
 
 The Weibull psychometric function:
 
-p2=delta*gamma+(1-delta)*(1-(1-gamma)*exp(-10**(beta*(x2+xThreshold))))
+p2=delta*gamma+(1-delta)*(1-(1-gamma)*exp(-(10**(beta*(x2+xThreshold)))))
 
 where x2 represents log10 intensity relative to threshold
 (i.e., x2 = x - T, where x is intensity, and T is threshold intensity).
@@ -138,10 +149,10 @@ the specified parameter values in self to compute a psychometric
 function and store it in self. All the other methods simply use
 the psychometric function stored as instance
 variables. recompute() is called solely by __init__() and
-beta_analysis() (and possibly by a few user programs). Thus, if
+betaAnalysis() (and possibly by a few user programs). Thus, if
 you prefer to use a different kind of psychometric function,
 called Foo, you need only subclass QuestObject, overriding
-__init__(), recompute(), and (if you need it) beta_analysis().
+__init__(), recompute(), and (if you need it) betaAnalysis().
 
 instance variables:
 
@@ -177,7 +188,7 @@ i.e. they are impossible.
 
 */
 
-function init(tGuess, tGuessSd, pThreshold, beta, delta, gamma, grain=0.01, range=null) {
+function init(tGuess, tGuessSd, pThreshold, beta=3.5, delta=0.01, gamma=0.5, grain=0.01, range=null, options) {
   /*
   Initialize Quest parameters.
 
@@ -212,346 +223,372 @@ function init(tGuess, tGuessSd, pThreshold, beta, delta, gamma, grain=0.01, rang
       range
   */
 
-  // flags
-  let updatePdf = true;
-  let warnPdf = true;
-  let normalizePdf = false;
+  options = Object.assign({
+    updatePdf: true,
+    warnPdf: true,
+    normalizePdf: false
+  }, options);
 
   dim = 500;
 
   if (range) {
-    if (range <= 0) 
+    if (range <= 0) {
       throw 'argument "range" must be greater than zero.';
+    }
     dim = range / grain;
     dim = 2 * Math.ceil(dim/2.0); // round up to even integer
   }
-  
-  
-  recompute();
-
-  function beta_analysis(outputFunc) {
-    /*
-    Analyze the quest function with beta as a free parameter.
-
-    It returns the mean estimates of alpha (as logC) and
-    beta. Gamma is left at whatever value the user fixed it at.
-    */
     
-    outputFunc = outputFunc || console.log; 
+  // public methods
 
-    let q2 = [];
+  let quest = {
     
-    for (let i=1; i<=17; i++) { //in range(1,17)
-      let q_copy = copy.copy(self)
-      q_copy.beta = 2 ** (i/4.0);
-      q_copy.dim = 250;
-      q_copy.grain = 0.02;
-      q_copy.recompute();
-      q2.push(q_copy);
-    }
-
-    let t2    = q2.map(d => d.mean());              //numpy.array([q2i.mean() for q2i in q2]) 
-    let p2    = q2.map((d, i) => d.pdf_at(t2[i]));  //numpy.array([q2i.pdf_at(t2i) for q2i,t2i in zip(q2,t2)])
-    let sd2   = q2.map(d => d.sd());                //numpy.array([q2i.sd() for q2i in q2])
-    let beta2 = q2.map(d => d.beta);                //numpy.array([q2i.beta for q2i in q2])
+    get beta() { return beta; },
+    get delta() { return delta; },
+    get gamma() { return gamma; },
     
-    let i = last(argsort(p2));
-    let t = t2[i];
-    let sd = q2[i].sd();
-    let p = sum(p2);
-    let betaMean = sum(p2*beta2)/p;
-    let betaSd = Math.sqrt(sum(p2*beta2**2)/p-(sum(p2*beta2)/p)**2);
-    let iBetaMean = sum(p2/beta2)/p;
-    let iBetaSd = Math.sqrt(sum(p2/beta2**2)/p-(sum(p2/beta2)/p)**2);
-    
-    outputFunc('logC 	 sd 	 beta	 sd	 gamma');
-    outputFunc(t.toFixed(2) + " " + sd.toFixed(2) + " " + (1/iBetaMean).toFixed(2) + " " + betaSd.toFixed(2) + " " + gamma.toFixed(3)));
-    
-  }
-
-  function mean() {
-    /*
-    Mean of Quest posterior pdf.
-
-    Get the mean threshold estimate.
-    */
-    return tGuess + sum(pdf * x) / sum(pdf);
-  }
-  
-  function mode() {
-    /*
-    Mode of Quest posterior pdf.
-
-    let [t,p] = q.mode();
-    't' is the mode threshold estimate
-    'p' is the value of the (unnormalized) pdf at t.
-    */
-    let iMode = last(argsort(pdf));
-    p = pdf[iMode];
-    t = x[iMode] + tGuess;
-    return [t, p];
-  }
-  
-  function p(x) {
-    /*
-    probability of correct response at intensity x.
-
-    p=q.p(x)
-
-    The probability of a correct (or yes) response at intensity x,
-    assuming threshold is at x=0.
-    */
-    if (x < x2[0]) {
-      return x2[0];
-    }
-    if (x > last(x2)) {
-      return last(x2);
-    }
-    return interp(x, x2, p2);
-  }
-  
-  function pdf_at(t) {
-    /*       
-    The (unnormalized) probability density of candidate threshold 't'.
-
-    This was converted from the Psychtoolbox's QuestPdf function.
-    */
-    let i = int(Math.round((t-tGuess)/grain)) + 1 + dim/2;
-    i = Math.min(pdf.length, Math.max(1,i)) - 1;
-    p = pdf[i];
-    return p;
-  }
-  
-  function quantile(_quantileOrder=null) {
-    /*
-    Get Quest recommendation for next trial level.
-
-    intensity=q.quantile([quantileOrder])
-
-    Gets a quantile of the pdf in the struct q.  You may specify
-    the desired quantileOrder, e.g. 0.5 for median, or, making two
-    calls, 0.05 and 0.95 for a 90confidence interval.  If the
-    'quantileOrder' argument is not supplied, then it's taken from
-    the QuestObject instance. __init__() uses recompute() to
-    compute the optimal quantileOrder and saves that in the
-    QuestObject instance; this quantileOrder yields a quantile
-    that is the most informative intensity for the next trial.
-
-    This was converted from the Psychtoolbox's QuestQuantile function.
-    */
-    _quantileOrder = _quantileOrder || quantileOrder;
-    
-    p = numpy.cumsum(pdf);
-    
-    if (anyInfinite(last(p))) {
-      throw "PDF is not finite";
-    }
-    if (last(p)==0) {
-      throw "PDF is all zero";
-    }
-    
-    let m1p = numpy.concatenate(([-1],p));
-    
-    let index = nonzero( m1p[1:]-m1p[:-1] )[0]
-    
-    if (index.length < 2) {
-      throw `PDF has only ${index.length} nonzero point(s)`;
-    }
-    
-    let ires = interp(_quantileOrder*last(p),p[index],x[index])
-    
-    return tGuess + ires;
-  }
-  
-  function sd() {
-    /*
-    Standard deviation of Quest posterior pdf.
-
-    Get the sd of the threshold distribution.
-
-    This was converted from the Psychtoolbox's QuestSd function.
-    */
-    p = sum(pdf);
-    sd = Math.sqrt(sum(multA(pdf*expA(x,2)))/p-(sum(multA(pdf,x))/p)**2);
-    return sd;
-  }
-  
-  function simulate(tTest, tActual) {
-    /*
-    Simulate an observer with given Quest parameters.
-
-    response=QuestSimulate(q,intensity,tActual)
-
-    Simulate the response of an observer with threshold tActual.
-
-    This was converted from the Psychtoolbox's QuestSimulate function.
-    */
-    t = Math.min( Math.max(tTest-tActual, x2[0]), last(x2) );
-    response = interp(t,x2,p2) > random.random();
-    return response;
-  }
-  
-  function recompute() {
-    /*
-    Recompute the psychometric function & pdf.
-
-    Call this immediately after changing a parameter of the
-    psychometric function. recompute() uses the specified
-    parameters in 'self' to recompute the psychometric
-    function. It then uses the newly computed psychometric
-    function and the history in intensities and responses
-    to recompute the pdf. (recompute() does nothing if q.updatePdf
-    is False.)
-
-    This was converted from the Psychtoolbox's QuestRecompute function.
-    */
-    if (!updatePdf) {
-      return;
-    }
-    if (gamma > pThreshold) {
-      warn( `reducing gamma from ${gamma.toFixed(2)} to 0.5`)
-      gamma = 0.5;
-    }
-    i = range(-dim/2, dim/2+1);
-    x = mult(i, grain);
-    //pdf = expA(Math.E, expA(multA(-0.5, divA(x, tGuessSd)), 2));  // num.exp(-0.5*(x/tGuessSd)**2)
-    pdf = x.map(x => Math.exp(-0.5*(x/tGuessSd)**2));
-    pdf = divA(pdf, sum(pdf)); // self.pdf/num.sum(self.pdf)
-    i2 = range(-dim, dim+1);
-    x2 = multA(i2, grain);
-    //  p2 = delta*gamma+(1-delta)*(1-(1-gamma)*num.exp(-10**(beta*x2)))
-    p2 = x2.map(x => delta*gamma+(1-delta)*(1-(1-gamma)*Math.exp(-10**(beta*x))))
-    
-    if (p2[0] >= pThreshold || last(p2) <= pThreshold) {
-      throw `psychometric function range [${p2[0].toFixed(2)},${last(p2).toFixed(2)}] omits ${pThreshold.toFixed(2)} threshold`)
-    }
-    if (anyInfinite(p2)) {
-      throw "Psychometric function p2 is not finite";
-    }
-    if (anyInfinite(pdf)) {
-      throw "Prior pdf is not finite";
-    }
-    
-    let nonZeroIndices = nonzero(subA(p2.slice(1), p2.slice(0,-1))); // strictly monotonic subset
-    if (nonZeroIndices.length < 2) {
-      throw `Psychometric function has only ${nonZeroIndices.length} strictly monotonic points`;
-    }
-    
-    xThreshold = interp(pThreshold,p2.filter((v,i) => nonZeroIndices.contains(i)),x2.filter((v,i) => nonZeroIndices.contains(i)));
-    
-    //p2 = delta*gamma+(1-delta)*(1-(1-gamma)*numpy.exp(-10**(beta*(x2+xThreshold))));
-    p2 = x2.map(x => delta*gamma+(1-delta)*(1-(1-gamma)*Math.exp(-10**(beta*(x+xThreshold)))));
-    
-    if (anyInfinite(p2)) {
-      throw "Psychometric function p2 is not finite";
-    }
-    
-    s2 = [p2.map(v => 1-v).reverse(), p2.slice().reverse()];
-    
-    if (!intensities || !responses) {
-      intensities = [];
-      responses = [];
-    }
-    if (anyInfinite(s2)) {
-      throw "Psychometric function s2 is not finite";
-    }
-
-    let eps = 1e-14;
-
-    let pL = p2[0];
-    let pH = last(p2);
-    let pE = pH * Math.log(pH+eps) - pL * Math.log(pL+eps)+(1-pH+eps)*Math.log(1-pH+eps)-(1-pL+eps)*Math.log(1-pL+eps);
-    pE = 1/(1+Math.exp(pE/(pL-pH)));
-    
-    quantileOrder = (pE-pL)/(pH-pL);
-  
-    // recompute the pdf from the historical record of trials
-    
-    for (let [index, intensity] of intensities.entries()) {
+    setData: function(_intensities, _responses, options) {
+      options = Object.assign({
+        dim:500, 
+        recompute: true
+      }, options);
       
-      let response = responses[index];
+      intensities = _intensities;
+      responses = _responses;
       
-      intensity = Math.max(-1e10, Math.min(1e10, intensity)) // make intensity finite
+      dim = options.dim;
       
-      //let ii = pdf.length + i - Math.round((intensity-tGuess)/grain)-1;
-      
-      let ii = i.map(x => pdf.length + x - Math.round((intensity-tGuess)/grain)-1);
-      
-      if (ii[0] < 0) {
-        ii = ii.map(x => x-ii[0]);
-      }
-      if (last(ii) >= s2[1].length) {
-        ii = ii.map(x => x + s2[1].length - last(ii) - 1);
+      if (options.recompute) {
+        this.recompute();
       }
       
-      let iii = ii.map(x => Math.trunc(x)); // ii.astype(numpy.int_)
-      if (ii.some((x,i) => Math.abs(x-iii[i]) > (1e-05 + 1e-08 * iii[i]))) {    //numpy.allclose(ii,iii)
-        throw "Truncation error";
+    },
+    
+    betaAnalysis: function(outputFunc) {
+      /*
+      Analyze the quest function with beta as a free parameter.
+
+      It returns the mean estimates of alpha (as logC) and
+      beta. Gamma is left at whatever value the user fixed it at.
+      */
+      
+      outputFunc = outputFunc || console.log; 
+
+      let q2 = [];
+      
+      for (let i=1; i<=17; i++) { //in range(1,17)
+        let q_copy = init(tGuess, tGuessSd, pThreshold, 2 ** (i/4.0), delta, gamma, 0.02, range, options);
+        q_copy.setData(intensities.slice(), responses.slice(), 250);
+        q2.push(q_copy);
       }
-      //pdf = pdf * s2[response,iii];
-      pdf = mulA(pdf, s2[response].map((x, i) => x[iii[i]]));
-      if (normalizePdf && ii.map(x => x % 100).every(x => x == 0)) {
-        pdf = divA(pdf, sum(pdf)); // avoid underflow; keep the pdf normalized
+
+      let t2    = q2.map(d => d.mean());              //numpy.array([q2i.mean() for q2i in q2]) 
+      let p2    = q2.map((d, i) => d.pdfAt(t2[i]));  //numpy.array([q2i.pdfAt(t2i) for q2i,t2i in zip(q2,t2)])
+      let sd2   = q2.map(d => d.sd());                //numpy.array([q2i.sd() for q2i in q2])
+      let beta2 = q2.map(d => d.beta);                //numpy.array([q2i.beta for q2i in q2])
+      
+      let i = last(argsort(p2));
+      let t = t2[i];
+      let sd = q2[i].sd();
+      let p = sum(p2);
+      let betaMean = sum(mulA(p2,beta2))/p;
+      let betaSd = Math.sqrt(sum(mulA(p2,expA(beta2,2)))/p-(sum(mulA(p2,beta2))/p)**2);
+      let iBetaMean = sum(divA(p2,beta2))/p;
+      let iBetaSd = Math.sqrt(sum(divA(p2,expA(beta2,2)))/p-(sum(divA(p2,beta2))/p)**2);
+      
+      outputFunc('logC  sd    beta  sd    gamma');
+      outputFunc(t.toFixed(2) + "  " + sd.toFixed(2) + "  " + (1/iBetaMean).toFixed(2) + "  " + betaSd.toFixed(2) + "  " + gamma.toFixed(3));
+      
+    },
+
+    mean: function() {
+      /*
+      Mean of Quest posterior pdf.
+
+      Get the mean threshold estimate.
+      */
+      return tGuess + sum(mulA(pdf, x)) / sum(pdf);
+    },
+    
+    mode: function() {
+      /*
+      Mode of Quest posterior pdf.
+
+      let [t,p] = q.mode();
+      't' is the mode threshold estimate
+      'p' is the value of the (unnormalized) pdf at t.
+      */
+      let iMode = last(argsort(pdf));
+      p = pdf[iMode];
+      t = x[iMode] + tGuess;
+      return [t, p];
+    },
+    
+    p: function(x) {
+      /*
+      probability of correct response at intensity x.
+
+      p=q.p(x)
+
+      The probability of a correct (or yes) response at intensity x,
+      assuming threshold is at x=0.
+      */
+      if (x < x2[0]) {
+        return x2[0];
       }
-    }
-    if (normalizePdf) {
-      pdf = divA(pdf, sum(pdf)); // avoid underflow; keep the pdf normalized
-    }
-    if (anyInfinite(pdf)) {
-      throw "Prior PDF is not finite";
-    }
-  }
-  
-  function update(intensity, response) {
-    /*
-    Update Quest posterior pdf.
+      if (x > last(x2)) {
+        return last(x2);
+      }
+      return interpolate(x, x2, p2);
+    },
+    
+    pdfAt: function(t) {
+      /*       
+      The (unnormalized) probability density of candidate threshold 't'.
 
-    Update self to reflect the results of this trial. The
-    historical records intensities and responses are always
-    updated, but self.pdf is only updated if self.updatePdf is
-    true. You can always call QuestRecompute to recreate q.pdf
-    from scratch from the historical record.
+      This was converted from the Psychtoolbox's QuestPdf function.
+      */
+      let i = Math.round((t-tGuess)/grain) + 1 + dim/2;
+      i = Math.min(pdf.length, Math.max(1,i)) - 1;
+      p = pdf[i];
+      return p;
+    },
+    
+    quantile: function(_quantileOrder=null) {
+      /*
+      Get Quest recommendation for next trial level.
 
-    This was converted from the Psychtoolbox's QuestUpdate function.
-    */
+      intensity=q.quantile([quantileOrder])
 
-    if (response < 0 || response > s2[0].length) {
-      throw `response ${response} out of range 0 to ${s2[0].length}`;
-    }
-    if (updatePdf) {
-      inten = Math.max(-1e10, Math.min(1e10, intensity)); // make intensity finite
-      ii = i.map(x => pdf.length + x - Math.round((inten - tGuess) / grain) - 1);
-      if (ii[0] < 0 || last(ii) > s2[1].length) {
-        if (warnPdf) {
-          low = (1 - pdf.length - i[0]) * grain + tGuess;
-          high = (s2[1].length - pdf.length - last(i)) * grain + tGuess;
-          warn(`intensity ${intensity.toFixed(2)} out of range ${low.toFixed(2)} to ${high.toFixed(2)}. Pdf will be inexact.`);
-        }
-        if (ii[0]<0) {
+      Gets a quantile of the pdf in the struct q.  You may specify
+      the desired quantileOrder, e.g. 0.5 for median, or, making two
+      calls, 0.05 and 0.95 for a 90confidence interval.  If the
+      'quantileOrder' argument is not supplied, then it's taken from
+      the QuestObject instance. __init__() uses recompute() to
+      compute the optimal quantileOrder and saves that in the
+      QuestObject instance; this quantileOrder yields a quantile
+      that is the most informative intensity for the next trial.
+
+      This was converted from the Psychtoolbox's QuestQuantile function.
+      */
+      _quantileOrder = _quantileOrder || quantileOrder;
+      
+      p = cumsum(pdf);
+      
+      if (!isFinite(last(p))) {
+        throw "PDF is not finite";
+      }
+      if (last(p)==0) {
+        throw "PDF is all zero";
+      }
+      
+      let m1p = [-1].concat(p);
+      
+      let nonZeroIndices = nonzero(subA(p2.slice(1), p2.slice(0,-1)));
+      
+      if (nonZeroIndices.length < 2) {
+        throw `PDF has only ${index.length} nonzero point(s)`;
+      }
+      
+      let ires = interpolate(_quantileOrder*last(p), pick(p, nonZeroIndices), pick(x, nonZeroIndices))
+      
+      return tGuess + ires;
+    },
+    
+    sd: function() {
+      /*
+      Standard deviation of Quest posterior pdf.
+
+      Get the sd of the threshold distribution.
+
+      This was converted from the Psychtoolbox's QuestSd function.
+      */
+      p = sum(pdf);
+      sd = Math.sqrt(sum(mulA(pdf,expA(x,2)))/p-(sum(mulA(pdf,x))/p)**2);
+      return sd;
+    },
+    
+    simulate: function(tTest, tActual) {
+      /*
+      Simulate an observer with given Quest parameters.
+
+      response=QuestSimulate(q,intensity,tActual)
+
+      Simulate the response of an observer with threshold tActual.
+
+      This was converted from the Psychtoolbox's QuestSimulate function.
+      */
+      t = Math.min( Math.max(tTest-tActual, x2[0]), last(x2) );
+      response = interpolate(t,x2,p2) > Math.random() ? 1 : 0;
+      return response;
+    },
+    
+    recompute: function() {
+      /*
+      Recompute the psychometric function & pdf.
+
+      Call this immediately after changing a parameter of the
+      psychometric function. recompute() uses the specified
+      parameters in 'self' to recompute the psychometric
+      function. It then uses the newly computed psychometric
+      function and the history in intensities and responses
+      to recompute the pdf. (recompute() does nothing if q.updatePdf
+      is False.)
+
+      This was converted from the Psychtoolbox's QuestRecompute function.
+      */
+      if (!options.updatePdf) {
+        return;
+      }
+      if (gamma > pThreshold) {
+        warn( `reducing gamma from ${gamma.toFixed(2)} to 0.5`)
+        gamma = 0.5;
+      }
+      i = rangeArr(-dim/2, dim/2+1);
+      x = mulA(i, grain);
+      //pdf = expA(Math.E, expA(mulA(-0.5, divA(x, tGuessSd)), 2));  // num.exp(-0.5*(x/tGuessSd)**2)
+      pdf = x.map(x => Math.exp(-0.5*(x/tGuessSd)**2));
+      pdf = divA(pdf, sum(pdf)); // self.pdf/num.sum(self.pdf)
+      i2 = rangeArr(-dim, dim+1);
+      x2 = mulA(i2, grain);
+      //  p2 = delta*gamma+(1-delta)*(1-(1-gamma)*num.exp(-10**(beta*x2)))
+      p2 = x2.map(x => delta*gamma+(1-delta)*(1-(1-gamma)*Math.exp(-(10**(beta*x)))))
+      
+      if (p2[0] >= pThreshold || last(p2) <= pThreshold) {
+        throw `psychometric function range [${p2[0].toFixed(2)},${last(p2).toFixed(2)}] omits ${pThreshold.toFixed(2)} threshold`;
+      }
+      if (anyInfinite(p2)) {
+        throw "Psychometric function p2 is not finite";
+      }
+      if (anyInfinite(pdf)) {
+        throw "Prior pdf is not finite";
+      }
+      
+      let nonZeroIndices = nonzero(subA(p2.slice(1), p2.slice(0,-1))); // strictly monotonic subset
+      if (nonZeroIndices.length < 2) {
+        throw `Psychometric function has only ${nonZeroIndices.length} strictly monotonic points`;
+      }
+      
+      xThreshold = interpolate(pThreshold,pick(p2, nonZeroIndices),pick(x2, nonZeroIndices));
+      
+      //p2 = delta*gamma+(1-delta)*(1-(1-gamma)*numpy.exp(-10**(beta*(x2+xThreshold))));
+      p2 = x2.map(x => delta*gamma+(1-delta)*(1-(1-gamma)*Math.exp(-(10**(beta*(x+xThreshold))))));
+      
+      if (anyInfinite(p2)) {
+        throw "Psychometric function p2 is not finite";
+      }
+      
+      s2 = [p2.map(v => 1-v).reverse(), p2.slice().reverse()];
+      
+      if (!intensities || !responses) {
+        intensities = [];
+        responses = [];
+      }
+      if (anyInfinite(s2)) {
+        throw "Psychometric function s2 is not finite";
+      }
+
+      let eps = 1e-14;
+
+      let pL = p2[0];
+      let pH = last(p2);
+      let pE = pH * Math.log(pH+eps) - pL * Math.log(pL+eps)+(1-pH+eps)*Math.log(1-pH+eps)-(1-pL+eps)*Math.log(1-pL+eps);
+      pE = 1/(1+Math.exp(pE/(pL-pH)));
+      
+      quantileOrder = (pE-pL)/(pH-pL);
+    
+      // recompute the pdf from the historical record of trials
+      
+      for (let [index, intensity] of intensities.entries()) {
+        
+        let response = responses[index];
+        
+        intensity = Math.max(-1e10, Math.min(1e10, intensity)) // make intensity finite
+        
+        //let ii = pdf.length + i - Math.round((intensity-tGuess)/grain)-1;
+        
+        let ii = i.map(x => pdf.length + x - Math.round((intensity-tGuess)/grain)-1);
+        
+        if (ii[0] < 0) {
           ii = ii.map(x => x-ii[0]);
         }
-        else {
+        if (last(ii) >= s2[1].length) {
           ii = ii.map(x => x + s2[1].length - last(ii) - 1);
         }
+        
+        let iii = ii.map(x => Math.trunc(x)); // ii.astype(numpy.int_)
+        if (ii.some((x,i) => Math.abs(x-iii[i]) > (1e-05 + 1e-08 * iii[i]))) {    //numpy.allclose(ii,iii)
+          throw "Truncation error";
+        }
+        //pdf = pdf * s2[response,iii];
+        pdf = mulA(pdf, iii.map(i => s2[response][i]));
+        if (options.normalizePdf && ii.map(x => x % 100).every(x => x == 0)) {
+          pdf = divA(pdf, sum(pdf)); // avoid underflow; keep the pdf normalized
+        }
       }
-      let iii = ii.map(x => Math.trunc(x)); // ii.astype(numpy.int_)
-      if (ii.some((x,i) => Math.abs(x-iii[i]) > (1e-05 + 1e-08 * iii[i]))) {    //numpy.allclose(ii,iii)
-        throw "Truncation error";
+      if (options.normalizePdf) {
+        pdf = divA(pdf, sum(pdf)); // avoid underflow; keep the pdf normalized
       }
-      //pdf = pdf * s2[response, iii];
-      pdf = mulA(pdf, s2[response].map((x, i) => x[iii[i]]));
-      
-      if (normalizePdf) {
-      pdf = divA(pdf, sum(pdf));
+      if (anyInfinite(pdf)) {
+        throw "Prior PDF is not finite";
       }
+    },
+    
+    update: function(intensity, response) {
+      /*
+      Update Quest posterior pdf.
+
+      Update self to reflect the results of this trial. The
+      historical records intensities and responses are always
+      updated, but self.pdf is only updated if self.updatePdf is
+      true. You can always call QuestRecompute to recreate q.pdf
+      from scratch from the historical record.
+
+      This was converted from the Psychtoolbox's QuestUpdate function.
+      */
+
+      if (response < 0 || response > s2.length-1) { // CHECK - should be s2.length?
+        throw `response ${response} out of range 0 to ${s2.length-1}`;
+      }
+      if (options.updatePdf) {
+        inten = Math.max(-1e10, Math.min(1e10, intensity)); // make intensity finite
+        ii = i.map(x => pdf.length + x - Math.round((inten - tGuess) / grain) - 1);
+        if (ii[0] < 0 || last(ii) > s2[1].length) {
+          if (options.warnPdf) {
+            low = (1 - pdf.length - i[0]) * grain + tGuess;
+            high = (s2[1].length - pdf.length - last(i)) * grain + tGuess;
+            warn(`intensity ${intensity.toFixed(2)} out of range ${low.toFixed(2)} to ${high.toFixed(2)}. Pdf will be inexact.`);
+          }
+          if (ii[0]<0) {
+            ii = ii.map(x => x-ii[0]);
+          }
+          else {
+            ii = ii.map(x => x + s2[1].length - last(ii) - 1);
+          }
+        }
+        let iii = ii.map(x => Math.trunc(x)); // ii.astype(numpy.int_)
+        if (ii.some((x,i) => Math.abs(x-iii[i]) > (1e-05 + 1e-08 * iii[i]))) {    //numpy.allclose(ii,iii)
+          throw "Truncation error";
+        }
+        //pdf = pdf * s2[response, iii];
+        pdf = mulA(pdf, iii.map(i => s2[response][i]));
+        
+        if (options.normalizePdf) {
+          pdf = divA(pdf, sum(pdf));
+        }
+      }
+      // keep a historical record of the trials
+      intensities.push(intensity);
+      responses.push(response);
     }
-    // keep a historical record of the trials
-    intensities.push(intensity);
-    responses.push(response);
   }
+  
+  quest.recompute();
+  
+  return quest;
 }
 
-function demo() {
+init.demo = function(tActual, tGuess, tGuessSd=2.0, pThreshold=0.75) {
   /*
   Demo script for Quest routines.
 
@@ -587,29 +624,9 @@ function demo() {
   */
 
   console.log('The intensity scale is abstract, but usually we think of it as representing log contrast.');
-
-  let tActual = null;
-  while (tActual === null) {
-    sys.stdout.write('Specify true threshold of simulated observer: ')
-    input = raw_input()
-    try:
-      tActual = float(input)
-    except Exception:
-      pass
-  }
+  console.log('True threshold of simulated observer: ' + tActual);
+  console.log('Estimated threshold: ' + tGuess);
   
-  let tGuess = null;
-  while (tGuess === null) {
-    sys.stdout.write('Estimate threshold: ')
-    input = raw_input()
-    try:
-      tGuess = float(input)
-    except Exception:
-      pass
-  }
-  
-  let tGuessSd = 2.0; // sd of Gaussian before clipping to specified range
-  let pThreshold = 0.82;
   let beta = 3.5;
   let delta = 0.01;
   let gamma = 0.5;
@@ -617,9 +634,8 @@ function demo() {
   q = init(tGuess, tGuessSd, pThreshold, beta, delta, gamma);
 
   // Simulate a series of trials.
-  let trialsDesired = 100;
+  let trialsDesired = 40;
   let wrongRight = ['wrong', 'right'];
-  timeZero = Date.now();
   
   for (let k=0; k < trialsDesired; k++) {
     // Get recommended level.  Choose your favorite algorithm.
@@ -627,21 +643,16 @@ function demo() {
     //tTest=q.mean()
     //tTest=q.mode()
 
-    tTest = tTest + random.choice([-0.1,0,0.1]);
+    //tTest = tTest + ([-0.1,0,0.1][Math.floor(Math.random()*3)]); // random choice
 
     // Simulate a trial
-    let timeSplit = Date.now(); // omit simulation and printing from reported time/trial.
     let response = q.simulate(tTest,tActual);
-    console.log(`Trial ${k+1} at ${tTest.toFixed(1)} is ${wrongRight[+response]}`);
-    timeZero = timeZero + Date.now() - timeSplit;
+    console.log(`Trial ${k+1} at ${tTest.toFixed(2)} is ${wrongRight[+response]}`);
 
     // Update the pdf
     q.update(tTest, response);
   }
   
-  // Print results of timing.
-  console.log((Date.now()-timeZero)/trialsDesired) + ' ms/trial');
-
   // Get final estimate.
   t = q.mean();
   sd = q.sd();
@@ -652,8 +663,12 @@ function demo() {
   console.log('\nQuest beta analysis. Beta controls the steepness of the Weibull function.\n');
   
   console.log('Now re-analyzing with beta as a free parameter ...');
-  q.beta_analysis();
+  q.betaAnalysis();
+  console.log();
   console.log('Actual parameters of simulated observer:');
   console.log('logC  beta  gamma');
-  console.log(tActual.toFixed(2) + " " + q.beta.toFixed(2) + " " + q.gamma.toFixed(2));
+  console.log(tActual.toFixed(2) + "  " + q.beta.toFixed(2) + "  " + q.gamma.toFixed(2));
 }
+
+
+module.exports = init;
