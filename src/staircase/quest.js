@@ -410,13 +410,7 @@ function init(tGuess, tGuessSd, pThreshold, beta=3.5, delta=0.01, gamma=0.5, gra
     
     simulate: function(tTest, tActual) {
       /*
-      Simulate an observer with given Quest parameters.
-
-      response=QuestSimulate(q,intensity,tActual)
-
-      Simulate the response of an observer with threshold tActual.
-
-      This was converted from the Psychtoolbox's QuestSimulate function.
+      Simulate the response of an observer with threshold tActual to a stimulus intensity tTest.
       */
       t = Math.min( Math.max(tTest-tActual, x2[0]), last(x2) );
       response = interpolate(t,x2,p2) > Math.random() ? 1 : 0;
@@ -588,7 +582,13 @@ function init(tGuess, tGuessSd, pThreshold, beta=3.5, delta=0.01, gamma=0.5, gra
   return quest;
 }
 
-init.demo = function(tActual, tGuess, tGuessSd=2.0, pThreshold=0.75) {
+function pad0(val, size) {
+  val = val.toString();
+  while (val.length < size) val = "0" + val;
+  return val;
+}
+
+init.demo = function(options) {
   /*
   Demo script for Quest routines.
 
@@ -623,51 +623,65 @@ init.demo = function(tActual, tGuess, tGuessSd=2.0, pThreshold=0.75) {
   psychometric method. Percept Psychophys, 33 (2), 113-20.
   */
 
-  console.log('The intensity scale is abstract, but usually we think of it as representing log contrast.');
-  console.log('True threshold of simulated observer: ' + tActual);
-  console.log('Estimated threshold: ' + tGuess);
+  options = Object.assign({
+    actualThreshold: 1.0,
+    estimatedThreshold: 1.2,
+    estimateSd: 2.0,
+    thresholdCriterion: 0.75,
+    beta: 3.5,
+    delta: 0.01,
+    gamma: 0.5,
+    numTrials: 100
+  }, options);
   
-  let beta = 3.5;
-  let delta = 0.01;
-  let gamma = 0.5;
+  //console.log('The intensity scale is abstract, but usually we think of it as representing log contrast.');
+  console.log();
+  console.log('-------------------- QUEST Demo Run --------------------');
+  console.log('True threshold of simulated observer: ' + options.actualThreshold);
+  console.log();
+  console.log('Estimated threshold: ' + options.estimatedThreshold);
+  console.log('Standard deviation of estimate: ' + options.estimateSd);
+  console.log();
+  console.log('Threshold criterion (prob. of correct resp.): ' + options.thresholdCriterion);
+  console.log('Beta (steepness of psychometric function): ' + options.beta);
+  console.log('Delta (fraction of random answers): ' + options.delta);
+  console.log('Gamma (fraction of correct answers at 0 intensity): ' + options.delta);
+  console.log('--------------------------------------------------------');
+  console.log();
   
-  q = init(tGuess, tGuessSd, pThreshold, beta, delta, gamma);
+  q = init(options.estimatedThreshold, options.estimateSd, options.thresholdCriterion, options.beta, options.delta, options.gamma);
 
   // Simulate a series of trials.
-  let trialsDesired = 40;
   let wrongRight = ['wrong', 'right'];
   
-  for (let k=0; k < trialsDesired; k++) {
+  for (let k=0; k < options.numTrials; k++) {
+    
     // Get recommended level.  Choose your favorite algorithm.
     let tTest = q.quantile()
     //tTest=q.mean()
     //tTest=q.mode()
 
-    //tTest = tTest + ([-0.1,0,0.1][Math.floor(Math.random()*3)]); // random choice
+    // random choice of deviation from suggested intensity
+    //tTest = tTest + ([-0.1,0,0.1][Math.floor(Math.random()*3)]); 
 
     // Simulate a trial
-    let response = q.simulate(tTest,tActual);
-    console.log(`Trial ${k+1} at ${tTest.toFixed(2)} is ${wrongRight[+response]}`);
+    let response = q.simulate(tTest, options.actualThreshold);
 
     // Update the pdf
     q.update(tTest, response);
+
+    console.log(`Trial ${pad0(k+1,2)} at ${tTest.toFixed(2)} is ${wrongRight[+response]} → estimate ${q.mean().toFixed(2)} ± ${q.sd().toFixed(2)}`);
   }
   
-  // Get final estimate.
-  t = q.mean();
-  sd = q.sd();
   
-  console.log(`Mean threshold estimate is ${t.toFixed(2)} +/- ${sd.toFixed(2)}`);
-  //t=QuestMode(q);
-  //console.log('Mode threshold estimate is %4.2f'%t)
-  console.log('\nQuest beta analysis. Beta controls the steepness of the Weibull function.\n');
-  
-  console.log('Now re-analyzing with beta as a free parameter ...');
+  console.log();
+  console.log('Re-analyzing with beta as a free parameter ...');
   q.betaAnalysis();
+  
   console.log();
   console.log('Actual parameters of simulated observer:');
   console.log('logC  beta  gamma');
-  console.log(tActual.toFixed(2) + "  " + q.beta.toFixed(2) + "  " + q.gamma.toFixed(2));
+  console.log(options.actualThreshold.toFixed(2) + "  " + q.beta.toFixed(2) + "  " + q.gamma.toFixed(2));
 }
 
 
