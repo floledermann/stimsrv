@@ -30,7 +30,7 @@ app.locals.roles = {};
 app.locals.experiment = experiment;
 app.locals.experimentIndex = 0;
 app.locals.currentExperiment = experiment.experiments[0];
-app.locals.currentCondition = app.locals.currentExperiment.controller.nextCondition(null,null,[],[]);
+app.locals.currentCondition = app.locals.currentExperiment.controller.nextCondition();
 app.locals.currentResponse = null;
 app.locals.conditions = [];
 app.locals.responses = [];
@@ -100,7 +100,15 @@ io.on("connection", (socket) => {
       }
       else {
         app.locals.experimentIndex++;
+        
+        if (app.locals.experimentIndex == app.locals.experiment.experiments.length) {
+          app.locals.experimentIndex = 0;
+        }
+        
         if (app.locals.experimentIndex < app.locals.experiment.experiments.length) {
+          
+          console.log("Next Experiment: " + app.locals.experimentIndex);
+          
           app.locals.currentExperiment = app.locals.experiment.experiments[app.locals.experimentIndex];
           app.locals.responses = [];
           app.locals.conditions = [];

@@ -7202,6 +7202,8 @@ function clientFactory(options) {
       });
       
       this.subscribeEvent("experiment start", data => {
+        console.log("Start experiment: " + data.experimentIndex);
+        console.log(data.condition);
         let trial = experiment.experiments[data.experimentIndex];
         if (data.experimentIndex !== experimentIndex) {
           experimentIndex = data.experimentIndex;

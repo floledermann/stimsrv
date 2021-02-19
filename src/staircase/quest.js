@@ -296,8 +296,8 @@ function init(tGuess, tGuessSd, pThreshold, beta=3.5, delta=0.01, gamma=0.5, gra
       let iBetaMean = sum(divA(p2,beta2))/p;
       let iBetaSd = Math.sqrt(sum(divA(p2,expA(beta2,2)))/p-(sum(divA(p2,beta2))/p)**2);
       
-      outputFunc('logC  sd    beta  sd    gamma');
-      outputFunc(t.toFixed(2) + "  " + sd.toFixed(2) + "  " + (1/iBetaMean).toFixed(2) + "  " + betaSd.toFixed(2) + "  " + gamma.toFixed(3));
+      outputFunc('logC  sd    beta  sd-beta  gamma');
+      outputFunc(t.toFixed(2) + "  " + sd.toFixed(2) + "  " + (1/iBetaMean).toFixed(2) + "  " + betaSd.toFixed(2) + "     " + gamma.toFixed(3));
       
     },
 
@@ -607,8 +607,6 @@ init.demo = function(options) {
   each trial is at the best QUANTILE, and the final estimate is at
   the MEAN of the posterior pdf.
 
-  This was converted from the Psychtoolbox's QuestDemo function.
-
   King-Smith, P. E., Grigsby, S. S., Vingrys, A. J., Benes, S. C.,
   and Supowit, A.  (1994) Efficient and unbiased modifications of
   the QUEST threshold method: theory, simulations, experimental
@@ -631,7 +629,8 @@ init.demo = function(options) {
     beta: 3.5,
     delta: 0.01,
     gamma: 0.5,
-    numTrials: 100
+    numTrials: 100,
+    method: "ideal" // "ideal", "mean" or "mode"
   }, options);
   
   //console.log('The intensity scale is abstract, but usually we think of it as representing log contrast.');
@@ -657,9 +656,18 @@ init.demo = function(options) {
   for (let k=0; k < options.numTrials; k++) {
     
     // Get recommended level.  Choose your favorite algorithm.
-    let tTest = q.quantile()
-    //tTest=q.mean()
-    //tTest=q.mode()
+    let tTest;
+
+    if (options.method == "mean") {
+      tTest=q.mean()
+    }
+    else if (options.method == "mode") {
+      tTest=q.mode()
+    }
+    else {
+      // default "ideal"
+      tTest = q.quantile()
+    }
 
     // random choice of deviation from suggested intensity
     //tTest = tTest + ([-0.1,0,0.1][Math.floor(Math.random()*3)]); 
@@ -669,8 +677,17 @@ init.demo = function(options) {
 
     // Update the pdf
     q.update(tTest, response);
+    
+    let estimate;
+    
+    if (options.method == "mode") {
+      estimate = q.mode();
+    }
+    else {
+      estimate = q.mean();
+    }
 
-    console.log(`Trial ${pad0(k+1,2)} at ${tTest.toFixed(2)} is ${wrongRight[+response]} → estimate ${q.mean().toFixed(2)} ± ${q.sd().toFixed(2)}`);
+    console.log(`Trial ${pad0(k+1,2)} at ${tTest.toFixed(2)} is ${wrongRight[+response]} → estimate ${estimate.toFixed(2)} ± ${q.sd().toFixed(2)}`);
   }
   
   

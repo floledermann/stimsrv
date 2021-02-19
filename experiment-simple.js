@@ -20,11 +20,14 @@ const snellen = require("./src/experiments/snellen.js");
 const bangbox = require("./src/experiments/bangbox.js");
 const pause = require("./src/experiments/pause.js");
 
+const staircase = require("./src/staircase/staircase.js");
+const random = require("./src/staircase/random.js");
+
 // this is a complete configuration
 module.exports = {
   
   name: "Simple Test Experiment",
-  
+    
   devices: [
     {
       name: "Main PC",
@@ -85,11 +88,25 @@ module.exports = {
       monitormessage: "Press Start or hit any key to start the experiment.",
       buttonlabel: "Start"
     }),
-    bangbox(),
+    //bangbox(),
     snellen({
-      angle: [0,90,180,270],
-      size: [20,18,16,14,12,10]
+      angle: random([0,90,180,270]),
+      size: staircase({
+        startValue: 10,
+        stepSize: 4,
+        stepType: "db", // "lin", "log", "db", "mul"
+        minReversals: 3,
+        //minValue: 
+        //maxValue:
+      })
+    }),
+    pause({
+      buttondisplay: "control",
+      displaymessage: "The experiment has ended. Thank you for your participation!",
+      monitormessage: "Experiment ended.",
+      buttonlabel: "Restart"
     })
+    
   ]
   
 }
