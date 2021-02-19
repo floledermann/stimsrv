@@ -5,9 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve-dev": "nodemon --ignore static -e js,json,html server.js ./experiment-simple.js",
+    "watch-server": "nodemon --ignore static -e js,json,html server.js ./experiment-simple.js",
+    "watch-client": "nodemon --ignore static -e js --exec 'npm run build-client'",
+    "watch-experiment": "nodemon --ignore static -e js --exec 'npm run build-experiment'",
     "debug-server": "node --inspect-brk server.js ./experiment-simple.js",
-    "watch-client": "nodemon --watch src -e js --exec 'npm run build-client'",
     "build-client": "browserify -r ./src/clients/browser/client-browser.js:stimsrvClient -s stimsrvClient -o static/client-browser.js",
     "build-experiment": "browserify -r ./experiment-simple.js:experiment -s experiment -o static/experiment.js"
   },
