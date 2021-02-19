@@ -32,7 +32,8 @@
     "mri": "1.1.6",
     "nunjucks": "3.2.2",
     "socket.io": "3.1.0",
-    "socket.io-client": "^3.1.1"
+    "socket.io-client": "3.1.1",
+    "another-dimension": "floledermann/another-dimension"
   },
   "devDependencies": {
     "nodemon": "2.0.7"
