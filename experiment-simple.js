@@ -92,7 +92,7 @@ module.exports = {
     snellen({
       angle: random([0,90,180,270]),
       size: staircase({
-        startValue: 10,
+        startValue: "10mm",
         stepSize: 4,
         stepType: "db", // "lin", "log", "db", "mul"
         minReversals: 3,

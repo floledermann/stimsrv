@@ -1,4 +1,7 @@
 
+
+const Dimension = require("another-dimension");
+
 module.exports = function(ctx, condition, options) {
   
   condition = Object.assign({
@@ -7,6 +10,8 @@ module.exports = function(ctx, condition, options) {
     middleBar: true
     // foregroundColor/backgroundColor are handled by caller!
   }, condition);
+  
+  condition.size = Dimension(condition.size, "px").toNumber("px");
     
   ctx.rotate(condition.angle / 180 * Math.PI);
     

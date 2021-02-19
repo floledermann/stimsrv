@@ -103,6 +103,7 @@ io.on("connection", (socket) => {
         
         if (app.locals.experimentIndex == app.locals.experiment.experiments.length) {
           app.locals.experimentIndex = 0;
+          // TODO: control looping behaviour, store data etc.
         }
         
         if (app.locals.experimentIndex < app.locals.experiment.experiments.length) {
