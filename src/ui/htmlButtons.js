@@ -1,7 +1,7 @@
 
 const valOrFunc = require("../util/valOrFunc.js");
 
-module.exports = function(labels, options) {
+module.exports = function(buttonDefs, options) {
   
   options = Object.assign({
     wrapperTag: "div",
@@ -12,8 +12,8 @@ module.exports = function(labels, options) {
   }, options);
   
   // single string -> convert to array
-  if (typeof labels != 'function' && !Array.isArray(labels)) {
-    labels = [labels];
+  if (typeof buttonDefs != 'function' && !Array.isArray(buttonDefs)) {
+    buttonDefs = [buttonDefs];
   }
   
   let client = null;
@@ -35,14 +35,14 @@ module.exports = function(labels, options) {
     
     render: function(condition) {
       
-      let _labels = valOrFunc.array(labels, condition);
+      let _buttonDefs = valOrFunc.array(buttonDefs, condition);
       
       //TODO: check if change/rerender is needed
       wrapper.innerHTML = "";
-      for (let [index, label] of _labels.entries()) {
+      for (let [index, buttonDef] of _buttonDefs.entries()) {
         
         let el = document.createElement(options.buttonTag);
-        el.innerHTML = valOrFunc(label, condition);
+        el.innerHTML = valOrFunc(buttonDef.label || buttonDef, condition);
         
         let evt = options.buttonEvent;
         
@@ -57,17 +57,17 @@ module.exports = function(labels, options) {
             // should we make this ocnfigruable?
             e.preventDefault();
             
-            client.response({label: label});
+            client.response(buttonDef.response || {label: buttonDef.label});
             
             if (options.broadcastEvents) {
               if (Array.isArray(options.broadcastEvents)) {
                 let evt = options.broadcastEvents[index];
                 if (evt) {
-                  broadcastVal(client, valOrFunc(evt,condition,label,index));
+                  broadcastVal(client, valOrFunc(evt,condition,buttonDef,index));
                 }
               }
               else {
-                broadcastVal(client, valOrFunc(options.broadcastEvents,condition,label,index));
+                broadcastVal(client, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
               }
             }
           });

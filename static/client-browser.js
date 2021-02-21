@@ -7163,10 +7163,13 @@ function clientFactory(options) {
     },
     
     response: function(data) {
-      data.experimentIndex = experimentIndex;
-      data.clientTimestamp = Date.now();
-      data.clientTimestampAdjust = clientTimestampAdjust;
-      this.event("response", data);
+      let msg = {
+        experimentIndex: experimentIndex,
+        clientTimestamp: Date.now(),
+        clientTimestampAdjust: clientTimestampAdjust,
+        response: data
+      }
+      this.event("response", msg);
     },
 
     nextExperiment: function() {

@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
     console.log("Received message: " + messageType);
     console.log(data);
     if (messageType == "response") {
-      app.locals.currentResponse = data;
+      app.locals.currentResponse = data.response;
       app.locals.responses.push(app.locals.currentResponse);
       // default controller
       let controller = app.locals.currentExperiment.controller || nextOnResponse();

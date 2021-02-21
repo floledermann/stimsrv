@@ -26,7 +26,12 @@ module.exports = function(parameters, options) {
     description: "Snellen-E visual acuity test", 
     interfaces: {
       display: renderer,
-      response: htmlButtons(["Left","Up","Down","Right"]),
+      response: htmlButtons([
+        {label: "Left", response: {angle: 180}},
+        {label: "Up", response: {angle: 270}},
+        {label: "Down", response: {angle: 90}},
+        {label: "Right", response: {angle: 0}}
+      ]),
       monitor: renderer,
       control: null,
     },
