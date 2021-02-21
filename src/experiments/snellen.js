@@ -12,7 +12,8 @@ module.exports = function(parameters, options) {
     foregroundColor: "#ffffff",
     angle: 0,
     size: "10mm",
-    middleBar: true
+    middleBar: true,
+    pixelAlign: true
   }, parameters);
 
   options = Object.assign({

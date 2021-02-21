@@ -91,10 +91,11 @@ module.exports = {
     //bangbox(),
     snellen({
       angle: random([0,90,180,270]),
+      pixelAlign: true,
       size: staircase({
         startValue: "10mm",
-        stepSize: 4,
-        stepType: "db", // "lin", "log", "db", "mul"
+        stepSize: 1.2,
+        stepType: "multiply",
         minReversals: 3,
         //minValue: 
         //maxValue:
