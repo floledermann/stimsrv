@@ -1,21 +1,24 @@
 
 const Dimension = require("another-dimension");
 
+const matchProperties = require("../util/matchProperties.js");
+
 module.exports = function(options) {
   
   options = Object.assign({
-    //startValue:
-    stepSize: 4,
+    startValue: 1,
+    stepSize: 2,
     stepType: "db", // "linear", "log", "db", "multiply"
-    //minReversals:
+    minReversals: 3,
     minTrials: 0,
     numIncorrectReverse: 1,
     numCorrectReverse: 3,
     initialSingleReverse: true,
-    //minValue: 
-    //maxValue:,
+    minValue: -Infinity,
+    maxValue: Infinity,
     minReversals: 3,
-    minTrials: 0
+    minTrials: 0,
+    isResponseCorrect: matchProperties
   }, options);
   
   if (!options.startValue) {
@@ -57,7 +60,9 @@ module.exports = function(options) {
   }
   
   return {
-    // return next condition, or null for end of experiment
+    // Generator interface
+    // If there is a next intensity, return { value: nextIntensity, done: false }
+    // When finished, return { done: true }
     next: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
       
       let currentIntensity = nextIntensity;
@@ -68,8 +73,10 @@ module.exports = function(options) {
       if (!lastResponse) {
         return { value: currentIntensity, done: false }
       }
-          
-      if (lastResponse.correct) {
+      
+      let correct = options.isResponseCorrect(lastCondition, lastResponse);
+      
+      if (correct) {
         correctCounter++;
       }
       else {
@@ -80,7 +87,7 @@ module.exports = function(options) {
       
       if (reversalIntensities.lengt == 0 && options.initialSingleReverse) {
         
-        if (lastResponse.correct) {
+        if (correct) {
           if (direction == "up") {
             reversal = true;
           }
