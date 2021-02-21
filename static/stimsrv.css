@@ -40,6 +40,12 @@ body {
   justify-content: center;
 }
 
+.content {
+  white-space: pre;
+  text-align: center;
+  line-height: 1.7;
+}
+
 .buttons {
   display: flex;
   flex: 1;
