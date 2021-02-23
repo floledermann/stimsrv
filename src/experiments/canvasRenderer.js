@@ -9,6 +9,7 @@ module.exports = function(renderFunc, options) {
     height: null,  // height in layout pixels, default: use parent height
     minimumIntensityColor: "#000000",
     maximumIntensityColor: "#ffffff",
+    centerIntensity: 0.5,
     gamma: 2.2
   });
   
@@ -50,7 +51,7 @@ module.exports = function(renderFunc, options) {
     render: function(condition) {
       condition = Object.assign({
         contrastRatio: 1.0,           // maximum contrast based on minimumIntensityColor, maximumIntensityColor
-        stimulusIntensityHigh: true,  // high intensity (bright) stimulus on low intensity background.
+        foregroundIntensityHigh: true,  // high intensity (bright) stimulus on low intensity background.
         rotate: 0
       }, condition);
       
@@ -59,7 +60,7 @@ module.exports = function(renderFunc, options) {
       let foregroundColor;
       let backgroundColor;
       
-      if (condition.stimulusIntensityHigh) {
+      if (condition.foregroundIntensityHigh) {
         foregroundColor = colorInterpolator((condition.contrastRatio + 1) / 2);
         backgroundColor = colorInterpolator((1 - condition.contrastRatio) / 2);
       }

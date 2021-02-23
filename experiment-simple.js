@@ -118,6 +118,7 @@ module.exports = {
       rotate: random([-2,+2]), // add random rotation to prevent aliasing
       pixelAlign: false,
       contrastRatio: 0.05,
+      foregroundIntensityHigh: true,
       size: staircase({
         startValue: "5mm",
         stepSize: 1.2,
