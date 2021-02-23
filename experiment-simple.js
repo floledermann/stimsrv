@@ -127,7 +127,7 @@ module.exports = {
     }),
     pause({
       buttondisplay: "control",
-      displaymessage: "The experiment has ended.\nThank you for your participation!",
+      displaymessage: "The experiment was completed successfully.\nThank you for your participation!",
       monitormessage: "Experiment ended.",
       buttonlabel: "Restart"
     })
