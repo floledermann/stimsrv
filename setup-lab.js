@@ -29,7 +29,7 @@ module.exports = {
         screen({
           pixelsize: "1199x1584", // TODO: check usable pixel size in browser
           pixeldensity: 301,
-          viewingdistance: "natural-handheld"
+          viewingdistance: "handheld"
         })
       ],
       inputs: [
@@ -41,9 +41,9 @@ module.exports = {
       id: "xperia",
       outputs: [
         screen({
-          pixelsize: "puhd",
+          pixelsize: "uhd",
           pixeldensity: 801,
-          viewingdistance: "natural-handheld"
+          viewingdistance: "handheld"
         }),
         "audio",
         "vibrate"
@@ -62,9 +62,9 @@ module.exports = {
       ip: "192.168.0.37",
       outputs: [
         screen({
-          pixelsize: "phd",
+          pixelsize: "hd",
           pixeldensity: 440,
-          viewingdistance: "natural-handheld"
+          viewingdistance: "handheld"
         }),
         "audio"
       ],
