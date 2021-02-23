@@ -8,19 +8,18 @@ const renderSnellen = require("./renderSnellen.js");
 module.exports = function(parameters, options) {
   
   parameters = Object.assign({
-    backgroundColor: "#000000",
-    foregroundColor: "#ffffff",
     angle: 0,
     size: "10mm",
     middleBar: true,
-    pixelAlign: true
+    pixelAlign: true,
+    contrastRatio: 1.0
   }, parameters);
 
   options = Object.assign({
   }, options);
   
   
-  let renderer = canvasRenderer(renderSnellen);
+  let renderer = canvasRenderer(renderSnellen, options);
   
   return {
     name: "snellen",

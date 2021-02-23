@@ -1,15 +1,22 @@
 
 const Dimension = require("another-dimension");
+const d3 = require("d3-interpolate");
+
 module.exports = function(renderFunc, options) {
   
   options = Object.assign({
     width: null,  // width in layout pixels, default: use parent width
-    height: null  // height in layout pixels, default: use parent height
+    height: null,  // height in layout pixels, default: use parent height
+    minimumIntensityColor: "#000000",
+    maximumIntensityColor: "#ffffff",
+    gamma: 2.2
   });
   
   let ctx = null;
   let width = null;
   let height = null;
+  
+  let colorInterpolator = d3.interpolateRgb.gamma(options.gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
   
   return {
     initialize: function(client, parent, document) {
@@ -42,17 +49,30 @@ module.exports = function(renderFunc, options) {
     // contract: if render() returns a string or element, then replace the parent content
     render: function(condition) {
       condition = Object.assign({
-        backgroundColor: "#000000",
-        foregroundColor: "#ffffff",
+        contrastRatio: 1.0,           // maximum contrast based on minimumIntensityColor, maximumIntensityColor
+        stimulusIntensityHigh: true,  // high intensity (bright) stimulus on low intensity background.
         rotate: 0
       }, condition);
       
       ctx.resetTransform();
-      ctx.fillStyle = condition.backgroundColor;
+      
+      let foregroundColor;
+      let backgroundColor;
+      
+      if (condition.stimulusIntensityHigh) {
+        foregroundColor = colorInterpolator((condition.contrastRatio + 1) / 2);
+        backgroundColor = colorInterpolator((1 - condition.contrastRatio) / 2);
+      }
+      else {
+        foregroundColor = colorInterpolator((1 - condition.contrastRatio) / 2);
+        backgroundColor = colorInterpolator((condition.contrastRatio + 1) / 2);
+      }
+      
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0,0,width,height);
       
-      ctx.fillStyle = condition.foregroundColor;
-      ctx.strokeStyle = condition.foregroundColor;
+      ctx.fillStyle = foregroundColor;
+      ctx.strokeStyle = foregroundColor;
       
       ctx.translate(Math.round(width / 2), Math.round(height / 2));
       

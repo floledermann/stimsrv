@@ -1,5 +1,4 @@
 
-
 const Dimension = require("another-dimension");
 
 module.exports = function(ctx, condition, options) {
