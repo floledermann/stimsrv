@@ -146,7 +146,8 @@ io.on("connection", (socket) => {
 app.get("/", (req, res) => {
   res.render("experiment.html", {
     experiment: experiment,
-    role: req.clientRole
+    role: req.clientRole,
+    device: req.clientDevice
   });
   
 });

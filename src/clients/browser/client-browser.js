@@ -6,11 +6,14 @@ const timing = require("./browser/timing.js");
 function clientFactory(options) {
   
   options = Object.assign({
-    interfaces: [],
+    // device
+    // role
     root: document.body
   }, options);
   
-  for (let ui of options.interfaces) {
+  let screenConfig = null;
+        
+  for (let ui of options.role.interfaces) {
     let el = document.createElement("section");
     el.id = "interface-" + ui;
     options.root.appendChild(el);
@@ -35,7 +38,7 @@ function clientFactory(options) {
   
   function prepareExperiment(experiment) {
     
-    for (ui of options.interfaces) {
+    for (ui of options.role.interfaces) {
       
       // clear ui
       let wrapper = document.getElementById("interface-" + ui);
@@ -49,7 +52,7 @@ function clientFactory(options) {
   }
   
   function showCondition(experiment, condition) {
-    for (ui of options.interfaces) {
+    for (ui of options.role.interfaces) {
       if (experiment.interfaces[ui]) {
         experiment.interfaces[ui]?.render?.(condition);
       }
@@ -59,7 +62,7 @@ function clientFactory(options) {
   let socket = null;
   let clientTimestampAdjust = null;
   let clientAverageDelay = null;
-
+  
   let client = {
     connect: function() {
     
@@ -140,11 +143,59 @@ function clientFactory(options) {
       showExperiment(experiment.experiments[experimentIndex]);
     },
     
+    warn: function(message, data) {
+      console.warn(message);
+      this.event("warning", {
+        message: message,
+        data: data
+      });
+    },
+
     error: function(message, data) {
+      console.error(message);
       this.event("error", {
         message: message,
         data: data
       });
+    },
+    
+    getPixelDensity: function() {
+      
+      // lazy init
+      if (!screenConfig) {
+        screenConfig = options.device.screens?.[0] || options.device;
+        if (options.role.screen) {
+          if (options.device.screens?.length) {
+            let candidates = options.device.screens.filter(d => d.id == options.role.screen);
+            if (candidates.length >= 1) {
+              if (candidates.length > 1) {
+                this.warn("Multiple screens with same id '" + options.role.screen + "' found - using first match.");
+              }
+              screenConfig = candidates[0];
+            }
+            else {
+              this.warn("No screen with id '" + options.role.screen + "' found - using first screen.");
+              screenConfig = options.device.screens[0];
+            }
+          }
+          else {
+            this.warn("Screen id '" + options.role.screen + "' is configured, but no screen definitions found for device '" + options.device.name + "'.");
+          }
+        }
+        else {
+          if (options.device.screens?.length > 1) {
+            this.warn("More than one screen defined for device '" + options.device.id + "' but screen is not specified for role '" + options.role.role + "' - using first screen.");
+          }
+        }
+      }
+
+      if (screenConfig.pixeldensity) {
+        return screenConfig.pixeldensity;
+      }
+      
+      this.warn("Pixel density not defined for screen, using default of 96.");
+      return 96;
+
     },
 
     run: function(_experiment) {
@@ -175,6 +226,7 @@ function clientFactory(options) {
     }
   }
   
+
   return client;
 }
 

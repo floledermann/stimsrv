@@ -18,8 +18,8 @@
 
 let client = stimsrvClient({
   clientid: "{{role.device}}",
-  role: "{{role.role}}",
-  interfaces: ["{{role.interfaces | join('","') | safe}}"]
+  role: {{ role | dump | safe }},
+  device: {{ device | dump | safe }}
 });
 
 client.connect();

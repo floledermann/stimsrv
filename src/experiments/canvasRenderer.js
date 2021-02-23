@@ -1,4 +1,5 @@
 
+const Dimension = require("another-dimension");
 module.exports = function(renderFunc, options) {
   
   options = Object.assign({
@@ -15,6 +16,11 @@ module.exports = function(renderFunc, options) {
       
       let canvas = document.createElement("canvas");
       let dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
+      
+      let pixelDensity = client.getPixelDensity();
+      Dimension.configure({
+        pixelDensity: pixelDensity
+      });
       
       let widthpx = options.width || parent.clientWidth;
       let heightpx = options.height || parent.clientHeight;

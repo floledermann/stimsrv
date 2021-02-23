@@ -34,17 +34,39 @@ module.exports = {
       id: "main",
       ip: ".",
       platform: "browser", // browser-old, browser-nojs, pdf, png
-      outputs: [
-        "screen1",
-        "screen2",
-        "screen3",
-        "audio"
-      ],
-      inputs: [
-        "mouse",
-        "keyboard"
-      ]
+      screens: [{
+          id: "left",
+          description: "Left external monitor",
+          resolution: "hd",
+          pixeldensity: 80
+        },{
+          id: "right",
+          description: "Right external monitor",
+          resolution: "hd",
+          pixeldensity: 80
+        },{
+          id: "main",
+          description: "Laptop internal monitor",
+          resolution: "hd",
+          pixeldensity: 120
+      }],
+      mouse: true,
+      keyboard: true
     },
+    {
+      name: "Google Pixel 2",
+      id: "pixel2",
+      resolution: "hd",
+      pixeldensity: 440,
+      touch: true
+    },
+    {
+      name: "Sony Xperia Z5-P",
+      id: "xperia",
+      resolution: "uhd",
+      pixeldensity: 801,
+      touch: false  // viewing only
+    }
   ],
   
   roles: [
@@ -56,12 +78,14 @@ module.exports = {
     },
     {
       device: "main",
+      screen: "left",
       role: "experiment",
       interfaces: ["display","response"],
       description: "Experiment screen for stimulus display and participant response"
     },
     {
       device: "main",
+      screen: "left",
       role: "experiment-debug",
       interfaces: ["display","response","debug"],
       description: "Experiment screen with debugging output"
@@ -93,7 +117,7 @@ module.exports = {
       angle: random([0,90,180,270]),
       pixelAlign: true,
       size: staircase({
-        startValue: "10mm",
+        startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",
         minReversals: 3,
