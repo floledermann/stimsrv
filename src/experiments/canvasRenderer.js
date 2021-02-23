@@ -44,6 +44,7 @@ module.exports = function(renderFunc, options) {
       condition = Object.assign({
         backgroundColor: "#000000",
         foregroundColor: "#ffffff",
+        rotate: 0
       }, condition);
       
       ctx.resetTransform();
@@ -54,6 +55,11 @@ module.exports = function(renderFunc, options) {
       ctx.strokeStyle = condition.foregroundColor;
       
       ctx.translate(Math.round(width / 2), Math.round(height / 2));
+      
+      // introduce rotation to avoid aliasing
+      if (condition.rotate) {
+        ctx.rotate(condition.rotate/180*Math.PI);
+      }
       
       renderFunc(ctx, condition);   
 

@@ -115,7 +115,8 @@ module.exports = {
     //bangbox(),
     snellen({
       angle: random([0,90,180,270]),
-      pixelAlign: true,
+      rotate: random([-2,+2]), // add random rotation to prevent aliasing
+      pixelAlign: false,
       size: staircase({
         startValue: "5mm",
         stepSize: 1.2,
