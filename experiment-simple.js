@@ -128,7 +128,7 @@ module.exports = {
       //highIntensity: 1.0,
       //contrastRatio: 1.05,
       foregroundIntensityHigh: true,
-      size: sequence(["5mm","3mm"],{stepCount:6}), /*staircase({
+      size: sequence.loop(["5mm","3mm"],{stepCount:6, loopCount: 2}), /*staircase({
         startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",

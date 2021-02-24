@@ -2,11 +2,13 @@ let sequence = function*(choices, options) {
   
   options = Object.assign({
     stepCount: 1,
-    loop: false
+    loop: false,
+    loopCount: undefined
   }, options);
   
   let i=0;
   let index=0;
+  let loopCounter = 0;
   
   while (true) {
     yield choices[index];
@@ -16,10 +18,11 @@ let sequence = function*(choices, options) {
       index++;
     }
     if (index == choices.length) {
-      if (!options.loop) {
+      loopCounter++;
+      if (!options.loop || (options.loopCount && loopCounter == options.loopCount)) {
         break;
       }
-      index=0;
+      index=0;    
     }
   }
   
