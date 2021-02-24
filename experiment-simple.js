@@ -118,11 +118,13 @@ module.exports = {
       buttonlabel: "Start"
     }),
     //bangbox(),
-    snellen({
+    snellen(
+    {
       angle: random([0,90,180,270]),
       rotate: random([-2,+2]), // add random rotation to prevent aliasing
       pixelAlign: false,
-      contrastRatio: 0.05,
+      //highIntensity: 1.0,
+      //contrastRatio: 1.05,
       foregroundIntensityHigh: true,
       size: staircase({
         startValue: "5mm",
@@ -132,6 +134,9 @@ module.exports = {
         //minValue: 
         //maxValue:
       })
+    },
+    {
+      ambientIntensity: 1/40,
     }),
     pause({
       buttondisplay: "control",

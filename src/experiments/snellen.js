@@ -11,8 +11,7 @@ module.exports = function(parameters, options) {
     angle: 0,
     size: "10mm",
     middleBar: true,
-    pixelAlign: true,
-    contrastRatio: 1.0
+    pixelAlign: true
   }, parameters);
 
   options = Object.assign({
