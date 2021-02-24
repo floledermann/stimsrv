@@ -7239,6 +7239,10 @@ function clientFactory(options) {
       return 96;
 
     },
+    
+    getGamma: function() {
+      return screenConfig?.gamma || 2.2;
+    },
 
     run: function(_experiment) {
       

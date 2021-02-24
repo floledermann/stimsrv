@@ -38,17 +38,20 @@ module.exports = {
           id: "left",
           description: "Left external monitor",
           resolution: "hd",
-          pixeldensity: 80
+          pixeldensity: 86,
+          gamma: 2.2
         },{
           id: "right",
           description: "Right external monitor",
           resolution: "hd",
-          pixeldensity: 80
+          pixeldensity: 86,
+          gamma: 2.2
         },{
           id: "main",
           description: "Laptop internal monitor",
           resolution: "hd",
-          pixeldensity: 120
+          pixeldensity: 157,
+          gamma: 2.2
       }],
       mouse: true,
       keyboard: true
@@ -58,6 +61,7 @@ module.exports = {
       id: "pixel2",
       resolution: "hd",
       pixeldensity: 440,
+      gamma: 1.6,
       touch: true
     },
     {
@@ -65,6 +69,7 @@ module.exports = {
       id: "xperia",
       resolution: "uhd",
       pixeldensity: 801,
+      gamma: 2.2,
       touch: false  // viewing only
     }
   ],
