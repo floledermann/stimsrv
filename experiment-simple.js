@@ -22,6 +22,7 @@ const pause = require("./src/experiments/pause.js");
 
 const staircase = require("./src/staircase/staircase.js");
 const random = require("./src/staircase/random.js");
+const sequence = require("./src/staircase/sequence.js");
 
 // this is a complete configuration
 module.exports = {
@@ -123,17 +124,18 @@ module.exports = {
       angle: random([0,90,180,270]),
       rotate: random([-2,+2]), // add random rotation to prevent aliasing
       pixelAlign: false,
+      lowIntensity: sequence.loop([0,0.25,0.5,0.75,0.9,0.952]),
       //highIntensity: 1.0,
       //contrastRatio: 1.05,
       foregroundIntensityHigh: true,
-      size: staircase({
+      size: sequence(["5mm","3mm"],{stepCount:6}), /*staircase({
         startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",
         minReversals: 3,
         //minValue: 
         //maxValue:
-      })
+      })*/
     },
     {
       ambientIntensity: 1/40,
