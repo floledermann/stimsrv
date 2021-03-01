@@ -7244,6 +7244,17 @@ function clientFactory(options) {
       return screenConfig?.gamma || 2.2;
     },
 
+    getViewingDistance: function() {
+      
+      let vd = screenConfig?.viewingdistance;
+      
+      if (!vd) {
+        this.warn("Viewing distance not configured for screen, using default of 600.");
+        vd = 600;
+      }
+      return vd;
+    },
+
     run: function(_experiment) {
       
       experiment = _experiment;
