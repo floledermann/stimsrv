@@ -33,7 +33,8 @@ module.exports = function(renderFunc, options) {
         pixelDensity: pixelDensity
       });
       
-      colorInterpolator = d3.interpolateRgb.gamma(client.getGamma())(options.minimumIntensityColor, options.maximumIntensityColor);
+      let gamma = client.getGamma();
+      colorInterpolator = d3.interpolateRgb.gamma(gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
       
       let widthpx = options.width || parent.clientWidth;
       let heightpx = options.height || parent.clientHeight;
