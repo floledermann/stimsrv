@@ -20,7 +20,13 @@ if (!experimentFileName) {
   console.error("No experiment file specified - exiting!");
   process.exit(1);
 }
-const experiment = require(experimentFileName);
+
+function requireUncached(module) {
+    delete require.cache[require.resolve(module)];
+    return require(module);
+}
+
+const experiment = requireUncached(experimentFileName);
 
 const app = express();
 
