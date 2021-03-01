@@ -17,6 +17,7 @@ use cases:
 */
 
 const snellen = require("./src/experiments/snellen.js");
+const centerline = require("./src/experiments/centerline.js");
 const bangbox = require("./src/experiments/bangbox.js");
 const pause = require("./src/experiments/pause.js");
 
@@ -112,23 +113,39 @@ module.exports = {
   // participant management etc.
   
   experiments: [
+  /*
     pause({
       buttondisplay: "control",
       displaymessage: "Waiting for the experiment to start...",
       monitormessage: "Press Start or hit any key to start the experiment.",
       buttonlabel: "Start"
-    }),
+    }),*/
     //bangbox(),
+    centerline({
+      centerLine: random.pick([true,false]),
+      angle: random.range(0,360),
+      size: staircase({
+        startValue: "3mm",
+        stepSize: 1.2,
+        stepType: "multiply",
+        minReversals: 3,
+        //minValue: 
+        //maxValue:
+      })
+    }),
     snellen(
     {
-      angle: random([0,90,180,270]),
-      rotate: random([-2,+2]), // add random rotation to prevent aliasing
+      angle: 0, //random([0,90,180,270]),
+      //rotate: random([-2,+2]), // add random rotation to prevent aliasing
+      translate: [0,0],
       pixelAlign: false,
-      lowIntensity: sequence.loop([0,0.25,0.5,0.75,0.9,0.952]),
+      lowIntensity: 0, //sequence.loop([0,0.25,0.5,0.75,0.9,0.95]),
       //highIntensity: 1.0,
       //contrastRatio: 1.05,
-      foregroundIntensityHigh: true,
-      size: sequence.loop(["5mm","3mm"],{stepCount:6, loopCount: 2}), /*staircase({
+      foregroundIntensityHigh: false,
+      size: "3px"
+      //size: sequence.loop(["5mm","3mm"],{stepCount:6, loopCount: 2}), 
+      /*staircase({
         startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",
@@ -138,7 +155,7 @@ module.exports = {
       })*/
     },
     {
-      ambientIntensity: 1/40,
+      ambientIntensity: 0, //1/40,
     }),
     pause({
       buttondisplay: "control",
