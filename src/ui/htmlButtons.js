@@ -1,7 +1,7 @@
 
 const valOrFunc = require("../util/valOrFunc.js");
 
-module.exports = function(buttonDefs, options) {
+function htmlButtons(buttonDefs, options) {
   
   options = Object.assign({
     wrapperTag: "div",
@@ -44,6 +44,35 @@ module.exports = function(buttonDefs, options) {
         let el = document.createElement(options.buttonTag);
         el.innerHTML = valOrFunc(buttonDef.label || buttonDef, condition);
         
+        if (buttonDef.canvas) {
+          let canvas = document.createElement("canvas");
+          
+          canvas.width = Math.round(60 * (devicePixelRatio || 1));
+          canvas.height = Math.round(40 * (devicePixelRatio || 1));
+          
+          canvas.style.width = "60px";
+          canvas.style.height = "40px";
+          
+          el.appendChild(canvas);
+          
+          let ctx = canvas.getContext("2d");
+          
+          let fgColor = "#ffffff";
+          let bgColor = "#000000";
+          
+          if (!condition.foregroundIntensityHigh) {
+            fgColor = "#000000";
+            bgColor = "#ffffff";
+          }
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
+          ctx.fillStyle = fgColor;
+          ctx.strokeStyle = fgColor;
+          ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
+          
+          buttonDef.canvas(ctx, condition);
+        }
+        
         let evt = options.buttonEvent;
         
         if (!Array.isArray(evt)) {
@@ -78,6 +107,14 @@ module.exports = function(buttonDefs, options) {
   }
 }
 
+htmlButtons.buttonCanvas = function(renderFunc, conditionOverride) {
+  return function(ctx, condition) {      
+    condition = Object.assign({}, condition, conditionOverride);
+    renderFunc(ctx, condition);
+  }
+}
+  
+
 function broadcastVal(client, evt) {
   let type = null;
   let data = {};
@@ -90,3 +127,5 @@ function broadcastVal(client, evt) {
   }
   client.broadcastEvent(type, data);
 }
+
+module.exports = htmlButtons;

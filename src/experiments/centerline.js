@@ -109,13 +109,16 @@ module.exports = function(parameters, options) {
     centerLine: true,
     fillGapIfNoLine: true, // fill gap with 1/3 intensity if no center line is present
     fillColor: "rgb(155, 155, 155)",  // 1/3 intensity at 2.2 gamma
-    pixelAlign: true
+    pixelAlign: true,
+    foregroundIntensityHigh: true
   }, parameters);
 
   options = Object.assign({
   }, options);
   
-  
+  let buttonParametersOn = {size: "25arcmin", angle: 0, length: "75arcmin", centerLine: true};
+  let buttonParametersOff = {size: "25arcmin", angle: 0, length: "75arcmin", centerLine: false};
+
   let renderer = canvasRenderer(renderCenterline, options);
   
   return {
@@ -124,8 +127,8 @@ module.exports = function(parameters, options) {
     interfaces: {
       display: renderer,
       response: htmlButtons([
-        {label: "Centerline present", response: {centerLine: true}},
-        {label: "Centerline NOT present", response: {centerLine: false}}
+        {label: "Centerline", canvas: htmlButtons.buttonCanvas(renderCenterline, buttonParametersOn), response: {centerLine: true}},
+        {label: "No&nbsp;Centerline", canvas: htmlButtons.buttonCanvas(renderCenterline, buttonParametersOff), response: {centerLine: false}}
       ]),
       monitor: renderer,
       control: null,
