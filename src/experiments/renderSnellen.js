@@ -1,7 +1,7 @@
 
 const Dimension = require("another-dimension");
 
-module.exports = function(ctx, condition, options) {
+module.exports = function(ctx, condition) {
   
   condition = Object.assign({
     angle: 0,
