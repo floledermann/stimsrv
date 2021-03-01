@@ -108,8 +108,9 @@ module.exports = function(parameters, options) {
     length: "30mm",
     centerLine: true,
     fillGapIfNoLine: true, // fill gap with 1/3 intensity if no center line is present
-    fillColor: "rgb(127, 127, 127)",  // gaussian blur on actual image
-    //fillColor: "rgb(155, 155, 155)",  // 1/3 intensity at 2.2 gamma
+    //fillColor: "rgb(127, 127, 127)",  // gaussian blur on actual image, also midpoint @ 1.0gamma
+    //fillColor: "rgb(85, 85, 85)",  // 1/3 intensity at 1.0 gamma
+    fillColor: "rgb(155, 155, 155)",  // 1/3 intensity at 2.2 gamma
     //fillColor: "rgb(212, 212, 212)", // 2/3 @ 2.2gamma
     //fillColor: "rgb(202, 202, 202)", // 3/5 @ 2.2gamma
     //fillColor: "rgb(168, 168, 168)", // 2/5 @ 2.2gamma
