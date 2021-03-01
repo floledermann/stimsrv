@@ -30,7 +30,8 @@ module.exports = function(renderFunc, options) {
       
       let pixelDensity = client.getPixelDensity();
       Dimension.configure({
-        pixelDensity: pixelDensity
+        pixelDensity: pixelDensity,
+        viewingDistance: client.getViewingDistance()
       });
       
       let gamma = client.getGamma();
