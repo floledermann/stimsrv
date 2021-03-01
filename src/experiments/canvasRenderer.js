@@ -123,11 +123,19 @@ module.exports = function(renderFunc, options) {
       ctx.fillStyle = foregroundColor;
       ctx.strokeStyle = foregroundColor;
       
+      // move origin to center
       ctx.translate(Math.round(width / 2), Math.round(height / 2));
       
       // introduce rotation to avoid aliasing
       if (condition.rotate) {
         ctx.rotate(condition.rotate/180*Math.PI);
+      }
+      if (condition.translate) {
+        let trans = condition.translate;
+        if (!Array.isArray(condition.translate)) {
+          trans = [trans, trans];
+        }
+        ctx.translate(trans[0], trans[1]);
       }
       
       renderFunc(ctx, condition);   
