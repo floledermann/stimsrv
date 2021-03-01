@@ -116,8 +116,8 @@ module.exports = function(parameters, options) {
   options = Object.assign({
   }, options);
   
-  let buttonParametersOn = {size: "25arcmin", angle: 0, length: "75arcmin", centerLine: true};
-  let buttonParametersOff = {size: "25arcmin", angle: 0, length: "75arcmin", centerLine: false};
+  let buttonParameters = {size: "25arcmin", angle: 0, length: "75arcmin"};
+  let buttonCanvas = htmlButtons.buttonCanvas(renderCenterline, buttonParameters);
 
   let renderer = canvasRenderer(renderCenterline, options);
   
@@ -127,8 +127,8 @@ module.exports = function(parameters, options) {
     interfaces: {
       display: renderer,
       response: htmlButtons([
-        {label: "Centerline", canvas: htmlButtons.buttonCanvas(renderCenterline, buttonParametersOn), response: {centerLine: true}},
-        {label: "No&nbsp;Centerline", canvas: htmlButtons.buttonCanvas(renderCenterline, buttonParametersOff), response: {centerLine: false}}
+        {label: "Centerline", canvas: buttonCanvas, response: {centerLine: true}},
+        {label: "No&nbsp;Centerline", canvas: buttonCanvas, response: {centerLine: false}}
       ]),
       monitor: renderer,
       control: null,

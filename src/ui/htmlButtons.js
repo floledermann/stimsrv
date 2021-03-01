@@ -55,12 +55,14 @@ function htmlButtons(buttonDefs, options) {
           
           el.appendChild(canvas);
           
+          let buttonCondition = Object.assign({}, condition, buttonDef.response);
+          
           let ctx = canvas.getContext("2d");
           
           let fgColor = "#ffffff";
           let bgColor = "#000000";
           
-          if (!condition.foregroundIntensityHigh) {
+          if (!buttonCondition.foregroundIntensityHigh) {
             fgColor = "#000000";
             bgColor = "#ffffff";
           }
@@ -70,7 +72,7 @@ function htmlButtons(buttonDefs, options) {
           ctx.strokeStyle = fgColor;
           ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
           
-          buttonDef.canvas(ctx, condition);
+          buttonDef.canvas(ctx, buttonCondition);
         }
         
         let evt = options.buttonEvent;
@@ -108,8 +110,8 @@ function htmlButtons(buttonDefs, options) {
 }
 
 htmlButtons.buttonCanvas = function(renderFunc, conditionOverride) {
-  return function(ctx, condition) {      
-    condition = Object.assign({}, condition, conditionOverride);
+  return function(ctx, buttonCondition) {      
+    condition = Object.assign({}, buttonCondition, conditionOverride);
     renderFunc(ctx, condition);
   }
 }
