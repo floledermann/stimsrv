@@ -25,7 +25,8 @@ module.exports = function(parameters, options) {
     // primitive values -> copy to output
     if (typeof parameters[key] == "number" ||
         typeof parameters[key] == "string" || 
-        typeof parameters[key] == "boolean" ) {
+        typeof parameters[key] == "boolean" ||
+        Array.isArray(parameters[key])) {
       parameters[key] = yieldForever(parameters[key]);
     }
     if (!typeof parameters[key]?.next == "function") {
