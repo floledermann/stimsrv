@@ -17,6 +17,7 @@ module.exports = function(parameters, options) {
   options = Object.assign({
   }, options);
   
+  let buttonCanvas = htmlButtons.buttonCanvas(renderSnellen, {size: "27arcmin"});
   
   let renderer = canvasRenderer(renderSnellen, options);
   
@@ -26,10 +27,10 @@ module.exports = function(parameters, options) {
     interfaces: {
       display: renderer,
       response: htmlButtons([
-        {label: "Left", response: {angle: 180}},
-        {label: "Up", response: {angle: 270}},
-        {label: "Down", response: {angle: 90}},
-        {label: "Right", response: {angle: 0}}
+        {label: "Left", canvas: buttonCanvas, response: {angle: 180}},
+        {label: "Up", canvas: buttonCanvas, response: {angle: 270}},
+        {label: "Down", canvas: buttonCanvas, response: {angle: 90}},
+        {label: "Right", canvas: buttonCanvas, response: {angle: 0}}
       ]),
       monitor: renderer,
       control: null,
