@@ -36,7 +36,8 @@ app.locals.roles = {};
 app.locals.experiment = experiment;
 app.locals.experimentIndex = 0;
 app.locals.currentExperiment = experiment.experiments[0];
-app.locals.currentCondition = app.locals.currentExperiment.controller.nextCondition();
+app.locals.currentController = app.locals.currentExperiment.controller();
+app.locals.currentCondition = app.locals.currentController.nextCondition();
 app.locals.currentResponse = null;
 app.locals.conditions = [];
 app.locals.responses = [];
@@ -89,9 +90,7 @@ io.on("connection", (socket) => {
     if (messageType == "response") {
       app.locals.currentResponse = data.response;
       app.locals.responses.push(app.locals.currentResponse);
-      // default controller
-      let controller = app.locals.currentExperiment.controller || nextOnResponse();
-      app.locals.currentCondition = controller.nextCondition(
+      app.locals.currentCondition = app.locals.currentController.nextCondition(
         app.locals.currentCondition,
         app.locals.currentResponse,
         app.locals.conditions,
@@ -121,8 +120,8 @@ io.on("connection", (socket) => {
           app.locals.conditions = [];
           app.locals.currentResponse = null;
           // default controller
-          let controller = app.locals.currentExperiment.controller || nextOnResponse();
-          app.locals.currentCondition = controller.nextCondition(
+          app.locals.currentController = app.locals.currentExperiment.controller() || nextOnResponse();
+          app.locals.currentCondition = app.locals.currentController.nextCondition(
             app.locals.currentCondition,
             app.locals.currentResponse,
             app.locals.conditions,

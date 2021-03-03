@@ -1,7 +1,9 @@
 
 //const parameterPermutator = require("./parameterPermutator.js");
 
-module.exports = function(parameters, options) {
+module.exports = function(_parameters, options) {
+  
+  Object.freeze(_parameters);
   
   options = Object.assign({
     
@@ -21,40 +23,52 @@ module.exports = function(parameters, options) {
     }
   }
   
-  for (key of Object.keys(parameters)) {
-    // primitive values -> copy to output
-    if (typeof parameters[key] == "number" ||
-        typeof parameters[key] == "string" || 
-        typeof parameters[key] == "boolean" ||
-        Array.isArray(parameters[key])) {
-      parameters[key] = yieldForever(parameters[key]);
-    }
-    if (!typeof parameters[key]?.next == "function") {
-      throw "Parameter " + key + " must be a primitive value or a generator";
-    }
-  }
-
-  // return next condition, or null for end of experiment
-  return {
-    nextCondition: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
-      
-      let condition = {};
-      
-      let done = false;
-      
-      for (key of Object.keys(parameters)) {
-        let param = parameters[key].next(lastCondition, lastResponse, conditions, responses);
-        if (param.done) {
-          done = true;
+  return function() {
+    
+    // make a copy of the parameters
+    let parameters = Object.assign({}, _parameters);
+    
+    for (key of Object.keys(parameters)) {
+      // primitive values -> copy to output
+      if (typeof parameters[key] == "number" ||
+          typeof parameters[key] == "string" || 
+          typeof parameters[key] == "boolean" ||
+          Array.isArray(parameters[key])) {
+        parameters[key] = yieldForever(parameters[key]);
+      }
+      else if (typeof parameters[key] == "function") {
+        parameters[key] = parameters[key]();
+        if (!typeof parameters[key].next == "function") {
+          throw "Parameter " + key + " factory must return a generator.";
         }
-        condition[key] = param.value;
       }
-      
-      if (!done) {
-        return condition;
+      else {
+        throw "Parameter " + key + " must be a primitive value or a factory function.";
       }
-          
-      return null; // end of experiment
+    }
+
+    // return next condition, or null for end of experiment
+    return {
+      nextCondition: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
+        
+        let condition = {};
+        
+        let done = false;
+        
+        for (key of Object.keys(parameters)) {
+          let param = parameters[key].next(lastCondition, lastResponse, conditions, responses);
+          if (param.done) {
+            done = true;
+          }
+          condition[key] = param.value;
+        }
+        
+        if (!done) {
+          return condition;
+        }
+            
+        return null; // end of experiment
+      }
     }
   }
 }
