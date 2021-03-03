@@ -11,8 +11,8 @@ module.exports = function(options) {
     stepType: "db", // "linear", "log", "db", "multiply"
     minReversals: 3,
     minTrials: 0,
-    numIncorrectReverse: 1,
-    numCorrectReverse: 3,
+    numUp: 1,
+    numDown: 3,
     initialSingleReverse: true,
     minValue: -Infinity,
     maxValue: Infinity,
@@ -29,17 +29,6 @@ module.exports = function(options) {
     options.startValue = Dimension(options.startValue);
   }
   
-  let direction = "down";
-  let correctCounter = 0;
-  
-  let reversalPoints = [];
-  let reversalIntensities = [];
-  
-  let nextIntensity = options.startValue;
-  if (nextIntensity instanceof Dimension) {
-    // clone
-    nextIntensity = Dimension(nextIntensity);
-  }
   
   function moveUp(currentIntensity) {
     switch (options.stepType) {
@@ -59,86 +48,103 @@ module.exports = function(options) {
     }
   }
   
-  return {
-    // Generator interface
-    // If there is a next intensity, return { value: nextIntensity, done: false }
-    // When finished, return { done: true }
-    next: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
-      
-      let currentIntensity = nextIntensity;
-      
-      let reversal = false;
-      
-      // initial condition
-      if (!lastResponse) {
-        return { value: currentIntensity, done: false }
-      }
-      
-      let correct = options.isResponseCorrect(lastCondition, lastResponse);
-      
-      if (correct) {
-        correctCounter++;
-      }
-      else {
-        correctCounter--;
-      }
-      
-      reversal = false;
-      
-      if (reversalIntensities.lengt == 0 && options.initialSingleReverse) {
+  return function() {
+    
+    let direction = "down";
+    let correctCounter = 0;
+    
+    let reversalPoints = [];
+    let reversalIntensities = [];
+    
+    let currentIntensity = options.startValue;
+    if (currentIntensity instanceof Dimension) {
+      // clone
+      currentIntensity = Dimension(currentIntensity);
+    }
+    
+    return {
+      // Generator interface
+      // If there is a next intensity, return { value: nextIntensity, done: false }
+      // When finished, return { done: true }
+      next: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
+        
+        // initial condition
+        if (!lastResponse) {
+          return { value: currentIntensity, done: false }
+        }
+        
+        let correct = options.isResponseCorrect(lastCondition, lastResponse);
         
         if (correct) {
+          correctCounter++;
+        }
+        else {
+          correctCounter--;
+        }
+        
+        //let currentIntensity = nextIntensity;
+        
+        let reversal = false;
+        
+        // initial response(s)
+        if (reversalIntensities.length == 0 && options.initialSingleReverse) {         
+          if (correct) {
+            direction = "down";
+            currentIntensity = moveDown(currentIntensity);
+            correctCounter = 0;
+          }
+          else {
+            reversal = true;
+            direction = "up";
+            currentIntensity = moveUp(currentIntensity);
+            correctCounter = 0;
+          }
+        }
+        else if (correctCounter >= options.numDown) {
           if (direction == "up") {
             reversal = true;
+            correctCounter = 0;
           }
           direction = "down";
         }
-        else {
+        else if (correctCounter <= -options.numUp) {
           if (direction == "down") {
             reversal = true;
+            correctCounter = 0;
           }
           direction = "up";
         }
-      }
-      else if (correctCounter >= options.numCorrectReverse) {
-        if (direction == "up") {
-          reversal = true;
+        
+        if (reversal) {
+          //console.log("REVERSAL");
+          reversalPoints.push(responses.length);
+          reversalIntensities.push(lastCondition);
         }
-        direction = "down";
-      }
-      else if (correctCounter <= -options.numIncorrectReverse) {
-        if (direction == "down") {
-          reversal = true;
+        
+        if (reversalIntensities.length >= options.minReversals &&
+            responses.length >= options.minTrials) {
+          // finished
+          return { done: true };
         }
-        direction = "up";
+        
+        
+        if (correctCounter >= options.numDown) {
+          //console.log("Moving DOWN");
+          currentIntensity = moveDown(currentIntensity);
+          correctCounter = 0;
+        }
+        else if (correctCounter <= -options.numUp) {
+          //console.log("Moving UP");
+          currentIntensity = moveUp(currentIntensity);
+          correctCounter = 0;
+        }
+             
+        if (options.startValue instanceof Dimension) {
+          currentIntensity = Dimension(currentIntensity, options.startValue.unit);
+        }
+        
+        return { value: currentIntensity, done: false }
       }
-      
-      if (reversal) {
-        reversalPoints.push(responses.length);
-        reversalIntensities.push(lastCondition);
-      }
-      
-      if (reversalIntensities.length >= options.minReversals &&
-          responses.length >= options.minTrials) {
-        // finished
-        return { done: true };
-      }
-      
-      
-      if (correctCounter >= options.numCorrectReverse) {
-        nextIntensity = moveDown(currentIntensity);
-        correctCounter = 0;
-      }
-      else if (correctCounter <= -options.numIncorrectReverse) {
-        nextIntensity = moveUp(currentIntensity);
-        correctCounter = 0;
-      }
-           
-      if (currentIntensity instanceof Dimension) {
-        nextIntensity = Dimension(nextIntensity, currentIntensity.unit);
-      }
-      
-      return { value: currentIntensity, done: false }
     }
   }
 }
