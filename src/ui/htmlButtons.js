@@ -85,8 +85,11 @@ function htmlButtons(buttonDefs, options) {
           el.addEventListener(eventType, function(e) {
             
             // to prevent touchstart from also triggering mousedown
-            // should we make this ocnfigruable?
-            e.preventDefault();
+            // but we want to keep mousedown for visual feedback
+            // should we make this configurable?
+            if (e.type == "touchstart") {
+              e.preventDefault();
+            }
             
             client.response(buttonDef.response || {label: buttonDef.label});
             
