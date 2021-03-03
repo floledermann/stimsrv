@@ -31,6 +31,7 @@ module.exports = function(options) {
   
   
   function moveUp(currentIntensity) {
+    console.log("Moving UP");
     switch (options.stepType) {
       case "db": return currentIntensity * 10.0**(options.stepSize/20.0); 
       case "log": return currentIntensity * 10.0**options.stepSize; 
@@ -40,6 +41,7 @@ module.exports = function(options) {
   }
   
   function moveDown(currentIntensity) {
+    console.log("Moving DOWN");
     switch (options.stepType) {
       case "db": return currentIntensity / 10.0**(options.stepSize/20.0); 
       case "log": return currentIntensity / 10.0**options.stepSize; 
@@ -76,9 +78,13 @@ module.exports = function(options) {
         let correct = options.isResponseCorrect(lastCondition, lastResponse);
         
         if (correct) {
+          console.log("Response CORRECT");
+          correctCounter = Math.max(correctCounter, 0);
           correctCounter++;
         }
         else {
+          console.log("Response INCORRECT");
+          correctCounter = Math.min(correctCounter, 0);
           correctCounter--;
         }
         
@@ -103,20 +109,21 @@ module.exports = function(options) {
         else if (correctCounter >= options.numDown) {
           if (direction == "up") {
             reversal = true;
-            correctCounter = 0;
+            //correctCounter = 0;
           }
           direction = "down";
         }
         else if (correctCounter <= -options.numUp) {
           if (direction == "down") {
             reversal = true;
-            correctCounter = 0;
+            //correctCounter = 0;
           }
           direction = "up";
         }
         
         if (reversal) {
-          //console.log("REVERSAL");
+          console.log("REVERSAL @ " + currentIntensity);
+          console.log(lastCondition);
           reversalPoints.push(responses.length);
           reversalIntensities.push(lastCondition);
         }
@@ -129,12 +136,10 @@ module.exports = function(options) {
         
         
         if (correctCounter >= options.numDown) {
-          //console.log("Moving DOWN");
           currentIntensity = moveDown(currentIntensity);
           correctCounter = 0;
         }
         else if (correctCounter <= -options.numUp) {
-          //console.log("Moving UP");
           currentIntensity = moveUp(currentIntensity);
           correctCounter = 0;
         }
