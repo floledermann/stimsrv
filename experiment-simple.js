@@ -129,18 +129,19 @@ module.exports = {
     centerline({
       centerLine: random.pick([true,false]),
       angle: random.range(0,360),
+      foregroundIntensityHigh: false,
       size: staircase({
-        startValue: "3mm",
+        startValue: "2mm",
         stepSize: 1.2,
         stepType: "multiply",
-        minReversals: 3,
+        minReversals: 5,
         //minValue: 
         //maxValue:
       })
     }),
     snellen(
     {
-      angle: 0, //random([0,90,180,270]),
+      angle: random([0,90,180,270]),
       //rotate: random([-2,+2]), // add random rotation to prevent aliasing
       translate: [0,0],
       pixelAlign: false,
@@ -148,16 +149,16 @@ module.exports = {
       //highIntensity: 1.0,
       //contrastRatio: 1.05,
       foregroundIntensityHigh: false,
-      size: "3px"
-      //size: sequence.loop(["5mm","3mm"],{stepCount:6, loopCount: 2}), 
-      /*staircase({
+      //size: "3px",
+      size: //sequence(["5mm","3mm","1mm"]), 
+      staircase({
         startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",
-        minReversals: 3,
+        minReversals: 5,
         //minValue: 
         //maxValue:
-      })*/
+      })
     },
     {
       ambientIntensity: 0, //1/40,
