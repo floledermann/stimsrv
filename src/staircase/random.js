@@ -7,9 +7,19 @@ function randomPick(choices, options) {
 }
 
 function randomRange(from, to, options) {
+  
+  options = Object.assign({
+    round: false    // 100, 10, 1/true, 0.1, 0.01, ...
+  }, options);
+  
   return function*() {
     while (true) {
-      yield from + Math.random() * (to-from);
+      let num = from + Math.random() * (to-from);
+      if (options.round) {
+        let round = +options.round;
+        num = Math.round(num / round) * round;
+      }
+      yield num;
     }
   }
 }
