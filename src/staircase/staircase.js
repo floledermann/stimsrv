@@ -143,6 +143,8 @@ module.exports = function(options) {
           currentIntensity = moveUp(currentIntensity);
           correctCounter = 0;
         }
+        
+        currentIntensity = Math.max(options.minValue, Math.min(options.maxValue, currentIntensity));
              
         if (options.startValue instanceof Dimension) {
           currentIntensity = Dimension(currentIntensity, options.startValue.unit);
