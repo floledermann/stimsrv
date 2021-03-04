@@ -128,7 +128,7 @@ module.exports = {
     //bangbox(),
     centerline({
       centerLine: random.pick([true,false]),
-      angle: random.range(0,360),
+      angle: random.range(0,360, {round: 1}),
       foregroundIntensityHigh: false,
       size: staircase({
         startValue: "2mm",
