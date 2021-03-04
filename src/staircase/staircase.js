@@ -3,6 +3,7 @@ const Dimension = require("another-dimension");
 
 const matchProperties = require("../util/matchProperties.js");
 
+// see https://github.com/psychopy/psychopy/blob/release/psychopy/data/staircase.py
 module.exports = function(options) {
   
   options = Object.assign({
@@ -31,7 +32,7 @@ module.exports = function(options) {
   
   
   function moveUp(currentIntensity) {
-    console.log("Moving UP");
+    //console.log("Moving UP");
     switch (options.stepType) {
       case "db": return currentIntensity * 10.0**(options.stepSize/20.0); 
       case "log": return currentIntensity * 10.0**options.stepSize; 
@@ -41,7 +42,7 @@ module.exports = function(options) {
   }
   
   function moveDown(currentIntensity) {
-    console.log("Moving DOWN");
+    //console.log("Moving DOWN");
     switch (options.stepType) {
       case "db": return currentIntensity / 10.0**(options.stepSize/20.0); 
       case "log": return currentIntensity / 10.0**options.stepSize; 
@@ -122,8 +123,8 @@ module.exports = function(options) {
         }
         
         if (reversal) {
-          console.log("REVERSAL @ " + currentIntensity);
-          console.log(lastCondition);
+          //console.log("REVERSAL @ " + currentIntensity);
+          //console.log(lastCondition);
           reversalPoints.push(responses.length);
           reversalIntensities.push(lastCondition);
         }
