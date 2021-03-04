@@ -1,4 +1,5 @@
 const path = require("path");
+const { networkInterfaces } = require('os');
 
 const mri = require("mri");
 const express = require("express");
@@ -65,7 +66,38 @@ app.use('/static', express.static(path.join(__dirname, "static")));
 
 app.use(clientRoleMiddleware(experiment.roles, experiment.devices));
 
-let server = app.listen(8080);
+let port = 8080;
+
+let server = app.listen(port, () => {
+  
+  const networks = networkInterfaces();
+  const ips = [];
+
+  for (const name of Object.keys(networks)) {
+    for (const net of networks[name]) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        ips.push(net.address);
+      }
+    }
+  }  
+    
+  //console.log("\x1b[32m%s\x1b[0m", "Green");
+  // https://stackoverflow.com/a/41407246/ for colors reference
+  console.log("\x1b[32m\x1b[1m");  // output color to green
+  console.log("******************************************************");
+  //console.log("**                                                  **");
+  console.log("** stimsrv server running on:                       **");
+  ips.forEach(ip => {
+    let adrStr = "http://" + ip + ":" + port + "/";
+    let padSize = 47 - adrStr.length;
+    let pad = "                                       ".substring(0, padSize);
+    console.log("**   " + adrStr + pad + "**"); 
+  });
+  //console.log("**                                                  **");
+  console.log("******************************************************");  
+  console.log("\x1b[0m");   // reset output color
+});
 
 let io = socketio(server, {serveClient: false});
 
@@ -85,8 +117,8 @@ io.on("connection", (socket) => {
   });
   
   socket.onAny((messageType, data) => {
-    console.log("Received message: " + messageType);
-    console.log(data);
+    //console.log("Received message: " + messageType);
+    //console.log(data);
     if (messageType == "response") {
       app.locals.currentResponse = data.response;
       app.locals.responses.push(app.locals.currentResponse);
