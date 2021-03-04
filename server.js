@@ -29,6 +29,8 @@ function requireUncached(module) {
 
 const experiment = requireUncached(experimentFileName);
 
+experiment.storage.getNextParticipantId();
+
 const app = express();
 
 app.locals.experimentTimestamp = Date.now();

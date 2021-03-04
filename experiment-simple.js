@@ -21,6 +21,8 @@ const centerline = require("./src/experiments/centerline.js");
 const bangbox = require("./src/experiments/bangbox.js");
 const pause = require("./src/experiments/pause.js");
 
+const filestorage = require("./src/storage/filestorage.js");
+
 const staircase = require("./src/staircase/staircase.js");
 const random = require("./src/staircase/random.js");
 const sequence = require("./src/staircase/sequence.js");
@@ -115,7 +117,13 @@ module.exports = {
       description: "Experiment screen for stimulus display."
     },
   ],  
-  // participant management etc.
+  
+  storage: filestorage({
+    participantId: "user_###",
+    filename: "#_YYYY-MM-DD_HH-mm", // https://momentjs.com/docs/#/displaying/format/
+    destination: "./data",
+    format: "json"
+  }),
   
   experiments: [
   /*
