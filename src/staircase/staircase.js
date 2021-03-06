@@ -69,7 +69,7 @@ module.exports = function(options) {
       // Generator interface
       // If there is a next intensity, return { value: nextIntensity, done: false }
       // When finished, return { done: true }
-      next: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
+      next: function(lastCondition=null, lastResponse=null, conditions=[]) {
         
         // initial condition
         if (!lastResponse) {
@@ -125,12 +125,12 @@ module.exports = function(options) {
         if (reversal) {
           //console.log("REVERSAL @ " + currentIntensity);
           //console.log(lastCondition);
-          reversalPoints.push(responses.length);
+          reversalPoints.push(conditions.length);
           reversalIntensities.push(lastCondition);
         }
         
         if (reversalIntensities.length >= options.minReversals &&
-            responses.length >= options.minTrials) {
+            conditions.length >= options.minTrials) {
           // finished
           return { done: true };
         }
