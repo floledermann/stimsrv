@@ -119,8 +119,6 @@ module.exports = {
   ],  
   
   storage: filestorage({
-    participantId: "user_###",
-    filename: "#_YYYY-MM-DD_HH-mm", // https://momentjs.com/docs/#/displaying/format/
     destination: "./data",
     format: "json"
   }),
