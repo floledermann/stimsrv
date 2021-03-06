@@ -5,7 +5,7 @@ function filestorage(options) {
   
   options = Object.assign({
     participantId: "user_###",
-    filename: "#_YYYY-MM-DD_HH-mm", // https://momentjs.com/docs/#/displaying/format/
+    filename: "#", // https://momentjs.com/docs/#/displaying/format/
     lockfileName: "#.lock",
     destination: "./data",
     format: "json"    
@@ -80,7 +80,8 @@ function filestorage(options) {
           let stat = await fs.stat(filePath);
           if (stat.mtime < initTime) {
             console.log("Found orphaned lock file: " + filename + " ... deleting.");
-            await fs.unlink(filePath);
+            // we do not have to await for this...
+            fs.unlink(filePath);
             // do not consider this id for the maximum
             num = -1;
           }
@@ -113,9 +114,29 @@ function filestorage(options) {
 
   }
   
+  async function storeParticipantData(userId, data) {
+    
+    userId = await userId;
+    
+    let idStr = userIdStr(userId);
+    
+    let filename = options.filename.replace("#",idStr) + "." + options.format;
+    let filepath = path.join(options.destination, filename);
+    
+    let json = JSON.stringify(data, 2);
+    fs.writeFile(filepath, json, 'utf8');
+    
+    // remove lockfile
+    let lockFileName = options.lockfileName.replace("#",idStr);
+    filepath = path.join(options.destination, lockFileName);
+    fs.unlink(filepath); 
+    
+  }
+  
   // public API
   return {
-    getNextParticipantId: preventConcurrent(getNextParticipantId)
+    getNextParticipantId: preventConcurrent(getNextParticipantId),
+    storeParticipantData: storeParticipantData
   }
   
   
