@@ -66,7 +66,7 @@ nunjucks.configure('views', {
 
 app.use('/static', express.static(path.join(__dirname, "static")));
 
-app.use(clientRoleMiddleware(experiment.roles, experiment.devices));
+app.use(clientRoleMiddleware(experiment));
 
 let port = 8080;
 

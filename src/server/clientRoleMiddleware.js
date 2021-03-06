@@ -4,11 +4,11 @@ const hashids = new Hashids();
 
 const clientIdCookieName = "stimsrv-clientid";
 
-function factory(roles, devices) {
+function factory(experiment) {
   
   let devicesById = {};
 
-  devices.forEach( d => {
+  experiment.devices.forEach( d => {
     if (d.id) devicesById[d.id] = d
   });
   
@@ -32,7 +32,7 @@ function factory(roles, devices) {
         return false;
       }      
       
-      clientId = devices.find(d => matchDevice(req, d))?.id;
+      clientId = experiment.devices.find(d => matchDevice(req, d))?.id;
  
       if (!clientId) {
         // still not found -> autogenerate id
@@ -44,7 +44,7 @@ function factory(roles, devices) {
     
     req.clientId = clientId;
     
-    let potentialRoles = roles.filter(r => r.device == clientId);
+    let potentialRoles = experiment.roles.filter(r => r.device == clientId);
     let activeRole = null;
     
     if (req.query.role) {
@@ -63,7 +63,7 @@ function factory(roles, devices) {
       req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
       
       res.render("select_role.html", {
-        experiment: req.app.locals.experiment,
+        experiment: experiment,
         ip: ip,
         clientid: req.clientId,
         potentialRoles: potentialRoles,
