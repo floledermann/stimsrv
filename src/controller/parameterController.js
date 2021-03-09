@@ -49,14 +49,14 @@ module.exports = function(_parameters, options) {
 
     // return next condition, or null for end of experiment
     return {
-      nextCondition: function(lastCondition=null, lastResponse=null, conditions=[], responses=[]) {
+      nextCondition: function(lastCondition=null, lastResponse=null, trials=[]) {
         
         let condition = {};
         
         let done = false;
         
         for (key of Object.keys(parameters)) {
-          let param = parameters[key].next(lastCondition, lastResponse, conditions, responses);
+          let param = parameters[key].next(lastCondition, lastResponse, trials);
           if (param.done) {
             done = true;
           }
