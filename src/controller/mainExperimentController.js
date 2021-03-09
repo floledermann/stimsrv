@@ -18,13 +18,24 @@ function MainExperimentController(experiment, options) {
   
   let trials = [];
   
-  let allTrials = [];
+  let experimentResults = [];
   
   let clients = [];
   
   let userId = null;
   
   function nextExperiment() {
+    
+    // store results of previous experiment
+    if (currentExperiment && currentExperiment?.store !== false) {
+      experimentResults.push({
+        name: currentExperiment?.name,
+        description: currentExperiment?.description,
+        trials: trials
+      });
+    }
+    
+    trials = [];
     
     experimentIndex++;
     
@@ -33,13 +44,12 @@ function MainExperimentController(experiment, options) {
       //console.log("Next Experiment: " + experimentIndex);
       
       currentExperiment = experiment.experiments[experimentIndex];
-      allTrials.push(trials);
-      trials = [];
       currentController = currentExperiment.controller() || options.defaultController();
            
       currentTrial = {
         condition: currentController.nextCondition(null,null,trials)  // no response yet
       };
+      trials.push(currentTrial);
       broadcast("experiment start", {
         experimentIndex: experimentIndex
       });
@@ -69,9 +79,9 @@ function MainExperimentController(experiment, options) {
     currentController = null;   
     currentTrial = null;
     
-    // TODO: save trial data before deleting!
-    storage.storeParticipantData(userId, allTrials);
-    allTrials = [];
+    storage.storeParticipantData(userId, experimentResults);
+    
+    experimentResults = [];
     trials = [];
   }
   

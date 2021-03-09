@@ -9,7 +9,8 @@ module.exports = function(options) {
     displaymessage: "The experiment is paused." + (options.controller == "control" ? "" : " Press button to continue."),
     monitormessage: "Experiment paused" + (options.controller == "control" ? ". Press button to continue." : ", waiting for user."),
     buttondisplay: "response",
-    buttonlabel: "Continue"
+    buttonlabel: "Continue",
+    store: false
   }, options);
   
   return {
@@ -20,7 +21,8 @@ module.exports = function(options) {
       monitor: htmlContent(options.monitormessage),
       control: options.buttondisplay == "control" ? htmlButtons(options.buttonlabel) : null,
     },
-    controller: nextOnResponse()
+    controller: nextOnResponse(),
+    store: options.store
   }
 
 
