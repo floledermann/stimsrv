@@ -9,7 +9,8 @@ module.exports = function(renderFunc, options) {
     height: null,  // height in layout pixels, default: use parent height
     minimumIntensityColor: "#000000",
     maximumIntensityColor: "#ffffff",
-    ambientIntensity: 1/100  // TODO: should this go into "viewing conditions" setting? Or combination of viewing conditions and display (reflectance) properties?
+    ambientIntensity: 1/100,  // TODO: should this go into "viewing conditions" setting? Or combination of viewing conditions and display (reflectance) properties?
+    dimensions: []
   }, options);
   
   let ctx = null;
@@ -56,6 +57,7 @@ module.exports = function(renderFunc, options) {
     
     // contract: if render() returns a string or element, then replace the parent content
     render: function(condition) {
+      
       condition = Object.assign({
         lowIntensity: 0,
         // highIntensity: 1.0,
@@ -63,6 +65,17 @@ module.exports = function(renderFunc, options) {
         foregroundIntensityHigh: true,  // high intensity (bright) stimulus on low intensity background.
         rotate: 0
       }, condition);
+      
+      // convert dimensions into pixels
+      for (let key of options.dimensions) {
+        let cond = condition[key];
+        if (Array.isArray(cond)) {
+          condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
+        }
+        else {
+          condition[key] = Dimension(cond, "px").toNumber("px");  
+        }
+      }
             
       let foregroundIntensity;
       let backgroundIntensity;

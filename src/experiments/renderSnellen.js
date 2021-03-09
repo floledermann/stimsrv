@@ -1,6 +1,4 @@
 
-const Dimension = require("another-dimension");
-
 module.exports = function(ctx, condition) {
   
   condition = Object.assign({
@@ -11,8 +9,6 @@ module.exports = function(ctx, condition) {
     // foregroundColor/backgroundColor are handled by caller!
   }, condition);
   
-  condition.size = Dimension(condition.size, "px").toNumber("px");
-    
 /*
 https://de.wikipedia.org/wiki/Snellen-Haken
 

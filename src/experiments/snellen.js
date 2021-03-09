@@ -15,12 +15,13 @@ module.exports = function(parameters, options) {
   }, parameters);
 
   options = Object.assign({
+    dimensions: ["size"]
   }, options);
-  
-  let buttonCanvas = htmlButtons.buttonCanvas(renderSnellen, {size: "27arcmin"});
-  
+    
   let renderer = canvasRenderer(renderSnellen, options);
   
+  let buttonCanvas = htmlButtons.buttonCanvas(renderSnellen, {size: "27arcmin"}, options);
+
   return {
     name: "snellen",
     description: "Snellen-E visual acuity test", 

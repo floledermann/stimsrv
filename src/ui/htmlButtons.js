@@ -1,3 +1,4 @@
+const Dimension = require("another-dimension");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
@@ -45,6 +46,10 @@ function htmlButtons(buttonDefs, options) {
         el.innerHTML = valOrFunc(buttonDef.label || buttonDef, condition);
         
         if (buttonDef.canvas) {
+          
+          // TODO: reuse canvasRenderer - this requires some refactoring there
+          // to get rid of fixed binding to specific canvas
+          
           let canvas = document.createElement("canvas");
           
           canvas.width = Math.round(60 * (devicePixelRatio || 1));
@@ -112,9 +117,27 @@ function htmlButtons(buttonDefs, options) {
   }
 }
 
-htmlButtons.buttonCanvas = function(renderFunc, conditionOverride) {
-  return function(ctx, buttonCondition) {      
+htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
+
+  options = Object.assign({
+    dimensions: []
+  }, options);
+  
+  return function(ctx, buttonCondition) {   
+  
     condition = Object.assign({}, buttonCondition, conditionOverride);
+    
+    // convert dimensions into pixels
+    for (let key of options?.dimensions) {
+      let cond = condition[key];
+      if (Array.isArray(cond)) {
+        condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
+      }
+      else {
+        condition[key] = Dimension(cond, "px").toNumber("px");  
+      }
+    }
+    
     renderFunc(ctx, condition);
   }
 }

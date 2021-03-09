@@ -20,9 +20,6 @@ function renderCenterline(ctx, condition) {
     // foregroundColor/backgroundColor are handled by caller!
   }, condition);
   
-  condition.size = Dimension(condition.size, "px").toNumber("px");
-  condition.length = Dimension(condition.length, "px").toNumber("px");
-    
 /*
   
   +--------------------------+   -      -    
@@ -120,10 +117,11 @@ module.exports = function(parameters, options) {
   }, parameters);
 
   options = Object.assign({
+    dimensions: ["size","length"]
   }, options);
   
   let buttonParameters = {size: "25arcmin", angle: 0, length: "75arcmin"};
-  let buttonCanvas = htmlButtons.buttonCanvas(renderCenterline, buttonParameters);
+  let buttonCanvas = htmlButtons.buttonCanvas(renderCenterline, buttonParameters, options);
 
   let renderer = canvasRenderer(renderCenterline, options);
   
@@ -141,6 +139,4 @@ module.exports = function(parameters, options) {
     },
     controller: parameterController(parameters, options)
   }
-
-
 }
