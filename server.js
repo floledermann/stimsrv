@@ -10,6 +10,8 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
+const Dimension = require("another-dimension");
+
 const clients = require("./src/clients/index.js");
 const clientRoleMiddleware = require("./src/server/clientRoleMiddleware.js");
 const MainExperimentController = require("./src/controller/mainExperimentController.js");
@@ -28,6 +30,8 @@ const app = express();
 
 app.locals.experiment = experiment;
 
+Dimension.configure({ toJSON: d => d.toString() });
+    
 let controller = MainExperimentController(experiment);
 controller.startExperiment();
 

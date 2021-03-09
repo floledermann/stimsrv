@@ -123,7 +123,7 @@ function filestorage(options) {
     let filename = options.filename.replace("#",idStr) + "." + options.format;
     let filepath = path.join(options.destination, filename);
     
-    let json = JSON.stringify(data, 2);
+    let json = JSON.stringify(data, null, 2);
     fs.writeFile(filepath, json, 'utf8');
     
     // remove lockfile
