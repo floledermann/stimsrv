@@ -124,13 +124,21 @@ function filestorage(options) {
     let filepath = path.join(options.destination, filename);
     
     let json = JSON.stringify(data, null, 2);
-    fs.writeFile(filepath, json, 'utf8');
+    await fs.writeFile(filepath, json, 'utf8');
     
     // remove lockfile
     let lockFileName = options.lockfileName.replace("#",idStr);
     filepath = path.join(options.destination, lockFileName);
-    fs.unlink(filepath); 
-    
+    try {
+      await fs.unlink(filepath); 
+    }
+    catch (error) {
+      if (error.code === 'ENOENT') {
+        console.warn("Lock file " + lockFileName + " does not exist any more.");
+      } else {
+        throw error;
+      }      
+    }
   }
   
   // public API
