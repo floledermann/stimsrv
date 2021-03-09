@@ -1,6 +1,6 @@
 
-//const parameterPermutator = require("./parameterPermutator.js");
 
+// outer factory is called at experiment initialization time
 module.exports = function(_parameters, options) {
   
   Object.freeze(_parameters);
@@ -23,6 +23,7 @@ module.exports = function(_parameters, options) {
     }
   }
   
+  // inner factory is called when task is started (in order to be able to start fresh for each task)
   return function() {
     
     // make a copy of the parameters
@@ -68,6 +69,22 @@ module.exports = function(_parameters, options) {
         }
             
         return null; // end of experiment
+      },
+      constantParameters: function() {
+        
+        let p = {};
+        
+        for (key of Object.keys(_parameters)) {
+          if (typeof _parameters[key] == "number" ||
+              typeof _parameters[key] == "string" || 
+              typeof _parameters[key] == "boolean" ||
+              Array.isArray(_parameters[key])) {
+            p[key] = _parameters[key];
+          }
+        }
+        
+        return p;
+        
       }
     }
   }

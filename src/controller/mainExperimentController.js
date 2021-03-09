@@ -28,10 +28,19 @@ function MainExperimentController(experiment, options) {
     
     // store results of previous experiment
     if (currentExperiment && currentExperiment?.store !== false) {
+      // separate constant parameters form changing parameters
+      let constantParameters = currentController?.constantParameters();
       experimentResults.push({
         name: currentExperiment?.name,
         description: currentExperiment?.description,
-        trials: trials
+        constantParameters: constantParameters,
+        trials: trials.map(t => ({
+          // include only parameters which are not constant
+          condition: Object.fromEntries(
+            Object.entries(t.condition).filter(([key, value]) => !(key in constantParameters))
+          ),
+          response: t.response
+        }))
       });
     }
     
