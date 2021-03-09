@@ -22,9 +22,11 @@ module.exports = function(renderFunc, options) {
   let colorInterpolator = null;
   
   return {
-    initialize: function(_client, parent, document) {
+    initialize: function(_client, parent) {
       
       client = _client;
+      
+      let document = parent.ownerDocument;
       
       let canvas = document.createElement("canvas");
       let dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
