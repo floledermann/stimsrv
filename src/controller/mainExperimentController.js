@@ -33,7 +33,7 @@ function MainExperimentController(experiment, options) {
       experimentResults.push({
         name: currentExperiment?.name,
         description: currentExperiment?.description,
-        constantParameters: constantParameters,
+        parameters: constantParameters,
         trials: trials.map(t => ({
           // include only parameters which are not constant
           condition: Object.fromEntries(
