@@ -80,8 +80,9 @@ function filestorage(options) {
           let stat = await fs.stat(filePath);
           if (stat.mtime < initTime) {
             console.log("Found orphaned lock file: " + filename + " ... deleting.");
-            // we do not have to await for this...
-            fs.unlink(filePath);
+            // we still have to await although we don't need to use the file, 
+            // because it may be recreated below
+            await fs.unlink(filePath);
             // do not consider this id for the maximum
             num = -1;
           }
