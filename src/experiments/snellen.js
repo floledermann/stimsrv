@@ -1,6 +1,7 @@
 
 const htmlButtons = require("../ui/htmlButtons.js");
 const parameterController = require("../controller/parameterController.js");
+const random = require("../staircase/random.js");
 
 const canvasRenderer = require("./canvasRenderer.js");
 const renderSnellen = require("./renderSnellen.js");
@@ -8,7 +9,7 @@ const renderSnellen = require("./renderSnellen.js");
 module.exports = function(parameters, options) {
   
   parameters = Object.assign({
-    angle: 0,
+    angle: random.pick([0,90,180,270]),
     size: "10mm",
     middleBar: true,
     pixelAlign: true
@@ -38,6 +39,4 @@ module.exports = function(parameters, options) {
     },
     controller: parameterController(parameters, options)
   }
-
-
 }
