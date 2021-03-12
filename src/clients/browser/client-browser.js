@@ -46,7 +46,7 @@ function clientFactory(options) {
     
       // setup new ui
       if (experiment.interfaces[ui]) {
-        experiment.interfaces[ui]?.initialize?.(client, wrapper, document);
+        experiment.interfaces[ui]?.initialize?.(client, wrapper);
       }
     }
   }

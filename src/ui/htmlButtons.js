@@ -22,16 +22,16 @@ function htmlButtons(buttonDefs, options) {
   let wrapper = null;
   
   return {
-    initialize: function(_client, _parent, _document) {
+    initialize: function(_client, parent) {
       
       client = _client;
-      document = _document;
+      document = parent.ownerDocument;
       
       wrapper = document.createElement(options.wrapperTag);
       if (options.wrapperClass) {
         wrapper.className = options.wrapperClass;
       }
-      _parent.appendChild(wrapper);
+      parent.appendChild(wrapper);
     },
     
     render: function(condition) {
