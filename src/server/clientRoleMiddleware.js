@@ -55,8 +55,10 @@ function factory(experiment) {
       activeRole = potentialRoles[0];
     }
     
-    req.clientDevice = devicesById[activeRole.device]
-       
+    if (activeRole) {
+      req.clientDevice = devicesById[activeRole.device]
+    }
+    
     // on new experiment, always show role selection screen
     if (req.method == "GET" && (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp)) {
       
