@@ -15,26 +15,45 @@ html {
 }
 
 body {
+  /* flex parent */
   display: flex;
   flex-direction: column;
+  
   width: 100%;
   height: 100%;
 }
 
 #interface-display,
 #interface-monitor {
-  background-color: #000000;
-  color: #ffffff;
-  flex: 1 1 100vmin;
+  /* flex child */
+  flex: 0 1 100vh; /* use full height initially, but shrink */
+  
+  /* flex parent (for text child elements etc.) */
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  position: relative; /* make offset parent */
+  overflow: hidden;
+
+  //background-color: #000000;
+  color: #ffffff;
   font-size: 1.2em;
+}
+
+#interface-display canvas,
+#interface-monitor canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #interface-response,
 #interface-control {
-  flex: 0 0 100px;
+  /* flex child */
+  flex: 1 0 0; /* use no height initially, but grow fully with content */
+
+  /* flex parent */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,13 +66,18 @@ body {
 }
 
 .buttons {
+  /* flex parent */
   display: flex;
-  flex: 1;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+
+  /* flex child */
+  flex: 1;
 }
 
 .buttons button {
+  /* flex child */
   flex: 0 1 100px; /* do *not* grow to available space - interestingly, content still grows the button which is good */
 }
 
@@ -91,6 +115,7 @@ input.code {
 }
 
 @media (min-aspect-ratio: 5/4) {
+  /*
   body   {
     flex-direction: row;
   }
@@ -105,5 +130,5 @@ input.code {
   .buttons button {
     flex: 0;
   }
-
+*/
 }

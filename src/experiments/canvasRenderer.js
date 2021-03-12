@@ -34,6 +34,8 @@ module.exports = function(renderFunc, options) {
   
   let colorInterpolator = null;
   
+  let lastCondition = null;
+  
   return {
     initialize: function(_client, parent) {
       
@@ -53,25 +55,44 @@ module.exports = function(renderFunc, options) {
       let gamma = client.getGamma();
       colorInterpolator = d3.interpolateRgb.gamma(gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
       
-      let widthpx = options.width || parent.clientWidth;
-      let heightpx = options.height || parent.clientHeight;
+      function resize(widthpx, heightpx) {
+        
+        // make dimensions even, so that half transform is full pixel
+        
+        widthpx = Math.round(widthpx/2 + 0.5) * 2;
+        heightpx = Math.round(heightpx/2 + 0.5) * 2;
+        
+        width = widthpx * dppx;
+        height = heightpx * dppx;
+        
+        canvas.width = width;      
+        canvas.height = height;
+        
+        canvas.style.width = widthpx + "px";
+        canvas.style.height = heightpx + "px";
+      }
       
-      width = widthpx * dppx;
-      height = heightpx * dppx;
-      
-      canvas.width = width;
-      canvas.height = height;
-      
-      canvas.style.width = widthpx + "px";
-      canvas.style.height = heightpx + "px";
+      resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
       
       parent.appendChild(canvas);
       
       ctx = canvas.getContext('2d');
+      
+      // TODO: dynmaically resize if parent resizes, but how to re-render?
+      let observer = new ResizeObserver((entries) => {
+        //let entry = entries.find((entry) => entry.target === parent);
+        resize(options.width || parent.clientWidth, options.height || parent.clientHeight)
+        if (lastCondition) {
+          this.render(lastCondition);
+        }
+      });
+      observer.observe(parent);
     },
     
     // contract: if render() returns a string or element, then replace the parent content
     render: function(condition) {
+      
+      lastCondition = condition;
       
       condition = Object.assign({
         lowIntensity: 0,
