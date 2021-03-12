@@ -2,6 +2,19 @@
 const Dimension = require("another-dimension");
 const d3 = require("d3-interpolate");
 
+function clamp(value, min=0, max=1) {
+  if (value < min) {
+    client.warn("Clamping intensity value " + value.toFixed(3) + " to 1.");
+    return min;
+  }
+  if (value > max) {
+    client.warn("Clamping intensity value " + value.toFixed(3) + " to 1.");
+    return max;
+  }
+  return value;
+}
+      
+
 module.exports = function(renderFunc, options) {
   
   options = Object.assign({
@@ -64,7 +77,8 @@ module.exports = function(renderFunc, options) {
         lowIntensity: 0,
         // highIntensity: 1.0,
         // contrastRatio: 2.0,           // maximum contrast based on minimumIntensityColor, maximumIntensityColor
-        foregroundIntensityHigh: true,  // high intensity (bright) stimulus on low intensity background.
+        foregroundIntensity: 1.0,  // high intensity (bright) stimulus on low intensity background.
+        backgroundIntensity: 0.0,
         rotate: 0
       }, condition);
       
@@ -78,9 +92,6 @@ module.exports = function(renderFunc, options) {
           condition[key] = Dimension(cond, "px").toNumber("px");  
         }
       }
-            
-      let foregroundIntensity;
-      let backgroundIntensity;
       
      // default case, use maximum intensity as high intensity
       if ((!condition.highIntensity) && (!condition.contrastRatio)) {
@@ -102,48 +113,40 @@ module.exports = function(renderFunc, options) {
         client.warn("Contrast ratio " + condition.contrastRatio + " exceeds valid range for center intensity " + condition.centerIntensity + " - clipping will occur!");
       }
       */
-      if (condition.foregroundIntensityHigh) {
-        foregroundIntensity = condition.highIntensity; //condition.contrastRatio / 2 + condition.centerIntensity - 0.5;
-        backgroundIntensity = condition.lowIntensity; //(1 - condition.contrastRatio) / 2 + condition.centerIntensity - 0.5;
+      if (!condition.foregroundColor) {
+        
+        let realForegroundIntensity = condition.lowIntensity + condition.foregroundIntensity * (condition.highIntensity - condition.lowIntensity); 
+        
+        realForegroundIntensity = clamp(realForegroundIntensity);
+        
+        condition.foregroundColor = colorInterpolator(realForegroundIntensity);
+        
+        console.log("FG: " + realForegroundIntensity.toFixed(3) + " -> " + condition.foregroundColor);
       }
-      else {
-        foregroundIntensity = condition.lowIntensity; //(1 - condition.contrastRatio) / 2 + condition.centerIntensity - 0.5;
-        backgroundIntensity = condition.highIntensity; //condition.contrastRatio / 2 + condition.centerIntensity - 0.5;
-      }
-      
-      function clamp(value) {
-        if (value < 0) {
-          client.warn("Clamping intensity value " + value.toFixed(3) + " to 0.");
-          return 0;
-        }
-        if (value > 1) {
-          client.warn("Clamping intensity value " + value.toFixed(3) + " to 1.");
-          return 1;
-        }
-        return value;
-      }
-      
-      foregroundIntensity = clamp(foregroundIntensity);
-      backgroundIntensity = clamp(backgroundIntensity);
-      
-      let foregroundColor = colorInterpolator(foregroundIntensity);
-      let backgroundColor = colorInterpolator(backgroundIntensity);
 
-      console.log("FG: " + foregroundIntensity.toFixed(3) + " -> " + foregroundColor);
-      console.log("BG: " + backgroundIntensity.toFixed(3) + " -> " + backgroundColor);
-           
+
+      if (!condition.backgroundColor) {
+        let realBackgroundIntensity = condition.lowIntensity + condition.backgroundIntensity * (condition.highIntensity - condition.lowIntensity);
+        
+        realBackgroundIntensity = clamp(realBackgroundIntensity);
+        
+        condition.backgroundColor = colorInterpolator(realBackgroundIntensity);
+
+        console.log("BG: " + realBackgroundIntensity.toFixed(3) + " -> " + condition.backgroundColor);
+      }
+      
       ctx.resetTransform();
       
-      ctx.fillStyle = backgroundColor;
+      ctx.fillStyle = condition.backgroundColor;
       ctx.fillRect(0,0,width,height);
       
-      ctx.fillStyle = foregroundColor;
-      ctx.strokeStyle = foregroundColor;
+      ctx.fillStyle = condition.foregroundColor;
+      ctx.strokeStyle = condition.foregroundColor;
       
       // move origin to center
       ctx.translate(Math.round(width / 2), Math.round(height / 2));
       
-      // introduce rotation to avoid aliasing
+      // affine transform
       if (condition.rotate) {
         ctx.rotate(condition.rotate/180*Math.PI);
       }
