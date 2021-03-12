@@ -19,6 +19,7 @@ use cases:
 const snellen = require("./src/experiments/snellen.js");
 const centerline = require("./src/experiments/centerline.js");
 const bangbox = require("./src/experiments/bangbox.js");
+const tao = require("./src/experiments/aucklandoptotypes.js");
 const pause = require("./src/experiments/pause.js");
 
 const filestorage = require("./src/storage/filestorage.js");
@@ -124,6 +125,18 @@ module.exports = {
   }),
   
   experiments: [
+    tao({
+      size: //sequence(["5mm","3mm","1mm"]), 
+        staircase({
+          startValue: "5mm",
+          stepSize: 1.2,
+          stepType: "multiply",
+          minReversals: 5,
+          minTrials: 2
+          //minValue: 
+          //maxValue:
+        })
+    }),
   /*
     pause({
       buttondisplay: "control",
@@ -132,6 +145,7 @@ module.exports = {
       buttonlabel: "Start"
     }),*/
     //bangbox(),
+    /*
     centerline({
       centerLine: random.pick([true,false]),
       angle: random.range(0,360, {round: 1}),
@@ -140,28 +154,29 @@ module.exports = {
         startValue: "2mm",
         stepSize: 1.2,
         stepType: "multiply",
-        minReversals: 5,
+        minReversals: 0, //5,
+        minTrials: 2
         //minValue: 
         //maxValue:
       })
-    }),
+    }),*/
     snellen(
     {
-      angle: random([0,90,180,270]),
       //rotate: random([-2,+2]), // add random rotation to prevent aliasing
-      translate: [0,0],
       pixelAlign: false,
       lowIntensity: 0, //sequence.loop([0,0.25,0.5,0.75,0.9,0.95]),
       //highIntensity: 1.0,
       //contrastRatio: 1.05,
-      foregroundIntensityHigh: false,
+      foregroundIntensity: 0,
+      backgroundIntensity: 1,
       //size: "3px",
       size: //sequence(["5mm","3mm","1mm"]), 
       staircase({
         startValue: "5mm",
         stepSize: 1.2,
         stepType: "multiply",
-        minReversals: 5,
+        minReversals: 0, //5,
+        minTrials: 2
         //minValue: 
         //maxValue:
       })
