@@ -78,7 +78,7 @@ body {
 
 .buttons button {
   /* flex child */
-  flex: 0 1 100px; /* do *not* grow to available space - interestingly, content still grows the button which is good */
+  flex: 0 1 80px; /* do *not* grow to available space - interestingly, content still grows the button which is good */
 }
 
 h1 {
