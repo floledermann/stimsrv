@@ -14,8 +14,22 @@ function clamp(value, min=0, max=1) {
   return value;
 }
       
-
-module.exports = function(renderFunc, options) {
+function getColorValueForIntensity(intensity, options) {
+  
+  colorInterpolator = d3.interpolateRgb.gamma(options.gamma || 1.0)(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
+  
+  let realIntensity = options.lowIntensity + intensity * (options.highIntensity - options.lowIntensity); 
+  
+  realIntensity = clamp(realIntensity);
+  
+  let colorValue = colorInterpolator(realIntensity);
+  
+  console.log("FG: " + realIntensity.toFixed(3) + " -> " + colorValue);
+  
+  return colorValue;
+}
+    
+function canvasRenderer(renderFunc, options) {
   
   options = Object.assign({
     width: null,  // width in layout pixels, default: use parent width
@@ -135,25 +149,11 @@ module.exports = function(renderFunc, options) {
       }
       */
       if (!condition.foregroundColor) {
-        
-        let realForegroundIntensity = condition.lowIntensity + condition.foregroundIntensity * (condition.highIntensity - condition.lowIntensity); 
-        
-        realForegroundIntensity = clamp(realForegroundIntensity);
-        
-        condition.foregroundColor = colorInterpolator(realForegroundIntensity);
-        
-        console.log("FG: " + realForegroundIntensity.toFixed(3) + " -> " + condition.foregroundColor);
+        condition.foregroundColor = getColorValueForIntensity(condition.foregroundIntensity, condition);
       }
 
-
       if (!condition.backgroundColor) {
-        let realBackgroundIntensity = condition.lowIntensity + condition.backgroundIntensity * (condition.highIntensity - condition.lowIntensity);
-        
-        realBackgroundIntensity = clamp(realBackgroundIntensity);
-        
-        condition.backgroundColor = colorInterpolator(realBackgroundIntensity);
-
-        console.log("BG: " + realBackgroundIntensity.toFixed(3) + " -> " + condition.backgroundColor);
+        condition.backgroundColor = getColorValueForIntensity(condition.backgroundIntensity, condition);
       }
       
       ctx.resetTransform();
@@ -184,3 +184,7 @@ module.exports = function(renderFunc, options) {
     }
   }
 }
+
+canvasRenderer.getColorValueForIntensity = getColorValueForIntensity;
+
+module.exports = canvasRenderer;
