@@ -125,7 +125,7 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
   
   return function(ctx, buttonCondition) {   
   
-    condition = Object.assign({}, buttonCondition, conditionOverride);
+    let condition = Object.assign({}, buttonCondition, conditionOverride);
     
     // convert dimensions into pixels
     for (let key of options?.dimensions) {

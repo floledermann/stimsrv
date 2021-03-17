@@ -16,7 +16,7 @@ function clamp(value, min=0, max=1) {
       
 function getColorValueForIntensity(intensity, options) {
   
-  colorInterpolator = d3.interpolateRgb.gamma(options.gamma || 1.0)(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
+  let colorInterpolator = d3.interpolateRgb.gamma(options.gamma || 1.0)(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
   
   let realIntensity = options.lowIntensity + intensity * (options.highIntensity - options.lowIntensity); 
   
