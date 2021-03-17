@@ -10,12 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-server": "nodemon --ignore static --ignore data -e js,json,html server.js ./experiment-simple.js",
     "watch-client": "nodemon --ignore static --ignore data -e js --exec \"npm run build-client\"",
-    "watch-experiment": "nodemon --ignore static --ignore data -e js --exec \"npm run build-experiment\"",
     "debug-server": "node --inspect-brk server.js ./experiment-simple.js",
-    "build-client": "browserify -r ./src/clients/browser/client-browser.js:stimsrvClient -s stimsrvClient -o static/client-browser.js",
-    "build-client-rollup": "rollup ./src/clients/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs",
-    "build-experiment": "browserify -r ./experiment-simple.js:experiment -s experiment -o static/experiment.js",
-    "build-experiment-rollup": "rollup ./experiment-simple.js --file static/experiment.js --format iife --name experiment --globals path:null,fs/promises:null --external path --plugin 'node-resolve={browser:true}' --plugin commonjs"
+    "build-client": "rollup ./src/clients/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs"
   },
   "repository": {
     "type": "git",
