@@ -7080,7 +7080,7 @@ function clientFactory(options) {
   
   function prepareExperiment(experiment) {
     
-    for (ui of options.role.interfaces) {
+    for (let ui of options.role.interfaces) {
       
       // clear ui
       let wrapper = document.getElementById("interface-" + ui);
@@ -7094,7 +7094,7 @@ function clientFactory(options) {
   }
   
   function showCondition(experiment, condition) {
-    for (ui of options.role.interfaces) {
+    for (let ui of options.role.interfaces) {
       if (experiment.interfaces[ui]) {
         experiment.interfaces[ui]?.render?.(condition);
       }
