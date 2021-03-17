@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
+  "bin": {
+    "stimsrv": "./server.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-server": "nodemon --ignore static --ignore data -e js,json,html server.js ./experiment-simple.js",
