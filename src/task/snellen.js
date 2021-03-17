@@ -1,7 +1,7 @@
 
 const htmlButtons = require("../ui/htmlButtons.js");
 const parameterController = require("../controller/parameterController.js");
-const random = require("../staircase/random.js");
+const random = require("../controller/random.js");
 
 const canvasRenderer = require("./canvasRenderer.js");
 const renderSnellen = require("./renderSnellen.js");

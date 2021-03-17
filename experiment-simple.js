@@ -16,17 +16,17 @@ use cases:
 - Kindle PDF Output
 */
 
-const snellen = require("./src/experiments/snellen.js");
-const centerline = require("./src/experiments/centerline.js");
-const bangbox = require("./src/experiments/bangbox.js");
-const tao = require("./src/experiments/aucklandoptotypes.js");
-const pause = require("./src/experiments/pause.js");
+const snellen = require("./src/task/snellen.js");
+const centerline = require("./src/task/centerline.js");
+const bangbox = require("./src/task/bangbox.js");
+const tao = require("./src/task/aucklandoptotypes.js");
+const pause = require("./src/task/pause.js");
 
 const filestorage = require("./src/storage/filestorage.js");
 
-const staircase = require("./src/staircase/staircase.js");
-const random = require("./src/staircase/random.js");
-const sequence = require("./src/staircase/sequence.js");
+const staircase = require("./src/controller/staircase.js");
+const random = require("./src/controller/random.js");
+const sequence = require("./src/controller/sequence.js");
 
 // this is a complete configuration
 module.exports = {
@@ -126,6 +126,7 @@ module.exports = {
   
   experiments: [
     tao({
+      vanishing: true,
       size: //sequence(["5mm","3mm","1mm"]), 
         staircase({
           startValue: "5mm",
