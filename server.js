@@ -20,13 +20,13 @@ const MainExperimentController = require("./src/controller/mainExperimentControl
 
 let options = mri(process.argv.slice(2));
 
-let experimentFileName = options._[0];
+let experimentFileName = options._[0] || ".";
 if (!experimentFileName) {
   console.error("No experiment file specified - exiting!");
   process.exit(1);
 }
 
-const experiment = require(experimentFileName);
+const experiment = require(path.resolve(experimentFileName));
 
 const app = express();
 
@@ -55,7 +55,9 @@ app.use(session({
   }
 }));
 
-nunjucks.configure('views', {
+// use current dir and stimsrv package relative as fallback path for templates
+// TODO: should locating templates be an option on the experiment object?
+nunjucks.configure([path.resolve("views"), path.join(__dirname, "views")], {
   express: app,
   autoescape: true
 });
