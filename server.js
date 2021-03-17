@@ -3,6 +3,10 @@
 const path = require("path");
 const { networkInterfaces } = require('os');
 
+const rollup = require("rollup");
+const rollupResolve = require("@rollup/plugin-node-resolve").nodeResolve;
+const rollupCommonJS = require("@rollup/plugin-commonjs");
+      
 const mri = require("mri");
 const express = require("express");
 const nunjucks = require("nunjucks");
@@ -27,6 +31,49 @@ if (!experimentFileName) {
 }
 
 const experiment = require(path.resolve(experimentFileName));
+
+async function bundleExperiment() {
+  
+  let bundle = await rollup.rollup({
+    input: path.resolve(experimentFileName),
+    external: ["fs/promises", "path"],
+    plugins: [
+      rollupResolve({browser: true}),
+      rollupCommonJS()
+    ],
+    onwarn: function(warning, rollupWarn) {
+      // ignore waring for circular dependencies on d3
+      let ignoredCircular = ["d3-interpolate"];
+      if (warning.code == "CIRCULAR_DEPENDENCY" &&
+        ignoredCircular.some(d => warning.importer.includes(d))) {
+        return;
+      }
+      if (warning.code == "MISSING_NODE_BUILTINS" &&
+        warning.modules?.includes("path")) {
+        return;
+      }
+      debugger;
+      rollupWarn(warning);
+    }
+  });
+  
+  await bundle.write({
+    file: path.join(__dirname, "static/experiment.js"),
+    format: "iife",
+    name: "experiment",
+    // remove node-specific libraries
+    globals: {
+      "fs/promises": "null",
+      "path": "null"
+    }
+  });
+  
+  await bundle.close();
+}
+
+bundleExperiment().then(() => {
+  console.log("Bundled experiment for browser at static/experiment.js.");
+});
 
 const app = express();
 
