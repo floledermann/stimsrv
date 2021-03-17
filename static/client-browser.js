@@ -7261,25 +7261,25 @@ function clientFactory(options) {
       experimentIndex = null;
       
       this.subscribeEvent("condition", data => {
-        let trial = experiment.experiments[experimentIndex];
+        let task = experiment.experiments[experimentIndex];
         if (data.experimentIndex !== experimentIndex) {
           this.error("Mismatching experiment index received for condition", data);
           experimentIndex = data.experimentIndex;
-          prepareExperiment(trial);
+          prepareExperiment(task);
         }
-        showCondition(trial, data.condition);
+        showCondition(task, data.condition);
       });
       
       this.subscribeEvent("experiment start", data => {
         console.log("Start experiment: " + data.experimentIndex);
-        let trial = experiment.experiments[data.experimentIndex];
+        let task = experiment.experiments[data.experimentIndex];
         if (data.experimentIndex !== experimentIndex) {
           experimentIndex = data.experimentIndex;
-          prepareExperiment(trial);
+          prepareExperiment(task);
         }
         if (data.condition) {
           console.log(data.condition);
-          showCondition(trial, data.condition);
+          showCondition(task, data.condition);
         }
       });
     }
