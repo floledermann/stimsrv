@@ -7,6 +7,7 @@ terms:
 - condition: level of an independent variable
 - stimulus: actual stimulus
 - experiment
+- task
 - trial
 - participant
 
