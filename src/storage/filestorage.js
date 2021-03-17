@@ -51,8 +51,8 @@ function filestorage(options) {
     catch (error) {
       if (error.code === 'ENOENT') {
         let absPath = path.resolve(options.destination);
-        console.warn("Destination folder " + absPath + " does not exist - assuming participant ID 1");
-        return 1;
+        console.warn("Destination folder " + absPath + " does not exist - creating folder...");
+        await fs.mkdir(options.destination, { recursive: true });
       } else {
         throw error;
       }      
