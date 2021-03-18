@@ -18,12 +18,14 @@ const bodyParser = require("body-parser");
 
 const Dimension = require("another-dimension");
 
-const clients = require("./src/clients/index.js");
-const clientRoleMiddleware = require("./src/server/clientRoleMiddleware.js");
-const MainExperimentController = require("./src/controller/mainExperimentController.js");
+const clients = require("../clients/index.js");
+const clientRoleMiddleware = require("./clientRoleMiddleware.js");
+const MainExperimentController = require("../controller/mainExperimentController.js");
 
 let options = mri(process.argv.slice(2));
 
+// you can also run stimsrv in a folder without specifying experiment, 
+// in which case it will consider the local package as the experiment
 let experimentFileName = options._[0] || ".";
 if (!experimentFileName) {
   console.error("No experiment file specified - exiting!");
@@ -32,10 +34,10 @@ if (!experimentFileName) {
 
 const experiment = require(path.resolve(experimentFileName));
 
-async function bundleExperiment() {
+async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
-    input: path.resolve(experimentFileName),
+    input: inputFileName,
     external: ["fs/promises", "path"],
     plugins: [
       rollupResolve({browser: true}),
@@ -58,21 +60,26 @@ async function bundleExperiment() {
   });
   
   await bundle.write({
-    file: path.join(__dirname, "static/experiment.js"),
+    file: outputFileName,
     format: "iife",
-    name: "experiment",
+    name: globalName,
     // remove node-specific libraries
     globals: {
       "fs/promises": "null",
       "path": "null"
     }
-  });
+  }); 
   
   await bundle.close();
 }
 
-bundleExperiment().then(() => {
+Promise.all([
+  bundleClientCode(path.resolve(experimentFileName), path.join(__dirname, "../../static/experiment.js"), "experiment"),
+  bundleClientCode(path.join(__dirname, "../clients/browser/client-browser.js"), path.join(__dirname, "../../static/client-browser.js"), "stimsrvClient")
+])
+.then(() => {
   console.log("Bundled experiment code for browser at static/experiment.js.");
+  console.log("Bundled client code for browser at static/client-browser.js.");
   console.log("Ready.");
 });
 
@@ -105,12 +112,12 @@ app.use(session({
 
 // use current dir and stimsrv package relative as fallback path for templates
 // TODO: should locating templates be an option on the experiment object?
-nunjucks.configure([path.resolve("views"), path.join(__dirname, "views")], {
+nunjucks.configure([path.resolve("views"), path.join(__dirname, "../../views")], {
   express: app,
   autoescape: true
 });
 
-app.use('/static', express.static(path.join(__dirname, "static")));
+app.use('/static', express.static(path.join(__dirname, "../../static")));
 
 app.use(clientRoleMiddleware(experiment));
 
