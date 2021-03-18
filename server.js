@@ -72,7 +72,7 @@ async function bundleExperiment() {
 }
 
 bundleExperiment().then(() => {
-  console.log("Bundled experiment for browser at static/experiment.js.");
+  console.log("Bundled experiment code for browser at static/experiment.js.");
 });
 
 const app = express();
