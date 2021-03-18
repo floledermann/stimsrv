@@ -4,7 +4,7 @@ const Dimension = require("another-dimension");
 const htmlButtons = require("../ui/htmlButtons.js");
 const parameterController = require("../controller/parameterController.js");
 
-const canvasRenderer = require("./canvasRenderer.js");
+const canvasRenderer = require("../stimuli/canvas/canvasRenderer.js");
 
 function renderCenterline(ctx, condition) {
 {

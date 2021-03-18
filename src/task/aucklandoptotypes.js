@@ -3,8 +3,8 @@ const htmlButtons = require("../ui/htmlButtons.js");
 const parameterController = require("../controller/parameterController.js");
 const random = require("../controller/random.js");
 
-const canvasRenderer = require("./canvasRenderer.js");
-const tao = require("./renderAucklandOptotypes.js");
+const canvasRenderer = require("../stimuli/canvas/canvasRenderer.js");
+const tao = require("../stimuli/canvas/aucklandoptotypes.js");
 
 function renderTAO(ctx, condition) {
   if (condition.vanishing) {
