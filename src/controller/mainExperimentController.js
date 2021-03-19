@@ -10,29 +10,29 @@ function MainExperimentController(experiment, options) {
   
   let experimentTimestamp = Date.now();
   
-  let experimentIndex = -1;
-  let currentExperiment = null;
+  let taskIndex = -1;
+  let currentTask = null;
   let currentController = null;
   
   let currentTrial = null;
   
   let trials = [];
   
-  let experimentResults = [];
+  let results = [];
   
   let clients = [];
   
   let userId = null;
   
-  function nextExperiment() {
+  function nextTask() {
     
     // store results of previous experiment
-    if (currentExperiment && currentExperiment?.store !== false) {
+    if (currentTask && currentTask?.store !== false) {
       // separate constant parameters form changing parameters
       let constantParameters = currentController?.constantParameters();
-      experimentResults.push({
-        name: currentExperiment?.name,
-        description: currentExperiment?.description,
+      results.push({
+        name: currentTask?.name,
+        description: currentTask?.description,
         parameters: constantParameters,
         trials: trials.map(t => ({
           // include only parameters which are not constant
@@ -46,24 +46,24 @@ function MainExperimentController(experiment, options) {
     
     trials = [];
     
-    experimentIndex++;
+    taskIndex++;
     
-    if (experimentIndex < experiment.experiments.length) {
+    if (taskIndex < experiment.tasks.length) {
       
-      //console.log("Next Experiment: " + experimentIndex);
+      //console.log("Next Experiment: " + taskIndex);
       
-      currentExperiment = experiment.experiments[experimentIndex];
-      currentController = currentExperiment.controller() || options.defaultController();
+      currentTask = experiment.tasks[taskIndex];
+      currentController = currentTask.controller() || options.defaultController();
            
       currentTrial = {
         condition: currentController.nextCondition(null,null,trials)  // no response yet
       };
       trials.push(currentTrial);
       broadcast("experiment start", {
-        experimentIndex: experimentIndex
+        taskIndex: taskIndex
       });
       broadcast("condition", {
-        experimentIndex: experimentIndex,
+        taskIndex: taskIndex,
         condition: currentTrial.condition
       });
     }
@@ -76,21 +76,21 @@ function MainExperimentController(experiment, options) {
   }
   
   function startExperiment() {
-    if (experimentIndex = -1) {
+    if (taskIndex = -1) {
       userId = storage.getNextParticipantId();
-      nextExperiment();
+      nextTask();
     }
   }
   
   function endExperiment() {
-    experimentIndex = -1;
-    currentExperiment = null;
+    taskIndex = -1;
+    currentTask = null;
     currentController = null;   
     currentTrial = null;
     
-    storage.storeParticipantData(userId, experimentResults);
+    storage.storeParticipantData(userId, results);
     
-    experimentResults = [];
+    results = [];
     trials = [];
   }
   
@@ -115,20 +115,20 @@ function MainExperimentController(experiment, options) {
       currentTrial = { condition: nextCondition };
       trials.push(currentTrial);
       broadcast("condition", {
-        experimentIndex: experimentIndex,
+        taskIndex: taskIndex,
         condition: currentTrial.condition,
       });
     }
     // conditions exhausted - show next experiment
     else {
-      nextExperiment();
+      nextTask();
     }
   }
   
   function addClient(client) {
     clients.push(client);
     client.message("experiment start", {
-      experimentIndex: experimentIndex,
+      taskIndex: taskIndex,
       condition: currentTrial?.condition
     });
   }

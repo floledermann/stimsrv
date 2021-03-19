@@ -6203,9 +6203,9 @@ var stimsrvClient = (function () {
 	  }
 	  
 	  let experiment = null;
-	  let experimentIndex = null;
+	  let taskIndex = null;
 	  
-	  function prepareExperiment(experiment) {
+	  function prepareTask(task) {
 	    
 	    for (let ui of options.role.interfaces) {
 	      
@@ -6214,16 +6214,16 @@ var stimsrvClient = (function () {
 	      wrapper.innerHTML = "";
 	    
 	      // setup new ui
-	      if (experiment.interfaces[ui]) {
-	        experiment.interfaces[ui]?.initialize?.(client, wrapper);
+	      if (task.interfaces[ui]) {
+	        task.interfaces[ui]?.initialize?.(client, wrapper);
 	      }
 	    }
 	  }
 	  
-	  function showCondition(experiment, condition) {
+	  function showCondition(task, condition) {
 	    for (let ui of options.role.interfaces) {
-	      if (experiment.interfaces[ui]) {
-	        experiment.interfaces[ui]?.render?.(condition);
+	      if (task.interfaces[ui]) {
+	        task.interfaces[ui]?.render?.(condition);
 	      }
 	    }
 	  }
@@ -6294,7 +6294,7 @@ var stimsrvClient = (function () {
 	    
 	    response: function(data) {
 	      let msg = {
-	        experimentIndex: experimentIndex,
+	        taskIndex: taskIndex,
 	        clientTimestamp: Date.now(),
 	        clientTimestampAdjust: clientTimestampAdjust,
 	        response: data
@@ -6302,16 +6302,6 @@ var stimsrvClient = (function () {
 	      this.event("response", msg);
 	    },
 
-	    nextExperiment: function() {
-	      if (experimentIndex === null) {
-	        experimentIndex = 0;
-	      }
-	      else {
-	        experimentIndex++;
-	      }
-	      showExperiment(experiment.experiments[experimentIndex]);
-	    },
-	    
 	    warn: function(message, data) {
 	      console.warn(message);
 	      this.event("warning", {
@@ -6385,24 +6375,24 @@ var stimsrvClient = (function () {
 	    run: function(_experiment) {
 	      
 	      experiment = _experiment;
-	      experimentIndex = null;
+	      taskIndex = null;
 	      
 	      this.subscribeEvent("condition", data => {
-	        let task = experiment.experiments[experimentIndex];
-	        if (data.experimentIndex !== experimentIndex) {
+	        let task = experiment.tasks[taskIndex];
+	        if (data.taskIndex !== taskIndex) {
 	          this.error("Mismatching experiment index received for condition", data);
-	          experimentIndex = data.experimentIndex;
-	          prepareExperiment(task);
+	          taskIndex = data.taskIndex;
+	          prepareTask(task);
 	        }
 	        showCondition(task, data.condition);
 	      });
 	      
 	      this.subscribeEvent("experiment start", data => {
-	        console.log("Start experiment: " + data.experimentIndex);
-	        let task = experiment.experiments[data.experimentIndex];
-	        if (data.experimentIndex !== experimentIndex) {
-	          experimentIndex = data.experimentIndex;
-	          prepareExperiment(task);
+	        console.log("Start experiment: " + data.taskIndex);
+	        let task = experiment.tasks[data.taskIndex];
+	        if (data.taskIndex !== taskIndex) {
+	          taskIndex = data.taskIndex;
+	          prepareTask(task);
 	        }
 	        if (data.condition) {
 	          console.log(data.condition);
