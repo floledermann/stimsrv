@@ -6264,7 +6264,7 @@ var stimsrvClient = (function () {
 
 	    event: function(eventType, data) {
 	      socket?.emit(eventType, Object.assign({}, data,{
-	        clientTimestamp: Date.now(),
+	        clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
 	        clientTimestampAdjust: clientTimestampAdjust,
 	        clientAverageDelay: clientAverageDelay
 	      }));
@@ -6295,7 +6295,7 @@ var stimsrvClient = (function () {
 	    response: function(data) {
 	      let msg = {
 	        taskIndex: taskIndex,
-	        clientTimestamp: Date.now(),
+	        clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
 	        clientTimestampAdjust: clientTimestampAdjust,
 	        response: data
 	      };
