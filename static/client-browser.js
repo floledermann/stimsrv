@@ -6399,6 +6399,11 @@ var stimsrvClient = (function () {
 	          showCondition(task, data.condition);
 	        }
 	      });
+	      
+	      this.subscribeEvent("stimsrv reload", data => {
+	        console.log("Server restarted - reloading experiment");
+	        window.location.reload();
+	      });
 	    }
 	  };
 	  

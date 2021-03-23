@@ -81,6 +81,7 @@ Promise.all([
   console.log("Bundled experiment code for browser at static/experiment.js.");
   console.log("Bundled client code for browser at static/client-browser.js.");
   console.log("Ready.");
+  controller.reload();
 });
 
 const app = express();

@@ -75,6 +75,11 @@ function MainExperimentController(experiment, options) {
     }
   }
   
+  function reload() {
+    // reload experiment in case of server restart
+    broadcast("stimsrv reload");
+  }
+  
   function startExperiment() {
     if (taskIndex = -1) {
       userId = storage.getNextParticipantId();
@@ -147,7 +152,8 @@ function MainExperimentController(experiment, options) {
     response: response,
     startExperiment: startExperiment,
     addClient: addClient,
-    removeClient: removeClient
+    removeClient: removeClient,
+    reload: reload
   }
   
 }
