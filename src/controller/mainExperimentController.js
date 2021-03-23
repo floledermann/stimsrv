@@ -1,18 +1,22 @@
+const { performance } = require("perf_hooks");
+
 const nextOnResponse = require("./nextOnResponse.js");
 
 function MainExperimentController(experiment, options) {
   
   options = Object.assign({
-    defaultController: nextOnResponse
+    defaultController: nextOnResponse,
+    relativeTimestamps: true
   }, options);
   
   let storage = experiment.storage;
   
-  let experimentTimestamp = Date.now();
+  let experimentTimeOffset = null;
   
   let taskIndex = -1;
   let currentTask = null;
   let currentController = null;
+  let currentTaskTimeOffset = null;
   
   let currentTrial = null;
   
@@ -24,6 +28,15 @@ function MainExperimentController(experiment, options) {
   
   let userId = null;
   
+  function relativeTime(referenceTime = 0) {
+    if (options.relativeTimestamps) {
+      return Math.round(performance.now()) - referenceTime;
+    }
+    else {
+      return Math.round(performance.timeOrigin + performance.now());
+    }
+  }
+  
   function nextTask() {
     
     // store results of previous experiment
@@ -34,17 +47,18 @@ function MainExperimentController(experiment, options) {
         name: currentTask?.name,
         description: currentTask?.description,
         parameters: constantParameters,
-        trials: trials.map(t => ({
+        taskTimeOffset: currentTaskTimeOffset,
+        trials: trials.map(t => Object.assign(t, {
           // include only parameters which are not constant
           condition: Object.fromEntries(
             Object.entries(t.condition).filter(([key, value]) => !(key in constantParameters))
-          ),
-          response: t.response
+          )
         }))
       });
     }
     
     trials = [];
+    currentTaskTimeOffset = null;
     
     taskIndex++;
     
@@ -54,18 +68,14 @@ function MainExperimentController(experiment, options) {
       
       currentTask = experiment.tasks[taskIndex];
       currentController = currentTask.controller() || options.defaultController();
-           
-      currentTrial = {
-        condition: currentController.nextCondition(null,null,trials)  // no response yet
-      };
-      trials.push(currentTrial);
+      currentTaskTimeOffset = relativeTime(experimentTimeOffset);
+      
       broadcast("experiment start", {
         taskIndex: taskIndex
       });
-      broadcast("condition", {
-        taskIndex: taskIndex,
-        condition: currentTrial.condition
-      });
+      
+      newTrial(currentController.nextCondition(null,null,trials));
+      
     }
     else {
       // end of experiment
@@ -83,6 +93,7 @@ function MainExperimentController(experiment, options) {
   function startExperiment() {
     if (taskIndex = -1) {
       userId = storage.getNextParticipantId();
+      experimentTimeOffset = relativeTime();
       nextTask();
     }
   }
@@ -92,11 +103,24 @@ function MainExperimentController(experiment, options) {
     currentTask = null;
     currentController = null;   
     currentTrial = null;
+    experimentTimeOffset = null;
     
     storage.storeParticipantData(userId, results);
     
     results = [];
     trials = [];
+  }
+  
+  function newTrial(condition) {
+    currentTrial = {
+      trialTimeOffset: relativeTime(experimentTimeOffset + currentTaskTimeOffset),
+      condition: condition  // no response yet
+    };
+    trials.push(currentTrial);
+    broadcast("condition", {
+      taskIndex: taskIndex,
+      condition: currentTrial.condition
+    });
   }
   
   function response(_response) {
@@ -117,12 +141,7 @@ function MainExperimentController(experiment, options) {
     
     // next condition within current experiment
     if (nextCondition) {
-      currentTrial = { condition: nextCondition };
-      trials.push(currentTrial);
-      broadcast("condition", {
-        taskIndex: taskIndex,
-        condition: currentTrial.condition,
-      });
+      newTrial(nextCondition);
     }
     // conditions exhausted - show next experiment
     else {
