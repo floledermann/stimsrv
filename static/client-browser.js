@@ -6119,9 +6119,14 @@ var stimsrvClient = (function () {
 	function warnDefaults(warningFunction, object, defaults) {
 	  
 	  for (let key of Object.keys(defaults)) {
-	    if (! key in object) {
-	      warningFunction("No value for " + key + " provided, using default of " + defaults[key] + "!");
-	      object[key] = defaults[key];
+	    if (! (key in object)) {
+	      //warningFunction("No value for " + key + " provided, using default of " + defaults[key] + "!");
+	      //object[key] = defaults[key];
+	      let val = defaults[key];
+	      Object.defineProperty(object, key, { get: function() {
+	        warningFunction("No value for " + key + " provided, using default of " + defaults[key] + ".");
+	        return val;
+	      } });
 	    }
 	  }
 	  
@@ -6206,8 +6211,6 @@ var stimsrvClient = (function () {
 	  let eventSubscribers = {};
 	  let broadcastSubscribers = {};
 
-	  let uiOptions = null; 
-
 	  function handleIncomingEvent(eventType, data) {
 	    console.log("Received message: " + eventType);
 	    console.log(data);
@@ -6264,6 +6267,8 @@ var stimsrvClient = (function () {
 	  
 	  function prepareTask(task) {
 	    
+	    let uiOptions = getRendererOptions();
+	      
 	    for (let ui of options.role.interfaces) {
 	      
 	      // clear ui
@@ -6304,14 +6309,14 @@ var stimsrvClient = (function () {
 	        }
 	      }
 	      else {
-	        warn("Screen id '" + options.role.screen + "' is configured, but no screen definitions found for device '" + options.device.name + "'.");
+	        warn("Screen id '" + options.role.screen + "' is configured for role '" + options.role.role + "', but no screen definitions found for device '" + options.device.name + "'.");
 	      }
 	    }
 	    else {
 	      if (options.device.screens?.length > 1) {
-	        warn("More than one screen defined for device '" + options.device.id + "' but screen is not specified for role '" + options.role.role + "' - using first screen.");
+	        warn("Screen is not specified for role '" + options.role.role + "', but more than one screen is defined for device '" + options.device.id + "' - using first screen.");
 	      }
-	    }
+	    }    
 	    
 	    let config = Object.assign({}, options.device, screenConfig);
 	    config.id = options.device.id;
@@ -6346,8 +6351,6 @@ var stimsrvClient = (function () {
 	    connect: function() {
 	    
 	      socket = build.connect();
-	      
-	      uiOptions = getRendererOptions();
 	      
 	      socket.onAny(handleIncomingEvent);
 
