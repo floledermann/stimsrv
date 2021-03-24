@@ -17,6 +17,9 @@ function MainExperimentController(experiment, options) {
   
   let storage = experiment.storage;
   
+  let clients = [];
+  
+  // state
   let experimentTimeOffset = null;
   
   let taskIndex = -1;
@@ -27,15 +30,31 @@ function MainExperimentController(experiment, options) {
   let currentTrial = null;
   
   let trials = [];
-  
   let results = [];
   
   let errors = [];
   let warnings = [];
   
-  let clients = [];
-  
   let userIdPromise = null;
+  
+  function resetExperiment() {
+    experimentTimeOffset = null;
+    
+    taskIndex = -1;
+    currentTask = null;
+    currentController = null;
+    currentTaskTimeOffset = null;
+    
+    currentTrial = null;
+    
+    trials = [];
+    results = [];
+    
+    errors = [];
+    warnings = [];
+    
+    userIdPromise = null;
+  }
   
   function relativeTime(referenceTime = 0) {
     if (experiment.settings.relativeTimestamps) {
@@ -89,8 +108,12 @@ function MainExperimentController(experiment, options) {
     else {
       // end of experiment
       broadcast("experiment end");
-      endExperiment();
-      // TODO: control looping behaviour, store data etc.
+      endExperiment().then(() => {
+        if (experiment.settings.loop) {
+          resetExperiment();
+          startExperiment();
+        }
+      });
     }
   }
   
@@ -107,7 +130,7 @@ function MainExperimentController(experiment, options) {
     }
   }
   
-  function endExperiment() {
+  async function endExperiment() {
     taskIndex = -1;
     currentTask = null;
     currentController = null;   
