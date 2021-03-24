@@ -25,8 +25,6 @@ function clientFactory(options) {
   let eventSubscribers = {};
   let broadcastSubscribers = {};
 
-  let uiOptions = null; 
-
   function handleIncomingEvent(eventType, data) {
     console.log("Received message: " + eventType);
     console.log(data);
@@ -83,6 +81,8 @@ function clientFactory(options) {
   
   function prepareTask(task) {
     
+    let uiOptions = getRendererOptions();
+      
     for (let ui of options.role.interfaces) {
       
       // clear ui
@@ -165,8 +165,6 @@ function clientFactory(options) {
     connect: function() {
     
       socket = socketio.connect();
-      
-      uiOptions = getRendererOptions();
       
       socket.onAny(handleIncomingEvent);
 
