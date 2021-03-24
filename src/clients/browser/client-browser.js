@@ -123,14 +123,14 @@ function clientFactory(options) {
         }
       }
       else {
-        warn("Screen id '" + options.role.screen + "' is configured, but no screen definitions found for device '" + options.device.name + "'.");
+        warn("Screen id '" + options.role.screen + "' is configured for role '" + options.role.role + "', but no screen definitions found for device '" + options.device.name + "'.");
       }
     }
     else {
       if (options.device.screens?.length > 1) {
-        warn("More than one screen defined for device '" + options.device.id + "' but screen is not specified for role '" + options.role.role + "' - using first screen.");
+        warn("Screen is not specified for role '" + options.role.role + "', but more than one screen is defined for device '" + options.device.id + "' - using first screen.");
       }
-    }
+    }    
     
     let config = Object.assign({}, options.device, screenConfig);
     config.id = options.device.id;
