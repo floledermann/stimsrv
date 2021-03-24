@@ -12,10 +12,10 @@ function renderTAO(ctx, condition) {
     ctx.fillStyle = canvasRenderer.getColorValueForIntensity((condition.lowIntensity + condition.highIntensity) / 2, condition);
     ctx.fillRect(-ctx.canvas.width/2-1,-ctx.canvas.height/2-1,ctx.canvas.width+2,ctx.canvas.height+2);
     if (condition.vanishing == "BWB") {
-      tao.strokeVanishing(condition.backgroundColor, condition.foregroundColor)(ctx, condition.shape, condition.size);
+      tao.strokeVanishing(condition.backgroundIntensity, condition.foregroundIntensity)(ctx, condition.shape, condition.size);
     }
     else {
-      tao.strokeVanishing(condition.foregroundColor, condition.backgroundColor)(ctx, condition.shape, condition.size);
+      tao.strokeVanishing(condition.foregroundIntensity, condition.backgroundIntensity)(ctx, condition.shape, condition.size);
     }
   }
   else {
@@ -38,7 +38,14 @@ module.exports = function(parameters) {
     
   let renderer = canvasRenderer(renderTAO, options);
   
-  let buttonCanvas = htmlButtons.buttonCanvas(renderTAO, {size: "27arcmin", vanishing: false}, options);
+  let buttonOverrides = {size: "27arcmin", vanishing: false};
+  if (parameters.vanishing) {
+    Object.assign(buttonOverrides, {
+      backgroundIntensity: 1,
+      foregroundIntensity: 0
+    })
+  }
+  let buttonCanvas = htmlButtons.buttonCanvas(renderTAO, buttonOverrides, options);
 
   function firstCap(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);

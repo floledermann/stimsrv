@@ -36,38 +36,38 @@ function canvasRenderer(renderFunc, options) {
     height: null,  // height in layout pixels, default: use parent height
     minimumIntensityColor: "#000000",
     maximumIntensityColor: "#ffffff",
-    ambientIntensity: 1/100,  // TODO: should this go into "viewing conditions" setting? Or combination of viewing conditions and display (reflectance) properties?
-    dimensions: []
+    dimensions: [],
+    intensities: []  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
   }, options);
+  
+  options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
   
   let ctx = null;
   let width = null;
   let height = null;
   
-  let client = null;
+  let runtime = null;
   
   let colorInterpolator = null;
   
   let lastCondition = null;
   
   return {
-    initialize: function(_client, parent) {
+    initialize: function(parent, _runtime) {
       
-      client = _client;
+      runtime = _runtime;
       
       let document = parent.ownerDocument;
       
       let canvas = document.createElement("canvas");
       let dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
       
-      let pixelDensity = client.getPixelDensity();
       Dimension.configure({
-        pixelDensity: pixelDensity,
-        viewingDistance: client.getViewingDistance()
+        pixelDensity: runtime.pixeldensity,
+        viewingDistance: runtime.viewingdistance
       });
       
-      let gamma = client.getGamma();
-      colorInterpolator = d3.interpolateRgb.gamma(gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
+      colorInterpolator = d3.interpolateRgb.gamma(runtime.gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
       
       function resize(widthpx, heightpx) {
         
@@ -117,7 +117,7 @@ function canvasRenderer(renderFunc, options) {
         rotate: 0
       }, condition);
       
-      // convert dimensions into pixels
+      // convert dimensions to pixels
       for (let key of options.dimensions) {
         let cond = condition[key];
         if (Array.isArray(cond)) {
@@ -135,34 +135,43 @@ function canvasRenderer(renderFunc, options) {
       
       if (condition.contrastRatio) {
         if (condition.highIntensity) {
-          client.warn("Both highIntensity and contrastRatio specified - omitting contrastRatio.");
+          runtime.warn("Both highIntensity and contrastRatio specified - omitting contrastRatio.");
         }
         else {
-          let realLowIntensity = condition.lowIntensity + options.ambientIntensity * (1-condition.lowIntensity);
+          let realLowIntensity = condition.lowIntensity + runtime.ambientIntensity * (1-condition.lowIntensity);
           let realHighIntensity = realLowIntensity * condition.contrastRatio;
-          condition.highIntensity = (realHighIntensity - options.ambientIntensity) / (1 - options.ambientIntensity);
+          condition.highIntensity = (realHighIntensity - runtime.ambientIntensity) / (1 - runtime.ambientIntensity);
         }
       }
       /*
       if (condition.contrastRatio / 2 > condition.centerIntensity) {
-        client.warn("Contrast ratio " + condition.contrastRatio + " exceeds valid range for center intensity " + condition.centerIntensity + " - clipping will occur!");
+        runtime.warn("Contrast ratio " + condition.contrastRatio + " exceeds valid range for center intensity " + condition.centerIntensity + " - clipping will occur!");
       }
       */
-      if (!condition.foregroundColor) {
-        condition.foregroundColor = getColorValueForIntensity(condition.foregroundIntensity, condition);
-      }
 
-      if (!condition.backgroundColor) {
-        condition.backgroundColor = getColorValueForIntensity(condition.backgroundIntensity, condition);
+      // convert intensities to color values
+      for (let key of options.intensities) {
+        let cond = condition[key];
+        if (typeof cond == "number") {
+          console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
+          condition[key] = getColorValueForIntensity(condition[key], condition);
+        }
+        else {
+          runtime.warn("Intensity value " + key + " not specified as number. Using specified value " + condition[key] + " unchanged.");
+        }
       }
       
       ctx.resetTransform();
       
-      ctx.fillStyle = condition.backgroundColor;
-      ctx.fillRect(0,0,width,height);
+      if (condition.backgroundIntensity) {
+        ctx.fillStyle = condition.backgroundIntensity;
+        ctx.fillRect(0,0,width,height);
+      }
       
-      ctx.fillStyle = condition.foregroundColor;
-      ctx.strokeStyle = condition.foregroundColor;
+      if (condition.foregroundIntensity) {
+        ctx.fillStyle = condition.foregroundIntensity;
+        ctx.strokeStyle = condition.foregroundIntensity;
+      }
       
       // move origin to center
       ctx.translate(Math.round(width / 2), Math.round(height / 2));

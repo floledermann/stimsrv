@@ -200,7 +200,7 @@ function MainExperimentController(experiment, options) {
       if (!Array.isArray(currentTrial.warnings)) {
         currentTrial.warnings = [];
       }
-      currentTrial.warnings.push(Object.assign({}, obj, {timeOffset: relativeTime(trialTimeOffset)}));
+      currentTrial.warnings.push(Object.assign({}, obj, {timeOffset: relativeTime(currentTrial.trialTimeOffset)}));
     }
     warnings.push(obj);
   }
@@ -217,7 +217,7 @@ function MainExperimentController(experiment, options) {
       if (!Array.isArray(currentTrial.errors)) {
         currentTrial.errors = [];
       }
-      currentTrial.errors.push(Object.assign({}, obj, {timeOffset: relativeTime(trialTimeOffset)}));
+      currentTrial.errors.push(Object.assign({}, obj, {timeOffset: relativeTime(currentTrial.trialTimeOffset)}));
     }
     errors.push(obj);
   }

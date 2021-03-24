@@ -185,6 +185,12 @@ io.on("connection", (socket) => {
     controller.response(data.response);
   });
   
+  socket.on("warning", (data) => {
+    let message = data.message;
+    delete data.message;
+    controller.warn(message, data);
+  });
+  
   socket.onAny((messageType, data) => {
     console.log("Received message: " + messageType);
     console.log(data);

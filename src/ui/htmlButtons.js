@@ -2,6 +2,8 @@ const Dimension = require("another-dimension");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
+const getColorValueForIntensity = require("../stimuli/canvas/canvasRenderer.js").getColorValueForIntensity;
+
 function htmlButtons(buttonDefs, options) {
   
   options = Object.assign({
@@ -17,14 +19,14 @@ function htmlButtons(buttonDefs, options) {
     buttonDefs = [buttonDefs];
   }
   
-  let client = null;
+  let runtime = null;
   let document = null;
   let wrapper = null;
   
   return {
-    initialize: function(_client, parent) {
+    initialize: function(parent, _runtime) {
       
-      client = _client;
+      runtime = _runtime;
       document = parent.ownerDocument;
       
       wrapper = document.createElement(options.wrapperTag);
@@ -64,19 +66,6 @@ function htmlButtons(buttonDefs, options) {
           
           let ctx = canvas.getContext("2d");
           
-          let fgColor = "#ffffff";
-          let bgColor = "#000000";
-          
-          if (!buttonCondition.foregroundIntensityHigh) {
-            fgColor = "#000000";
-            bgColor = "#ffffff";
-          }
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(0,0,ctx.canvas.width, ctx.canvas.height);
-          ctx.fillStyle = fgColor;
-          ctx.strokeStyle = fgColor;
-          ctx.translate(ctx.canvas.width/2, ctx.canvas.height/2);
-          
           buttonDef.canvas(ctx, buttonCondition);
         }
         
@@ -96,17 +85,17 @@ function htmlButtons(buttonDefs, options) {
               e.preventDefault();
             }
             
-            client.response(buttonDef.response || {label: buttonDef.label});
+            runtime.response(buttonDef.response || {label: buttonDef.label});
             
             if (options.broadcastEvents) {
               if (Array.isArray(options.broadcastEvents)) {
                 let evt = options.broadcastEvents[index];
                 if (evt) {
-                  broadcastVal(client, valOrFunc(evt,condition,buttonDef,index));
+                  broadcastVal(runtime, valOrFunc(evt,condition,buttonDef,index));
                 }
               }
               else {
-                broadcastVal(client, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
+                broadcastVal(runtime, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
               }
             }
           });
@@ -120,14 +109,23 @@ function htmlButtons(buttonDefs, options) {
 htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
 
   options = Object.assign({
-    dimensions: []
+    dimensions: [],
+    intensities: []
   }, options);
+  
+  options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);  
   
   return function(ctx, buttonCondition) {   
   
-    let condition = Object.assign({}, buttonCondition, conditionOverride);
+    let condition = Object.assign({
+      lowIntensity: 0,
+      highIntensity: 1.0,
+      foregroundIntensity: 1.0,  // high intensity (bright) stimulus on low intensity background.
+      backgroundIntensity: 0.0,
+      rotate: 0
+   }, buttonCondition, conditionOverride);
     
-    // convert dimensions into pixels
+    // convert dimensions to pixels
     for (let key of options?.dimensions) {
       let cond = condition[key];
       if (Array.isArray(cond)) {
@@ -138,12 +136,49 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
       }
     }
     
+    // convert intensities to color values
+    for (let key of options.intensities) {
+      let cond = condition[key];
+      if (typeof cond == "number") {
+        console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
+        condition[key] = getColorValueForIntensity(condition[key], condition);
+      }
+    }
+
+    ctx.resetTransform();
+    
+    if (condition.backgroundIntensity) {
+      ctx.fillStyle = condition.backgroundIntensity;
+      ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    }
+    
+    if (condition.foregroundIntensity) {
+      ctx.fillStyle = condition.foregroundIntensity;
+      ctx.strokeStyle = condition.foregroundIntensity;
+    }
+    
+    // move origin to center
+    ctx.translate(Math.round(ctx.canvas.width / 2), Math.round(ctx.canvas.height / 2));
+    
+    // affine transform
+    if (condition.rotate) {
+      ctx.rotate(condition.rotate/180*Math.PI);
+    }
+    if (condition.translate) {
+      let trans = condition.translate;
+      if (!Array.isArray(condition.translate)) {
+        trans = [trans, trans];
+      }
+      ctx.translate(trans[0], trans[1]);
+    }
+          
+    
     renderFunc(ctx, condition);
   }
 }
   
 
-function broadcastVal(client, evt) {
+function broadcastVal(runtime, evt) {
   let type = null;
   let data = {};
   if (typeof evt == 'string') {
@@ -153,7 +188,7 @@ function broadcastVal(client, evt) {
     type = evt.type;
     data = evt.data;
   }
-  client.broadcastEvent(type, data);
+  runtime.broadcastEvent(type, data);
 }
 
 module.exports = htmlButtons;

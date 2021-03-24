@@ -1,18 +1,20 @@
 
 const socketio = require("socket.io-client");
 
+const warnDefaults = require("../../util/warnDefaults.js");
+
 const timing = require("./browser/timing.js");
 
 function clientFactory(options) {
   
   options = Object.assign({
+    // these need to be passed in:
+    // clientid
     // device
     // role
     root: document.body
   }, options);
-  
-  let screenConfig = null;
-        
+          
   for (let ui of options.role.interfaces) {
     let el = document.createElement("section");
     el.id = "interface-" + ui;
@@ -23,6 +25,8 @@ function clientFactory(options) {
   let eventSubscribers = {};
   let broadcastSubscribers = {};
 
+  let uiOptions = null; 
+
   function handleIncomingEvent(eventType, data) {
     console.log("Received message: " + eventType);
     console.log(data);
@@ -31,6 +35,47 @@ function clientFactory(options) {
         cb(data);
       }
     }
+  }
+
+  function emitEvent(eventType, data) {
+    socket?.emit(eventType, Object.assign({}, data, {
+      clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
+      clientTimestampAdjust: clientTimestampAdjust,
+      clientAverageDelay: clientAverageDelay
+    }));
+  }
+    
+  function event(eventType, data) {
+    emitEvent("broadcast", {
+      type: eventType,
+      data: data
+    });
+  }
+    
+  function response(data) {
+    let msg = {
+      taskIndex: taskIndex,
+      clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
+      clientTimestampAdjust: clientTimestampAdjust,
+      response: data
+    }
+    emitEvent("response", msg);
+  }
+
+  function warn(message, data) {
+    console.warn(message);
+    emitEvent("warning", {
+      message: message,
+      data: data
+    });
+  }
+
+  function error(message, data) {
+    console.error(message);
+    emitEvent("error", {
+      message: message,
+      data: data
+    });
   }
   
   let experiment = null;
@@ -46,7 +91,7 @@ function clientFactory(options) {
     
       // setup new ui
       if (task.interfaces[ui]) {
-        task.interfaces[ui]?.initialize?.(client, wrapper);
+        task.interfaces[ui]?.initialize?.(wrapper, uiOptions);
       }
     }
   }
@@ -58,7 +103,60 @@ function clientFactory(options) {
       }
     }
   }
-  
+
+  function getRendererOptions() {
+    
+    let screenConfig = options.device.screens?.[0];
+    
+    if (options.role.screen) {
+      if (options.device.screens?.length) {
+        let candidates = options.device.screens.filter(d => d.id == options.role.screen);
+        if (candidates.length >= 1) {
+          if (candidates.length > 1) {
+            warn("Multiple screens with same id '" + options.role.screen + "' found - using first match.");
+          }
+          screenConfig = candidates[0];
+        }
+        else {
+          warn("No screen with id '" + options.role.screen + "' found - using first screen.");
+          screenConfig = options.device.screens[0];
+        }
+      }
+      else {
+        warn("Screen id '" + options.role.screen + "' is configured, but no screen definitions found for device '" + options.device.name + "'.");
+      }
+    }
+    else {
+      if (options.device.screens?.length > 1) {
+        warn("More than one screen defined for device '" + options.device.id + "' but screen is not specified for role '" + options.role.role + "' - using first screen.");
+      }
+    }
+    
+    let config = Object.assign({}, options.device, screenConfig);
+    config.id = options.device.id;
+    if (screenConfig) {
+      config.screenId = screenConfig.id;
+    }
+    delete config.screens;
+    
+    warnDefaults(warn, config, {
+      pixeldensity: 96,
+      gamma: 2.2,
+      viewingdistance: 600,
+      ambientIntensity: 1/100
+    });
+    
+    Object.assign(config, {
+      warn: warn,
+      error: error,
+      event: event,
+      response: response
+    })
+    
+    return config;
+    
+  }
+    
   let socket = null;
   let clientTimestampAdjust = null;
   let clientAverageDelay = null;
@@ -67,6 +165,8 @@ function clientFactory(options) {
     connect: function() {
     
       socket = socketio.connect();
+      
+      uiOptions = getRendererOptions();
       
       socket.onAny(handleIncomingEvent);
 
@@ -93,14 +193,6 @@ function clientFactory(options) {
       });
     },
 
-    event: function(eventType, data) {
-      socket?.emit(eventType, Object.assign({}, data,{
-        clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
-        clientTimestampAdjust: clientTimestampAdjust,
-        clientAverageDelay: clientAverageDelay
-      }));
-    },
-
     // should this even be public, or force to use broadcast events only?
     subscribeEvent: function(eventType, callback) {
       if (!eventSubscribers[eventType]) {
@@ -116,93 +208,14 @@ function clientFactory(options) {
       broadcastSubscribers[eventType].push(callback);
     },
     
-    broadcastEvent: function(eventType, data) {
-      this.event("broadcast", {
-        type: eventType,
-        data: data
-      });
-    },
+    warn: warn,
     
-    response: function(data) {
-      let msg = {
-        taskIndex: taskIndex,
-        clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
-        clientTimestampAdjust: clientTimestampAdjust,
-        response: data
-      }
-      this.event("response", msg);
-    },
-
-    warn: function(message, data) {
-      console.warn(message);
-      this.event("warning", {
-        message: message,
-        data: data
-      });
-    },
-
-    error: function(message, data) {
-      console.error(message);
-      this.event("error", {
-        message: message,
-        data: data
-      });
-    },
+    error: error,
     
-    getPixelDensity: function() {
-      
-      // lazy init
-      if (!screenConfig) {
-        screenConfig = options.device.screens?.[0] || options.device;
-        if (options.role.screen) {
-          if (options.device.screens?.length) {
-            let candidates = options.device.screens.filter(d => d.id == options.role.screen);
-            if (candidates.length >= 1) {
-              if (candidates.length > 1) {
-                this.warn("Multiple screens with same id '" + options.role.screen + "' found - using first match.");
-              }
-              screenConfig = candidates[0];
-            }
-            else {
-              this.warn("No screen with id '" + options.role.screen + "' found - using first screen.");
-              screenConfig = options.device.screens[0];
-            }
-          }
-          else {
-            this.warn("Screen id '" + options.role.screen + "' is configured, but no screen definitions found for device '" + options.device.name + "'.");
-          }
-        }
-        else {
-          if (options.device.screens?.length > 1) {
-            this.warn("More than one screen defined for device '" + options.device.id + "' but screen is not specified for role '" + options.role.role + "' - using first screen.");
-          }
-        }
-      }
-
-      if (screenConfig.pixeldensity) {
-        return screenConfig.pixeldensity;
-      }
-      
-      this.warn("Pixel density not defined for screen, using default of 96.");
-      return 96;
-
-    },
+    event: event,
     
-    getGamma: function() {
-      return screenConfig?.gamma || 2.2;
-    },
-
-    getViewingDistance: function() {
-      
-      let vd = screenConfig?.viewingdistance;
-      
-      if (!vd) {
-        this.warn("Viewing distance not configured for screen, using default of 600.");
-        vd = 600;
-      }
-      return vd;
-    },
-
+    response: response,
+    
     run: function(_experiment) {
       
       experiment = _experiment;
