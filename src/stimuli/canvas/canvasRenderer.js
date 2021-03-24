@@ -152,12 +152,14 @@ function canvasRenderer(renderFunc, options) {
       // convert intensities to color values
       for (let key of options.intensities) {
         let cond = condition[key];
-        if (typeof cond == "number") {
-          //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-          condition[key] = getColorValueForIntensity(condition[key], condition);
-        }
-        else {
-          runtime.warn("Intensity value " + key + " not specified as number. Using specified value " + condition[key] + " unchanged.");
+        if (cond !== undefined) {
+          if (typeof cond == "number") {
+            //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
+            condition[key] = getColorValueForIntensity(condition[key], condition);
+          }
+          else {
+            runtime.warn("Intensity value " + key + " not specified as number. Using specified value " + condition[key] + " unchanged.");
+          }
         }
       }
       
