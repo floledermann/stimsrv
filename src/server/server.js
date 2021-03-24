@@ -90,7 +90,7 @@ app.locals.experiment = experiment;
 
 Dimension.configure({ toJSON: d => d.toString() });
     
-let controller = MainExperimentController(experiment);
+let controller = MainExperimentController(experiment, experiment.settings);
 controller.startExperiment();
 
 // is this still needed as a global?
