@@ -9,7 +9,7 @@ module.exports = function(htmlString, options) {
   let parent = null;
   
   return {
-    initialize: function(_client, _parent, _document) {
+    initialize: function(_parent, _runtime) {
       parent = _parent;
     },
     
