@@ -140,7 +140,7 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
     for (let key of options.intensities) {
       let cond = condition[key];
       if (typeof cond == "number") {
-        console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
+        //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
         condition[key] = getColorValueForIntensity(condition[key], condition);
       }
     }

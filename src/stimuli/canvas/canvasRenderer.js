@@ -24,7 +24,7 @@ function getColorValueForIntensity(intensity, options) {
   
   let colorValue = colorInterpolator(realIntensity);
   
-  console.log("FG: " + realIntensity.toFixed(3) + " -> " + colorValue);
+  //console.log("FG: " + realIntensity.toFixed(3) + " -> " + colorValue);
   
   return colorValue;
 }
@@ -153,7 +153,7 @@ function canvasRenderer(renderFunc, options) {
       for (let key of options.intensities) {
         let cond = condition[key];
         if (typeof cond == "number") {
-          console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
+          //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
           condition[key] = getColorValueForIntensity(condition[key], condition);
         }
         else {
