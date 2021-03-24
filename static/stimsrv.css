@@ -74,11 +74,17 @@ body {
 
   /* flex child */
   flex: 1;
+  padding: 0.3em;
 }
 
 .buttons button {
   /* flex child */
   flex: 0 1 80px; /* do *not* grow to available space - interestingly, content still grows the button which is good */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0.3em;
 }
 
 h1 {
