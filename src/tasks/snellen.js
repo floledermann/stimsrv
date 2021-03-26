@@ -37,6 +37,6 @@ module.exports = function(parameters, options) {
       monitor: renderer,
       control: null,
     },
-    controller: parameterController(parameters, options)
+    controller: parameterController(parameters)
   }
 }

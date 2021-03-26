@@ -1,16 +1,9 @@
 
 
 // outer factory is called at experiment initialization time
-module.exports = function(_parameters, options) {
+module.exports = function(_parameters, conditions) {
   
-  Object.freeze(_parameters);
-  
-  options = Object.assign({
-    
-  }, options);
-  
-  //permutator = parameterPermutator(parameters, options);
-  
+  Object.freeze(_parameters);  
   
   // all parameters should be generators, so convert primitive values into infinite generators
   function* yieldOnce(val) {
@@ -24,7 +17,7 @@ module.exports = function(_parameters, options) {
   }
   
   // inner factory is called when task is started (in order to be able to start fresh for each task)
-  return function() {
+  return function(context) {
     
     // make a copy of the parameters
     let parameters = Object.assign({}, _parameters);
@@ -47,6 +40,12 @@ module.exports = function(_parameters, options) {
         throw "Parameter " + key + " must be a primitive value or a factory function.";
       }
     }
+    
+    let conditionsIterator = null;
+    
+    if (conditions) {
+      conditionsIterator = conditions();
+    }
 
     // return next condition, or null for end of experiment
     return {
@@ -62,6 +61,12 @@ module.exports = function(_parameters, options) {
             done = true;
           }
           condition[key] = param.value;
+        }
+        
+        if (conditionsIterator) {
+          let cond = conditionsIterator.next(lastCondition, lastResponse, trials);
+        
+          Object.assign(condition, cond.value);
         }
         
         if (!done) {
