@@ -44,8 +44,14 @@ function htmlButtons(buttonDefs, options) {
       wrapper.innerHTML = "";
       for (let [index, buttonDef] of _buttonDefs.entries()) {
         
+        let buttonCondition = Object.assign({}, condition, buttonDef.response);
+        
         let el = document.createElement(options.buttonTag);
-        el.innerHTML = valOrFunc(buttonDef.label || buttonDef, condition);
+        el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
+        
+        if (buttonDef.style) {
+          el.style.cssText = buttonDef.style;
+        }
         
         if (buttonDef.canvas) {
           
@@ -61,9 +67,7 @@ function htmlButtons(buttonDefs, options) {
           canvas.style.height = "40px";
           
           el.appendChild(canvas);
-          
-          let buttonCondition = Object.assign({}, condition, buttonDef.response);
-          
+                    
           let ctx = canvas.getContext("2d");
           
           buttonDef.canvas(ctx, buttonCondition);
