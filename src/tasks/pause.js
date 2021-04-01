@@ -10,7 +10,7 @@ module.exports = function(options) {
     monitormessage: "Experiment paused" + (options.controller == "control" ? ". Press button to continue." : ", waiting for user."),
     buttondisplay: "response",
     buttonlabel: "Continue",
-    store: false
+    store: false  // do not store by default
   }, options);
   
   return {
