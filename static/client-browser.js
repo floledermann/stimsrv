@@ -6277,7 +6277,7 @@ var stimsrvClient = (function () {
 	    
 	      // setup new ui
 	      if (task.interfaces[ui]) {
-	        task.interfaces[ui]?.initialize?.(wrapper, uiOptions);
+	        task.interfaces[ui]?.initialize?.(wrapper, uiOptions) || task.interfaces["*"]?.initialize?.(wrapper, uiOptions);
 	      }
 	    }
 	  }
@@ -6285,7 +6285,7 @@ var stimsrvClient = (function () {
 	  function showCondition(task, condition) {
 	    for (let ui of options.role.interfaces) {
 	      if (task.interfaces[ui]) {
-	        task.interfaces[ui]?.render?.(condition);
+	        task.interfaces[ui]?.render?.(condition) || task.interfaces["*"]?.render?.(condition);
 	      }
 	    }
 	  }

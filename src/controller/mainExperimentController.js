@@ -90,14 +90,22 @@ function MainExperimentController(experiment, options) {
     trials = [];
     currentTaskTimeOffset = null;
     
-    taskIndex++;
+    let nextContext = currentController?.nextContext?.(trials);
     
-    if (taskIndex < experiment.tasks.length) {
+    if (!nextContext?.continue) {
+      taskIndex++;
+    }
+
+    context = nextContext?.context || context;
       
+    if (taskIndex < experiment.tasks.length) {
+      if (!nextContext?.continue) {
+        currentTask = experiment.tasks[taskIndex](context);
+        context = currentTask.context || context;      
+        currentController = currentTask.controller || options.defaultController(context);
+      }
       //console.log("Next Experiment: " + taskIndex);
       
-      currentTask = experiment.tasks[taskIndex](context);
-      currentController = currentTask.controller || options.defaultController(context);
       currentTaskTimeOffset = relativeTime(experimentTimeOffset);
       
       broadcast("experiment start", {

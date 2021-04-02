@@ -14,11 +14,11 @@ module.exports = function(config) {
   
   return function(context) {
     
-    // mix passed-in context with config.context and add taskIndex override
-    context = Object.assign({}, valOrFunc(config.context, context), context, {taskIndex: 0});
+    // mix defaults with config.context and passed in context
+    context = Object.assign({taskIndex: 0}, valOrFunc(config.context, context), context);
     
     if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex] == "function") {
-      let subContext = Object.assign({},context,context.context)
+      let subContext = Object.assign({}, context, context.context)
       currentTask = config.tasks[context.taskIndex](subContext);
     }
     else {
@@ -29,10 +29,12 @@ module.exports = function(config) {
     return {
       name: currentTask.name,
       interfaces: currentTask.interfaces,
+      context: context,
       controller: {
         nextCondition: currentTask.controller.nextCondition,
-        nextContext: (conditions, responses) => {
-          let c = currentTask.nextContext?.(conditions, responses);
+        nextContext: trials => {
+                  
+          let c = currentTask.controller.nextContext?.(trials);
           let newContext = Object.assign({}, context, {context: c || context.context || {}});
           
           // should the current sub-task be continued?
@@ -43,11 +45,14 @@ module.exports = function(config) {
             }
           }
           
+          // otherwise, advance loop counter, or loop at end
           newContext.taskIndex++;
           
           if (newContext.taskIndex >= config.tasks.length) {
             newContext.taskIndex = 0;
           }
+          
+          context = newContext;
           
           return {
             'continue': true,
