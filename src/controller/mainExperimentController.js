@@ -7,7 +7,7 @@ const nextOnResponse = require("./nextOnResponse.js");
 function MainExperimentController(experiment, options) {
   
   options = Object.assign({
-    defaultController: nextOnResponse,
+    defaultController: nextOnResponse(),
   }, options);
   
   experiment.settings = Object.assign({
@@ -21,6 +21,8 @@ function MainExperimentController(experiment, options) {
   
   // state
   let experimentTimeOffset = null;
+  
+  let context = experiment.context || {};
   
   let taskIndex = -1;
   let currentTask = null;
@@ -70,7 +72,7 @@ function MainExperimentController(experiment, options) {
     // store results of previous experiment
     if (currentTask && currentTask?.store !== false) {
       // separate constant parameters form changing parameters
-      let constantParameters = currentController?.constantParameters();
+      let constantParameters = currentController.constantParameters?.();
       results.push({
         name: currentTask?.name,
         description: currentTask?.description,
@@ -94,12 +96,13 @@ function MainExperimentController(experiment, options) {
       
       //console.log("Next Experiment: " + taskIndex);
       
-      currentTask = experiment.tasks[taskIndex];
-      currentController = currentTask.controller() || options.defaultController();
+      currentTask = experiment.tasks[taskIndex](context);
+      currentController = currentTask.controller || options.defaultController(context);
       currentTaskTimeOffset = relativeTime(experimentTimeOffset);
       
       broadcast("experiment start", {
-        taskIndex: taskIndex
+        taskIndex: taskIndex,
+        context: context
       });
       
       newTrial(currentController.nextCondition(null,null,trials));
@@ -168,6 +171,7 @@ function MainExperimentController(experiment, options) {
     trials.push(currentTrial);
     broadcast("condition", {
       taskIndex: taskIndex,
+      context: context,
       condition: currentTrial.condition
     });
   }
@@ -202,6 +206,7 @@ function MainExperimentController(experiment, options) {
     clients.push(client);
     client.message("experiment start", {
       taskIndex: taskIndex,
+      context: context,
       condition: currentTrial?.condition
     });
   }

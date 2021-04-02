@@ -1,29 +1,59 @@
 
+const valOrFunc = require("../util/valOrFunc.js");
 const htmlContent = require("../ui/htmlContent.js");
 const htmlButtons = require("../ui/htmlButtons.js");
 const nextOnResponse = require("../controller/nextOnResponse.js");
 
-module.exports = function(options) {
+module.exports = function(config) {
   
-  options = Object.assign({
-    displaymessage: "The experiment is paused." + (options.controller == "control" ? "" : " Press button to continue."),
-    monitormessage: "Experiment paused" + (options.controller == "control" ? ". Press button to continue." : ", waiting for user."),
-    buttondisplay: "response",
-    buttonlabel: "Continue",
-    store: false  // do not store by default
-  }, options);
-  
-  return {
-    name: "pause",
-    interfaces: {
-      display: htmlContent(options.displaymessage),
-      response: options.buttondisplay == "response" ? htmlButtons(options.buttonlabel) : null,
-      monitor: htmlContent(options.monitormessage),
-      control: options.buttondisplay == "control" ? htmlButtons(options.buttonlabel) : null,
+  config = Object.assign({
+    message: {
+      display: "The experiment is paused." + (config.buttondisplay == "control" ? "" : " Press button to continue."),
+      "*": "Experiment paused" + (config.buttondisplay == "control" ? ". Press button to continue." : ", waiting for user.")
     },
-    controller: nextOnResponse(),
-    store: options.store
+    buttondisplay: "response",
+    button: "Continue",
+    store: false  // do not store by default
+  }, config);
+  
+  return function(context) {
+    
+    // construct interfaces from config info
+    
+    let interfaces = {
+    }
+    
+    
+    // message UIs: all by default, or specified by individual keys
+    let message = valOrFunc(config.message, context);
+    
+    if (typeof message == "string") {
+      message = {"*": message}
+    }
+    
+    for (let key of Object.keys(message)) {
+      interfaces[key] = htmlContent(valOrFunc(message[key], context));
+    }
+    
+    // buttons: as specified by config.buttondisplay (single UI key or Array)
+    if (!Array.isArray(config.buttondisplay)) {
+      config.buttondisplay = [config.buttondisplay];
+    }
+    
+    for (let key of config.buttondisplay) {
+      let button = valOrFunc(config.button, context);
+      if (typeof button == "string") {
+        button = htmlButtons(button);
+      }
+      interfaces[key] = button;
+    }
+  
+    return {
+      name: "pause",
+      interfaces: interfaces,
+      controller: nextOnResponse()(context),
+      store: config.store
+    }
   }
-
 
 }
