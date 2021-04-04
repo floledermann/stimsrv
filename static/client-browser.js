@@ -6198,7 +6198,8 @@ var stimsrvClient = (function () {
 	    // clientid
 	    // device
 	    // role
-	    root: document.body
+	    root: document.body,
+	    clientTimestamps: true
 	  }, options);
 	          
 	  for (let ui of options.role.interfaces) {
@@ -6222,11 +6223,17 @@ var stimsrvClient = (function () {
 	  }
 
 	  function emitEvent(eventType, data) {
-	    socket?.emit(eventType, Object.assign({}, data, {
-	      clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
-	      clientTimestampAdjust: clientTimestampAdjust,
-	      clientAverageDelay: clientAverageDelay
-	    }));
+	    let timingInfo = {};
+	    
+	    if (options.clientTimestamps) {
+	      timingInfo = {
+	        clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
+	        clientTimestampAdjust: clientTimestampAdjust,
+	        clientAverageDelay: clientAverageDelay
+	      };
+	    }
+
+	    socket?.emit(eventType, Object.assign({}, data, timingInfo));
 	  }
 	    
 	  function event(eventType, data) {
@@ -6239,10 +6246,12 @@ var stimsrvClient = (function () {
 	  function response(data) {
 	    let msg = {
 	      taskIndex: taskIndex,
-	      clientTimestamp: Math.round(performance.now() + performance.timeOrigin),
-	      clientTimestampAdjust: clientTimestampAdjust,
 	      response: data
 	    };
+	    if (options.clientTimestamps) {
+	      msg.clientTimestamp = Math.round(performance.now() + performance.timeOrigin);
+	      msg.clientTimestampAdjust = clientTimestampAdjust;
+	    }
 	    emitEvent("response", msg);
 	  }
 
@@ -6353,17 +6362,19 @@ var stimsrvClient = (function () {
 	      socket = build.connect();
 	      
 	      socket.onAny(handleIncomingEvent);
-
-	      timing(socket).calibrate({
-	        updateCallback: (durations, averageDelay) => {
-	          console.log("Testing delay to server, average: " + averageDelay.toFixed(2) + "ms...");
-	          clientAverageDelay = averageDelay;
-	        }
-	      }).then(timestampAdjust => {
-	        console.log("Negotiated timestamp adjustment: " + timestampAdjust + "ms.");
-	        clientTimestampAdjust = timestampAdjust;
-	      });
-
+	        
+	      if (options.clientTimestamps) {
+	        timing(socket).calibrate({
+	          updateCallback: (durations, averageDelay) => {
+	            console.log("Testing delay to server, average: " + averageDelay.toFixed(2) + "ms...");
+	            clientAverageDelay = averageDelay;
+	          }
+	        }).then(timestampAdjust => {
+	          console.log("Negotiated timestamp adjustment: " + timestampAdjust + "ms.");
+	          clientTimestampAdjust = timestampAdjust;
+	        });
+	      }
+	      
 	      this.subscribeEvent("broadcast", data => {
 	        
 	        let broadcastType = data.type;
@@ -6421,7 +6432,6 @@ var stimsrvClient = (function () {
 	      });
 	      
 	      this.subscribeEvent("experiment start", data => {
-	        console.log("Start experiment: " + data.taskIndex);
 	        let task = experiment.tasks[data.taskIndex](data.context || {});
 	        if (data.taskIndex !== taskIndex) {
 	          taskIndex = data.taskIndex;
@@ -6433,7 +6443,6 @@ var stimsrvClient = (function () {
 	          prepareTask(task);
 	          //
 	          
-	          console.log(data.condition);
 	          showCondition(task, data.condition);
 	        }
 	      });
