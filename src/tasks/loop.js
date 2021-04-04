@@ -13,8 +13,7 @@ module.exports = function(config) {
   
   let currentTask = null;
   
-  // TODO: this is called by the server but also by the client!!
-  // separate controller function from constructor function!
+  // this is called on server and on client - it cannot return a (changed) context, but only set up internal configuration
   return function(context) {
     
     // mix defaults with passed in context and locally defined context

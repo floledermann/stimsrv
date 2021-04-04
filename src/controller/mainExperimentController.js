@@ -110,7 +110,10 @@ function MainExperimentController(experiment, options) {
     if (taskIndex < experiment.tasks.length) {
       if (!nextContext?.continue) {
         currentTask = experiment.tasks[taskIndex](context);
-        context = currentTask.context || context;      
+        // we can't store the (modified) context, since the factory is also called on client and storing
+        // its return value may introduce inconsistencies.
+        // if ex-ante context modification is needed, consider calling nextContext() beofre the task, not after?
+        //context = currentTask.context || context;      
         currentController = currentTask.controller || options.defaultController(context);
       }
       //console.log("Next Experiment: " + taskIndex);
