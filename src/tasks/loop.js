@@ -7,19 +7,27 @@ module.exports = function(config) {
     context: {},
     tasks: [],
     warn: console.warn,
-    error: console.error
+    error: console.error,
+    loop: true
   }, config);
   
   let currentTask = null;
   
+  // TODO: this is called by the server but also by the client!!
+  // separate controller function from constructor function!
   return function(context) {
     
-    // mix defaults with config.context and passed in context
-    context = Object.assign({taskIndex: 0}, valOrFunc(config.context, context), context);
+    // mix defaults with passed in context and locally defined context
+    // TODO: locally, we don't want to use config.context at all, but just use the passed in values
+    context = Object.assign({taskIndex: 0}, context, valOrFunc(config.context, context));
     
     if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex] == "function") {
-      let subContext = Object.assign({}, context, context.context)
+      // pass merged context to subtask, excluding taskIndex if not defined in sub-context
+      let subContext = Object.assign({}, context);
+      delete subContext.taskIndex;
+      Object.assign(subContext, context.context);
       currentTask = config.tasks[context.taskIndex](subContext);
+      context.context = currentTask.context;
     }
     else {
       config.error("No task found for taskIndex " + context.taskIndex + ".");
@@ -27,36 +35,69 @@ module.exports = function(config) {
     }
     
     return {
-      name: currentTask.name,
-      interfaces: currentTask.interfaces,
+      get name() {
+        return currentTask.name;
+      },
+      get interfaces() {
+        return currentTask.interfaces;
+      },
       context: context,
       controller: {
-        nextCondition: currentTask.controller.nextCondition,
+        nextCondition: function(lastCondition, lastResponse, conditions, responses) {
+          return currentTask.controller.nextCondition(lastCondition, lastResponse, conditions, responses);
+        },
         nextContext: trials => {
                   
           let c = currentTask.controller.nextContext?.(trials);
-          let newContext = Object.assign({}, context, {context: c || context.context || {}});
+          
+          context.context = c?.context || context.context || {};
           
           // should the current sub-task be continued?
           if (c?.continue) {
             return {
               'continue': true,
-              context: newContext
+              context: context
             }
           }
           
+          // sub-task has ended, so copy context properties into own context, but allow precedence for local values
+          // TODO: should copying of values from child context to parent context be done implicitly
+          // like so, or should there be an explicit way?
+          context = Object.assign({}, context.context, context);
+          delete context.context;
+          
           // otherwise, advance loop counter, or loop at end
-          newContext.taskIndex++;
+          context.taskIndex++;
           
-          if (newContext.taskIndex >= config.tasks.length) {
-            newContext.taskIndex = 0;
+          if (context.taskIndex >= config.tasks.length) {
+            // stop loop?
+            if (!valOrFunc(config.loop, context)) {
+              delete context.taskIndex;
+              return {
+                'continue': false, 
+                context: context
+              }
+            }
+            // loop goes on, reset index
+            context.taskIndex = 0;
           }
-          
-          context = newContext;
+
+          if (typeof config.tasks[context.taskIndex] == "function") {
+            // pass merged context to subtask, excluding taskIndex from current context
+            let subContext = Object.assign({}, context);
+            delete subContext.taskIndex;
+            Object.assign(subContext, context.context);
+            currentTask = config.tasks[context.taskIndex](subContext);
+            context.context = currentTask.context;
+          }
+          else {
+            config.error("No task found for taskIndex " + context.taskIndex + ".");
+            currentTask = null;
+          }    
           
           return {
-            'continue': true,
-            context: newContext
+            'continue': true, 
+            context: context
           }
         }
       }
