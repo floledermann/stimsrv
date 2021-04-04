@@ -59,6 +59,8 @@ function MainExperimentController(experiment, options) {
   function resetResults() {
     experimentTimeOffset = null;
     
+    context = experiment.context || {};
+
     trials = [];
     results = [];
     
@@ -81,7 +83,7 @@ function MainExperimentController(experiment, options) {
     // store results of previous experiment
     if (currentTask && currentTask?.store !== false) {
       // separate constant parameters form changing parameters
-      let constantParameters = currentController.constantParameters?.();
+      let constantParameters = currentController.constantParameters?.() || [];
       results.push({
         name: currentTask?.name,
         description: currentTask?.description,
