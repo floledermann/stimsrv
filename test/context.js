@@ -53,8 +53,38 @@ describe("Context", () => {
         },     
         context => {
           currentContext = context;
+          let counter = 2;
+          return {
+            controller: {
+              nextCondition: () => null, // always continue
+              nextContext: () => {
+                
+                counter++;
+                
+                currentContext = {param1: "value1." + counter};
+                
+                return {
+                  context: currentContext,
+                  'continue': counter < 5
+                }
+              }
+            }
+          }
+        },
+        context => {
+          currentContext = context;
+          return {
+            controller: {
+              nextCondition: () => null, // always continue
+              nextContext: () => ({context:{param1: "foo"}})
+            }
+          }
+        },
+        // last task, only log context
+        context => {
+          currentContext = context;
           return {}
-        }     
+        }            
       ]
     };
     
@@ -84,6 +114,22 @@ describe("Context", () => {
       assert(!currentContext.hasOwnProperty("param2"));   
     });
     
+    it("Same task continues if requested by nextContext()", () => {
+      controller.response({});
+      assert.equal(currentContext.param1, "value1.3");  
+      controller.response({});
+      assert.equal(currentContext.param1, "value1.4");  
+      // with next call, it goes to next task, but sets context nonetheless
+      controller.response({});
+      assert.equal(currentContext.param1, "value1.5");  
+    });
+
+    it("Next task is called if nextContext() breaks loop", () => {
+      controller.response({});
+      assert.equal(currentContext.param1, "foo");  
+      assert(!currentContext.hasOwnProperty("param2"));   
+    });
+       
   });
  
   
