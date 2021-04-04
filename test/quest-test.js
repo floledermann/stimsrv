@@ -1,4 +1,4 @@
-
+/*
 let quest = require("./src/staircase/quest.js");
 
 quest.demo({
@@ -8,3 +8,4 @@ quest.demo({
   thresholdCriterion: 0.75,
   numTrials: 100
 });
+*/

@@ -7,7 +7,7 @@
     "stimsrv": "./src/server/server.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test",
     "watch-server": "nodemon --ignore static --ignore data -e js,json,html ./src/server/server.js ./experiment-simple.js",
     "debug-server": "node --inspect-brk ./src/server/server.js ./experiment-simple.js",
     "build-client": "rollup ./src/clients/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs"
@@ -40,6 +40,7 @@
     "socket.io-client": "3.1.1"
   },
   "devDependencies": {
+    "mocha": "8.3.2",
     "nodemon": "2.0.7"
   }
 }
