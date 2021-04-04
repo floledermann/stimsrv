@@ -1,5 +1,6 @@
 
 const socketio = require("socket.io-client");
+const deepEqual = require("fast-deep-equal");
 
 const warnDefaults = require("../../util/warnDefaults.js");
 
@@ -87,6 +88,9 @@ function clientFactory(options) {
   
   let experiment = null;
   let taskIndex = null;
+  let context = {};
+  
+  let currentTask = null;
   
   function prepareTask(task) {
     
@@ -230,35 +234,30 @@ function clientFactory(options) {
       
       experiment = _experiment;
       taskIndex = null;
+      context = {};
       
       this.subscribeEvent("condition", data => {
-        let task = experiment.tasks[taskIndex](data.context);
-        if (data.taskIndex !== taskIndex) {
-          this.error("Mismatching experiment index received for condition", data);
+        
+        if (currentTask === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
+          this.error("Task data changed without initialization.", data);
+          currentTask = experiment.tasks[taskIndex](data.context);
           taskIndex = data.taskIndex;
-          prepareTask(task);
+          context = data.context;
+          prepareTask(currentTask);
         }
         
-        // temp fix
-        prepareTask(task);
-        //
-        
-        showCondition(task, data.condition);
+        showCondition(currentTask, data.condition);
       });
       
       this.subscribeEvent("task init", data => {
-        let task = experiment.tasks[data.taskIndex](data.context);
-        if (data.taskIndex !== taskIndex) {
-          taskIndex = data.taskIndex;
-          prepareTask(task);
-        }
+        
+        currentTask = experiment.tasks[data.taskIndex](data.context);
+        taskIndex = data.taskIndex;
+        context = data.context;
+        prepareTask(currentTask);
+
         if (data.condition) {
-          
-          // temp fix
-          prepareTask(task);
-          //
-          
-          showCondition(task, data.condition);
+          showCondition(currentTask, data.condition);
         }
       });
       

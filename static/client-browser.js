@@ -6116,6 +6116,51 @@ var stimsrvClient = (function () {
 	Object.defineProperty(exports, "Manager", { enumerable: true, get: function () { return manager_2.Manager; } });
 	});
 
+	// do not edit .js files directly - edit src/index.jst
+
+
+
+	var fastDeepEqual = function equal(a, b) {
+	  if (a === b) return true;
+
+	  if (a && b && typeof a == 'object' && typeof b == 'object') {
+	    if (a.constructor !== b.constructor) return false;
+
+	    var length, i, keys;
+	    if (Array.isArray(a)) {
+	      length = a.length;
+	      if (length != b.length) return false;
+	      for (i = length; i-- !== 0;)
+	        if (!equal(a[i], b[i])) return false;
+	      return true;
+	    }
+
+
+
+	    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+	    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+	    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+	    keys = Object.keys(a);
+	    length = keys.length;
+	    if (length !== Object.keys(b).length) return false;
+
+	    for (i = length; i-- !== 0;)
+	      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+	    for (i = length; i-- !== 0;) {
+	      var key = keys[i];
+
+	      if (!equal(a[key], b[key])) return false;
+	    }
+
+	    return true;
+	  }
+
+	  // true if both NaN, false otherwise
+	  return a!==a && b!==b;
+	};
+
 	function warnDefaults(warningFunction, object, defaults) {
 	  
 	  for (let key of Object.keys(defaults)) {
@@ -6273,6 +6318,9 @@ var stimsrvClient = (function () {
 	  
 	  let experiment = null;
 	  let taskIndex = null;
+	  let context = {};
+	  
+	  let currentTask = null;
 	  
 	  function prepareTask(task) {
 	    
@@ -6416,35 +6464,30 @@ var stimsrvClient = (function () {
 	      
 	      experiment = _experiment;
 	      taskIndex = null;
+	      context = {};
 	      
 	      this.subscribeEvent("condition", data => {
-	        let task = experiment.tasks[taskIndex](data.context);
-	        if (data.taskIndex !== taskIndex) {
-	          this.error("Mismatching experiment index received for condition", data);
+	        
+	        if (currentTask === null || data.taskIndex != taskIndex || !fastDeepEqual(context, data.context)) {
+	          this.error("Task data changed without initialization.", data);
+	          currentTask = experiment.tasks[taskIndex](data.context);
 	          taskIndex = data.taskIndex;
-	          prepareTask(task);
+	          context = data.context;
+	          prepareTask(currentTask);
 	        }
 	        
-	        // temp fix
-	        prepareTask(task);
-	        //
-	        
-	        showCondition(task, data.condition);
+	        showCondition(currentTask, data.condition);
 	      });
 	      
 	      this.subscribeEvent("task init", data => {
-	        let task = experiment.tasks[data.taskIndex](data.context);
-	        if (data.taskIndex !== taskIndex) {
-	          taskIndex = data.taskIndex;
-	          prepareTask(task);
-	        }
+	        
+	        currentTask = experiment.tasks[data.taskIndex](data.context);
+	        taskIndex = data.taskIndex;
+	        context = data.context;
+	        prepareTask(currentTask);
+
 	        if (data.condition) {
-	          
-	          // temp fix
-	          prepareTask(task);
-	          //
-	          
-	          showCondition(task, data.condition);
+	          showCondition(currentTask, data.condition);
 	        }
 	      });
 	      
