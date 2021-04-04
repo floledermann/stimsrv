@@ -40,11 +40,14 @@ module.exports = function(config) {
       get interfaces() {
         return currentTask.interfaces;
       },
-      context: context,
       controller: {
         nextCondition: function(lastCondition, lastResponse, conditions, responses) {
           return currentTask.controller.nextCondition(lastCondition, lastResponse, conditions, responses);
         },
+        constantParamters: function() {
+          return currentTask.controller.constantParamters();
+        },
+        // this is only called by server
         nextContext: trials => {
                   
           let c = currentTask.controller.nextContext?.(trials);

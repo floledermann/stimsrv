@@ -155,6 +155,7 @@ function clientFactory(options) {
       ambientIntensity: 1/100
     });
     
+    // set callback functions
     Object.assign(config, {
       warn: warn,
       error: error,

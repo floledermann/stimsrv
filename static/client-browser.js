@@ -6341,6 +6341,7 @@ var stimsrvClient = (function () {
 	      ambientIntensity: 1/100
 	    });
 	    
+	    // set callback functions
 	    Object.assign(config, {
 	      warn: warn,
 	      error: error,
@@ -6417,7 +6418,7 @@ var stimsrvClient = (function () {
 	      taskIndex = null;
 	      
 	      this.subscribeEvent("condition", data => {
-	        let task = experiment.tasks[taskIndex](data.context || {});
+	        let task = experiment.tasks[taskIndex](data.context);
 	        if (data.taskIndex !== taskIndex) {
 	          this.error("Mismatching experiment index received for condition", data);
 	          taskIndex = data.taskIndex;
@@ -6431,8 +6432,8 @@ var stimsrvClient = (function () {
 	        showCondition(task, data.condition);
 	      });
 	      
-	      this.subscribeEvent("experiment start", data => {
-	        let task = experiment.tasks[data.taskIndex](data.context || {});
+	      this.subscribeEvent("task init", data => {
+	        let task = experiment.tasks[data.taskIndex](data.context);
 	        if (data.taskIndex !== taskIndex) {
 	          taskIndex = data.taskIndex;
 	          prepareTask(task);

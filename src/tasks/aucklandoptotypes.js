@@ -51,19 +51,21 @@ module.exports = function(parameters) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  return {
-    name: "tao",
-    description: "Auckland Optotypes visual acuity test", 
-    interfaces: {
-      display: renderer,
-      response: htmlButtons(parameters.shapes.map(name => ({
-        label: firstCap(name),
-        canvas: buttonCanvas,
-        response: {shape: name}
-      }))),
-      monitor: renderer,
-      control: null,
-    },
-    controller: parameterController(parameters)
+  return function(context) {
+    return {
+      name: "tao",
+      description: "Auckland Optotypes visual acuity test", 
+      interfaces: {
+        display: renderer,
+        response: htmlButtons(parameters.shapes.map(name => ({
+          label: firstCap(name),
+          canvas: buttonCanvas,
+          response: {shape: name}
+        }))),
+        monitor: renderer,
+        control: null,
+      },
+      controller: parameterController(parameters, null, context)
+    }
   }
 }
