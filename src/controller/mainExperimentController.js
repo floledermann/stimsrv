@@ -122,7 +122,7 @@ function MainExperimentController(experiment, options) {
       
       currentTaskTimeOffset = relativeTime(experimentTimeOffset);
       
-      broadcast("experiment start", {
+      broadcast("task init", {
         taskIndex: taskIndex,
         context: context
       });
@@ -222,7 +222,7 @@ function MainExperimentController(experiment, options) {
   
   function addClient(client) {
     clients.push(client);
-    client.message("experiment start", {
+    client.message("task init", {
       taskIndex: taskIndex,
       context: context,
       condition: currentTrial?.condition

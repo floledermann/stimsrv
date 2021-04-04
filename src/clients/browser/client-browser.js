@@ -231,7 +231,7 @@ function clientFactory(options) {
       taskIndex = null;
       
       this.subscribeEvent("condition", data => {
-        let task = experiment.tasks[taskIndex](data.context || {});
+        let task = experiment.tasks[taskIndex](data.context);
         if (data.taskIndex !== taskIndex) {
           this.error("Mismatching experiment index received for condition", data);
           taskIndex = data.taskIndex;
@@ -245,8 +245,8 @@ function clientFactory(options) {
         showCondition(task, data.condition);
       });
       
-      this.subscribeEvent("experiment start", data => {
-        let task = experiment.tasks[data.taskIndex](data.context || {});
+      this.subscribeEvent("task init", data => {
+        let task = experiment.tasks[data.taskIndex](data.context);
         if (data.taskIndex !== taskIndex) {
           taskIndex = data.taskIndex;
           prepareTask(task);
