@@ -240,7 +240,7 @@ function clientFactory(options) {
         
         if (currentTask === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
           this.error("Task data changed without initialization.", data);
-          currentTask = experiment.tasks[taskIndex](data.context);
+          currentTask = experiment.tasks[taskIndex].ui(data.context);
           taskIndex = data.taskIndex;
           context = data.context;
           prepareTask(currentTask);
@@ -251,7 +251,7 @@ function clientFactory(options) {
       
       this.subscribeEvent("task init", data => {
         
-        currentTask = experiment.tasks[data.taskIndex](data.context);
+        currentTask = experiment.tasks[data.taskIndex].ui(data.context);
         taskIndex = data.taskIndex;
         context = data.context;
         prepareTask(currentTask);

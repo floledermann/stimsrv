@@ -7,7 +7,7 @@ const nextOnResponse = require("./nextOnResponse.js");
 function MainExperimentController(experiment, options) {
   
   options = Object.assign({
-    defaultController: nextOnResponse(),
+    defaultController: nextOnResponse,
   }, options);
   
   experiment.settings = Object.assign({
@@ -40,6 +40,8 @@ function MainExperimentController(experiment, options) {
   let userIdPromise = null;
   
   function resetExperiment() {
+    
+    console.log("reset experiment");
     
     resetTask();
     
@@ -101,7 +103,7 @@ function MainExperimentController(experiment, options) {
     trials = [];
     currentTaskTimeOffset = null;
     
-    let nextContext = currentController?.nextContext?.(trials);
+    let nextContext = currentController?.nextContext?.(context, trials);
     
     if (!nextContext?.continue) {
       taskIndex++;
@@ -111,12 +113,17 @@ function MainExperimentController(experiment, options) {
       
     if (taskIndex < experiment.tasks.length) {
       if (!nextContext?.continue) {
-        currentTask = experiment.tasks[taskIndex](context);
+        //console.log("starting task " + taskIndex);
+        //console.log(context);
+        currentTask = experiment.tasks[taskIndex];
         // we can't store the (modified) internal context, since the factory is also 
         // called on client and storing its return value may introduce inconsistencies.
         // if ex-ante context modification is needed, consider calling nextContext() before the task, not after?
-        //context = currentTask.context || context;      
-        currentController = currentTask.controller || options.defaultController(context);
+        currentController = currentTask.controller || options.defaultController();
+        context = currentController.initialContext?.(context) || context;      
+      }
+      else {
+        //console.log("continuing task " + taskIndex);
       }
       //console.log("Next Experiment: " + taskIndex);
       
@@ -127,11 +134,12 @@ function MainExperimentController(experiment, options) {
         context: context
       });
       
-      newTrial(currentController.nextCondition(null,null,trials));
+      newTrial(currentController.nextCondition?.(null,null,trials));
       
     }
     else {
       // end of experiment
+      //console.log("experiment end.");
       broadcast("experiment end");
       endExperiment().then(() => {
         if (experiment.settings.loop) {
@@ -204,7 +212,7 @@ function MainExperimentController(experiment, options) {
     
     currentTrial.response = _response;
     
-    let nextCondition = currentController.nextCondition(
+    let nextCondition = currentController.nextCondition?.(
       currentTrial.condition,
       currentTrial.response,
       trials

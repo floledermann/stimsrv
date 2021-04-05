@@ -6470,7 +6470,7 @@ var stimsrvClient = (function () {
 	        
 	        if (currentTask === null || data.taskIndex != taskIndex || !fastDeepEqual(context, data.context)) {
 	          this.error("Task data changed without initialization.", data);
-	          currentTask = experiment.tasks[taskIndex](data.context);
+	          currentTask = experiment.tasks[taskIndex].ui(data.context);
 	          taskIndex = data.taskIndex;
 	          context = data.context;
 	          prepareTask(currentTask);
@@ -6481,7 +6481,7 @@ var stimsrvClient = (function () {
 	      
 	      this.subscribeEvent("task init", data => {
 	        
-	        currentTask = experiment.tasks[data.taskIndex](data.context);
+	        currentTask = experiment.tasks[data.taskIndex].ui(data.context);
 	        taskIndex = data.taskIndex;
 	        context = data.context;
 	        prepareTask(currentTask);

@@ -16,44 +16,45 @@ module.exports = function(config) {
     store: false  // do not store by default
   }, config);
   
-  return function(context) {
+  return {
+    ui: function(context) {
     
-    // construct interfaces from config info
-    
-    let interfaces = {
-    }
-    
-    
-    // message UIs: all by default, or specified by individual keys
-    let message = valOrFunc(config.message, context);
-    
-    if (typeof message == "string") {
-      message = {"*": message}
-    }
-    
-    for (let key of Object.keys(message)) {
-      interfaces[key] = htmlContent(valOrFunc(message[key], context));
-    }
-    
-    // buttons: as specified by config.buttondisplay (single UI key or Array)
-    if (!Array.isArray(config.buttondisplay)) {
-      config.buttondisplay = [config.buttondisplay];
-    }
-    
-    for (let key of config.buttondisplay) {
-      let button = valOrFunc(config.button, context);
-      if (typeof button == "string") {
-        button = htmlButtons(button);
+      // construct interfaces from config info
+      
+      let interfaces = {
       }
-      interfaces[key] = button;
-    }
-  
-    return {
-      name: "pause",
-      interfaces: interfaces,
-      controller: nextOnResponse()(context),
-      store: config.store
-    }
+      
+      
+      // message UIs: all by default, or specified by individual keys
+      let message = valOrFunc(config.message, context);
+      
+      if (typeof message == "string") {
+        message = {"*": message}
+      }
+      
+      for (let key of Object.keys(message)) {
+        interfaces[key] = htmlContent(valOrFunc(message[key], context));
+      }
+      
+      // buttons: as specified by config.buttondisplay (single UI key or Array)
+      if (!Array.isArray(config.buttondisplay)) {
+        config.buttondisplay = [config.buttondisplay];
+      }
+      
+      for (let key of config.buttondisplay) {
+        let button = valOrFunc(config.button, context);
+        if (typeof button == "string") {
+          button = htmlButtons(button);
+        }
+        interfaces[key] = button;
+      }
+    
+      return {
+        name: "pause",
+        interfaces: interfaces,
+      }
+    },
+    controller: nextOnResponse()
   }
 
 }

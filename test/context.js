@@ -16,120 +16,147 @@ function mockStorage() {
   }
 }
 
+function contextExperiment(initialContext, controllers) {
+  return mainExperimentController({
+    storage: mockStorage(),
+    context: {
+      param1: "value1"
+    },
+    tasks: controllers.map(exp => {
+      if (typeof exp == "function") {
+        return { controller: { initialContext: exp }};
+      }
+      return { controller: exp };
+    })
+  })
+}
+
 describe("Context", () => {
 
   describe("Handing context between tasks", () => {
-    
-      
-    let currentContext = null;
-    
-    let experiment = {
-      storage: mockStorage(),
-      context: {
-        param1: "value1"
-      },
-      tasks: [
-        context => {
-          currentContext = context;
-          return {}
-        },
-        context => {
-          currentContext = context;
-          return {
-            controller: {
-              nextCondition: () => null, // always continue
-              nextContext: () => ({context: {param2: "value2"}})
-            }
-          }
-        },     
-        context => {
-          currentContext = context;
-          return {
-            controller: {
-              nextCondition: () => null, // always continue
-              nextContext: () => ({context:{param1: "value1.2"}})
-            }
-          }
-        },     
-        context => {
-          currentContext = context;
-          let counter = 2;
-          return {
-            controller: {
-              nextCondition: () => null, // always continue
-              nextContext: () => {
-                
-                counter++;
-                
-                currentContext = {param1: "value1." + counter};
-                
-                return {
-                  context: currentContext,
-                  'continue': counter < 5
-                }
-              }
-            }
-          }
-        },
-        context => {
-          currentContext = context;
-          return {
-            controller: {
-              nextCondition: () => null, // always continue
-              nextContext: () => ({context:{param1: "foo"}})
-            }
-          }
-        },
-        // last task, only log context
-        context => {
-          currentContext = context;
-          return {}
-        }            
-      ]
-    };
-    
-    let controller = mainExperimentController(experiment);
-      
+
     it("Initial context gets passed to first task", () => {
+      let currentContext = null;
+      let controller = contextExperiment(
+        { param1: "value1" },
+        [
+          context => {
+            currentContext = context;
+            return context;
+          }
+        ]
+      );
       controller.startExperiment();
       assert.equal(currentContext.param1, "value1");    
     });
     
     it("Context gets passed to next task unchanged", () => {
+      
+      let currentContext = null;
+      
+      let controller = contextExperiment(
+        { param1: "value1" },
+        [
+          context => context,
+          context => {
+            currentContext = context;
+            return context;
+          }
+        ]
+      );
+      
+      controller.startExperiment();
       controller.response({});
+      
       assert.equal(currentContext.param1, "value1");  
       assert(!currentContext.hasOwnProperty("param2"));   
     });
     
-    it("Task can add context parameter in nextContext()", () => {
+    it("Task can change context in initialContext()", () => {
+      
+      let currentContext = null;
+      
+      let controller = contextExperiment(
+        { param1: "value1" },
+        [
+          context => ({ param2: "value2" }),
+          context => {
+            currentContext = context;
+            return context;
+          }
+        ]
+      );
+      
+      controller.startExperiment();
       controller.response({});
-      //assert.equal(currentContext.param1, "value1");  
+      
       assert(!currentContext.hasOwnProperty("param1"));   
       assert.equal(currentContext.param2, "value2");  
     });
-    
-    it("Task can overwrite context parameter in nextContext()", () => {
+
+    it("Task can change context in nextContext()", () => {
+      
+      let currentContext = null;
+      
+      let controller = contextExperiment(
+        { param1: "value1" },
+        [
+          { nextContext: context => ({context: {param2: "value2" }}) },
+          context => {
+            currentContext = context;
+            return context;
+          }
+        ]
+      );
+      
+      controller.startExperiment();
       controller.response({});
-      assert.equal(currentContext.param1, "value1.2");  
-      assert(!currentContext.hasOwnProperty("param2"));   
-    });
-    
-    it("Same task continues if requested by nextContext()", () => {
-      controller.response({});
-      assert.equal(currentContext.param1, "value1.3");  
-      controller.response({});
-      assert.equal(currentContext.param1, "value1.4");  
-      // with next call, it goes to next task, but sets context nonetheless
-      controller.response({});
-      assert.equal(currentContext.param1, "value1.5");  
+      
+      assert(!currentContext.hasOwnProperty("param1"));   
+      assert.equal(currentContext.param2, "value2");  
     });
 
-    it("Next task is called if nextContext() breaks loop", () => {
-      controller.response({});
-      assert.equal(currentContext.param1, "foo");  
-      assert(!currentContext.hasOwnProperty("param2"));   
+    it("Same task continues if requested by nextContext()", () => {
+      
+      let currentContext = null;
+      
+      let counter = 0;
+      
+      let controller = contextExperiment(
+        { param1: "value1" },
+        [
+          {
+            initialContext: context => {
+              currentContext = context;
+            },
+            nextContext: context => {
+              let nextContext = {param1: "value1." + (++counter) };
+              currentContext = nextContext;
+              return {'continue': counter < 3, context: nextContext}
+            }
+          },
+          context => {
+            context.param2 = "task2";
+            currentContext = context;
+            return context;
+          }
+        ]
+      );
+      
+      controller.startExperiment();   // at task 1
+      assert.strictEqual(currentContext.param1, "value1");  
+      controller.response({});        // at task 1, counter == 1
+      assert.equal(currentContext.param1, "value1.1");  
+      controller.response({});        // at task 1, counter == 2
+      assert.equal(currentContext.param1, "value1.2");  
+      controller.response({});        // at task 2, counter == 3, continue == false
+      assert.equal(currentContext.param1, "value1.3");  
+      assert.equal(currentContext.param2, "task2");  
+      // restarting experiment is done asynchronous (due to storage), so below code does not work in immediate mode
+      //controller.response({});        // experiment restarts, initial context
+      //assert.equal(currentContext.param1, "value1");  
     });
-       
+
   });
  
   
