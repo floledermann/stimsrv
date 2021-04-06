@@ -16,6 +16,12 @@ module.exports = function(config) {
   let outerContext = null;
   
   return {
+    get name() {
+      return currentTask?.name;
+    },
+    get store() {
+      return currentTask?.store;
+    },
     // this is called on client - it cannot return a (changed) context, but only set up internal configuration
     ui: function(context) {   
     
@@ -32,9 +38,6 @@ module.exports = function(config) {
       }
       
       return {
-        get name() {
-          return currentTask.name;
-        },
         get interfaces() {
           return currentTask.interfaces;
         }

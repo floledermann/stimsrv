@@ -17,6 +17,8 @@ module.exports = function(config) {
   }, config);
   
   return {
+    name: "pause",
+    store: config.store,
     ui: function(context) {
     
       // construct interfaces from config info
@@ -50,8 +52,7 @@ module.exports = function(config) {
       }
     
       return {
-        name: "pause",
-        interfaces: interfaces,
+        interfaces: interfaces
       }
     },
     controller: nextOnResponse()
