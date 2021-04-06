@@ -43,7 +43,7 @@ module.exports = function(config) {
     // these are only called by server
     controller: {
       nextCondition: function(lastCondition, lastResponse, conditions, responses) {
-        return currentTask.controller.nextCondition(lastCondition, lastResponse, conditions, responses);
+        return currentTask.controller.nextCondition?.(lastCondition, lastResponse, conditions, responses);
       },
       constantParamters: function() {
         return currentTask.controller.constantParamters();
@@ -84,11 +84,10 @@ module.exports = function(config) {
           }
         }
         
-        // sub-task has ended, so copy context properties into own context, but local values have precedence
-        // (this is needed e.g. for nested loop counters)
+        // sub-task has ended, so copy context properties into own context
         // TODO: should copying of values from child context to parent context be done implicitly
         // like so, or should there be an explicit way?
-        context = Object.assign({}, context.context, context);
+        context = Object.assign({}, context, context.context);
         delete context.context;
         
         // otherwise, advance loop counter, or loop at end
@@ -98,6 +97,9 @@ module.exports = function(config) {
           // stop loop?
           if (!valOrFunc(config.loop, context)) {
             delete context.taskIndex;
+            // override with outer context for "local" context parameters
+            // (this is needed e.g. for nested loop counters)
+            Object.assign(context, outerContext);
             return {
               'continue': false, 
               context: config.modifyContext ? context : outerContext
