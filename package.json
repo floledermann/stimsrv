@@ -7,7 +7,7 @@
     "stimsrv": "./src/server/server.js"
   },
   "scripts": {
-    "test": "mocha test",
+    "test": "mocha --ignore test/util.js test",
     "watch-server": "nodemon --ignore static --ignore data -e js,json,html ./src/server/server.js ./experiment-simple.js",
     "debug-server": "node --inspect-brk ./src/server/server.js ./experiment-simple.js",
     "build-client": "rollup ./src/clients/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs"

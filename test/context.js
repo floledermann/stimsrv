@@ -2,34 +2,7 @@
 
 const assert = require("assert");
 
-const mainExperimentController = require("../src/controller/mainExperimentController.js");
-
-function mockStorage() {
-  return {
-    lastParticipantData: null,
-    getNextParticipantId: function() {
-      return new Promise((resolve, reject) => resolve(1));
-    },
-    storeParticipantData: function(userIdPromise, data) {
-      this.lastParticipantData = data;
-    }
-  }
-}
-
-function contextExperiment(initialContext, controllers) {
-  return mainExperimentController({
-    storage: mockStorage(),
-    context: {
-      param1: "value1"
-    },
-    tasks: controllers.map(exp => {
-      if (typeof exp == "function") {
-        return { controller: { initialContext: exp }};
-      }
-      return { controller: exp };
-    })
-  })
-}
+const {controllerTask, controllerTasks, controllersExperiment} = require("./util.js");
 
 describe("Context", () => {
 
@@ -37,13 +10,10 @@ describe("Context", () => {
 
     it("Initial context gets passed to first task", () => {
       let currentContext = null;
-      let controller = contextExperiment(
+      let controller = controllersExperiment(
         { param1: "value1" },
         [
-          context => {
-            currentContext = context;
-            return context;
-          }
+          context => (currentContext = context)
         ]
       );
       controller.startExperiment();
@@ -54,14 +24,11 @@ describe("Context", () => {
       
       let currentContext = null;
       
-      let controller = contextExperiment(
+      let controller = controllersExperiment(
         { param1: "value1" },
         [
           context => context,
-          context => {
-            currentContext = context;
-            return context;
-          }
+          context => (currentContext = context)
         ]
       );
       
@@ -76,14 +43,11 @@ describe("Context", () => {
       
       let currentContext = null;
       
-      let controller = contextExperiment(
+      let controller = controllersExperiment(
         { param1: "value1" },
         [
           context => ({ param2: "value2" }),
-          context => {
-            currentContext = context;
-            return context;
-          }
+          context => (currentContext = context)
         ]
       );
       
@@ -98,14 +62,11 @@ describe("Context", () => {
       
       let currentContext = null;
       
-      let controller = contextExperiment(
+      let controller = controllersExperiment(
         { param1: "value1" },
         [
           { nextContext: context => ({context: {param2: "value2" }}) },
-          context => {
-            currentContext = context;
-            return context;
-          }
+          context => (currentContext = context)
         ]
       );
       
@@ -122,7 +83,7 @@ describe("Context", () => {
       
       let counter = 0;
       
-      let controller = contextExperiment(
+      let controller = controllersExperiment(
         { param1: "value1" },
         [
           {
@@ -130,9 +91,8 @@ describe("Context", () => {
               currentContext = context;
             },
             nextContext: context => {
-              let nextContext = {param1: "value1." + (++counter) };
-              currentContext = nextContext;
-              return {'continue': counter < 3, context: nextContext}
+              currentContext = {param1: "value1." + (++counter) };
+              return {'continue': counter < 3, context: currentContext}
             }
           },
           context => {
