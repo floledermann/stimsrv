@@ -1,49 +1,87 @@
+"use strict";
 
-const mainExperimentController = require("../src/controller/mainExperimentController.js");
+const assert = require("assert");
 
-function mockStorage() {
-  return {
-    lastParticipantData: null,
-    getNextParticipantId: function() {
-      return new Promise((resolve, reject) => resolve(1));
-    },
-    storeParticipantData: function(userIdPromise, data) {
-      this.lastParticipantData = data;
-    }
-  }
-}
+const propertiesGenerator = require("../src/util/propertiesGenerator.js");
+const valOrFunc = require("../src/util/valOrFunc.js");
 
-function controllerTask(taskOrControllerOrInitialContextFunc) {
-  if (typeof taskOrControllerOrInitialContextFunc == "function") {
-    return { controller: { initialContext: taskOrControllerOrInitialContextFunc }};
-  }
-  if (taskOrControllerOrInitialContextFunc?.controller) {
-    // this is a full-fledged task - return unchanged
-    return taskOrControllerOrInitialContextFunc;
-  }
-  return { controller: taskOrControllerOrInitialContextFunc };
-}
+describe("Utilities", () => {
 
-function controllerTasks(controllers) {
-  return controllers.map(controllerTask);
-}
+  describe("propertiesGenerator", () => {
 
-function tasksExperiment(initialContext, tasks) {
-  return mainExperimentController({
-    storage: mockStorage(),
-    context: initialContext,
-    tasks: tasks
-  })
-}
+    it("Immediately completes with no iterable properties", () => {
+      
+      let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"] });
+      
+      let result = gen.next();
+      
+      assert(result.done);   
+      
+    });
 
-function controllersExperiment(initialContext, controllers) {
-  return tasksExperiment(initialContext, controllerTasks(controllers));
-}
+    it("Returns values only for iterators", () => {
+      
+      let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"][Symbol.iterator]() });
+      
+      let result = gen.next();
+      
+      assert(!result.done);  
+      assert(typeof result.value == "object");
+      assert(Object.keys(result.value).length == 1);
+      assert.equal(result.value.prop3, "a");     
+      
+    });
 
-module.exports = {
-  mockStorage: mockStorage,
-  controllerTask: controllerTask,
-  controllerTasks: controllerTasks,
-  tasksExperiment: tasksExperiment,
-  controllersExperiment: controllersExperiment
-}
+    it("Iterates over iterator peroperties, then completes", () => {
+      
+      let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"][Symbol.iterator]() });
+      
+      let result = gen.next();     
+      assert(!result.done);  
+      assert.equal(result.value.prop3, "a");     
+      
+      result = gen.next();     
+      assert(!result.done);  
+      assert.equal(result.value.prop3, "b");     
+      
+      result = gen.next();     
+      assert(result.done);     
+      
+    });
+
+
+  });
+  
+  describe("valOrFunc", () => {
+
+    it("Passes primitive value unchanged", () => {
+       assert.equal(valOrFunc("a", {}), "a");   
+       assert.equal(valOrFunc(1, {}), 1);   
+       assert.deepEqual(valOrFunc([1,2], {}), [1,2]);   
+    });
+
+    it("Returns value for functions", () => {
+       assert.equal(valOrFunc(() => "a"), "a");   
+       assert.equal(valOrFunc(x => "a", "b"), "a");   
+       assert.equal(valOrFunc(x => x, "b"), "b");   
+       assert.equal(valOrFunc(x => x.prop1, {prop1: "a"}), "a");   
+    });
+
+    it("valOrFunc.allProperties", () => {
+      let input = {
+        a: "a",
+        b: () => "b",
+        c: x => x.prop1
+      }
+      
+      let context = { prop1: "c" };
+      
+      assert.deepEqual(valOrFunc.allProperties(input, context), {"a":"a","b":"b","c":"c"});
+      
+    });
+
+
+  });
+  
+});
+

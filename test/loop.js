@@ -2,7 +2,7 @@
 
 const assert = require("assert");
 
-const {controllerTask, controllerTasks, tasksExperiment} = require("./util.js");
+const {controllerTask, controllerTasks, tasksExperiment} = require("./_util.js");
 
 const loop = require("../src/tasks/loop.js");
 
@@ -64,7 +64,7 @@ describe("Loop", () => {
       assert.equal(currentContext.param1, "end");    
     });
 
-    it("Nested loop use local context variables", () => {
+    it("Nested loop uses local context variables", () => {
       let currentContext = null;
       let controller = tasksExperiment({param1: 1}, [
         loop({

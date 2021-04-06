@@ -2,7 +2,9 @@
 
 const assert = require("assert");
 
-const {controllerTask, controllerTasks, controllersExperiment} = require("./util.js");
+const sequence = require("../src/controller/sequence.js");
+
+const {controllerTask, controllerTasks, controllersExperiment} = require("./_util.js");
 
 describe("Context", () => {
 
@@ -112,13 +114,48 @@ describe("Context", () => {
       controller.response({});        // at task 2, counter == 3, continue == false
       assert.equal(currentContext.param1, "value1.3");  
       assert.equal(currentContext.param2, "task2");  
-      // restarting experiment is done asynchronous (due to storage), so below code does not work in immediate mode
-      //controller.response({});        // experiment restarts, initial context
-      //assert.equal(currentContext.param1, "value1");  
+      // restart experiment
+      controller.response({});        // experiment restarts, initial context
+      assert.equal(currentContext.param1, "value1");  
     });
 
   });
  
+  describe("Context iterators", () => {
+
+    it("Iterator for individual parameter", () => {
+      let currentContext = null;
+      let controller = controllersExperiment(
+        { param1: sequence.loop(["value1","value2"]) },
+        [
+          context => (currentContext = context)
+        ]
+      );
+      controller.startExperiment();
+      assert.equal(currentContext.param1, "value1");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value1");    
+    });
+  
+    it("Iterator for whole context", () => {
+      let currentContext = null;
+      let controller = controllersExperiment(
+        sequence.loop([{ param1: "value1" }, { param1: "value2"}]),
+        [
+          context => (currentContext = context)
+        ]
+      );
+      controller.startExperiment();
+      assert.equal(currentContext.param1, "value1");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value1");    
+    });
+  
+  });
   
 });
 
