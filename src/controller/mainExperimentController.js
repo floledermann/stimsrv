@@ -79,7 +79,7 @@ function MainExperimentController(experiment, options) {
   function resetResults() {
     experimentTimeOffset = null;
     
-    if (typeof experiment.context == "function" || (experiment.context.next && typeof experiment.context.next == "function")) {
+    if (typeof experiment.context == "function" || (experiment.context?.next && typeof experiment.context.next == "function")) {
       context = {};
     }
     else {
