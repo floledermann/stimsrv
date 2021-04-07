@@ -117,6 +117,59 @@ describe("Loop", () => {
       assert.equal(currentContext.param1, "end");    
     });
 
+    it("Context variable that didn't exist in the outer context will persist after the inner loop", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: 1}, [
+        loop({
+          context: {
+            param1: 2,
+            param2: 2
+          },
+          loop: false, // stop after 1 run
+          tasks: controllerTasks([           
+            context => (currentContext = context),              // task 1       
+          ])
+        }),
+        controllerTask( context => (currentContext = context) ) // task 2
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, 2);    
+      assert.equal(currentContext.param2, 2);   
+      
+      controller.response({});
+      assert.equal(currentContext.param1, 1);    
+      assert.equal(currentContext.param2, 2);    
+
+    });
+
+    it("Context variables don't persist if modifyContext == false", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: 1}, [
+        loop({
+          context: {
+            param1: 2,
+            param2: 2
+          },
+          loop: false, // stop after 1 run
+          modifyContext: false,
+          tasks: controllerTasks([           
+            context => (currentContext = context),              // task 1       
+          ])
+        }),
+        controllerTask( context => (currentContext = context) ) // task 2
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, 2);    
+      assert.equal(currentContext.param2, 2);
+      
+      controller.response({});
+      assert.equal(currentContext.param1, 1);    
+      assert.strictEqual(currentContext.param2, undefined);    
+
+    });
+
   });
   
   
