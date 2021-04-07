@@ -49,14 +49,21 @@ module.exports = function(config) {
     },
     // these are only called by server
     controller: function(context) {
+      
+      //console.log("Loop controller constructor called");
+      //console.log(context);
+      
       return {
         nextCondition: function(lastCondition, lastResponse, conditions, responses) {
-          return currentTask.controller.nextCondition?.(lastCondition, lastResponse, conditions, responses);
+          return currentController.nextCondition?.(lastCondition, lastResponse, conditions, responses);
         },
         constantParamters: function() {
-          return currentTask.controller.constantParamters();
+          return currentController.constantParamters();
         },
         initialContext: context => {
+
+          //console.log("Loop.initialContext() called");
+          
           // mix defaults with passed in context and locally defined context
 
           // store for later return if config.modifyContext is false
@@ -106,6 +113,8 @@ module.exports = function(config) {
         },
         nextContext: (context, trials) => {
                   
+          //console.log("Loop.nextContext() called");
+          
           let c = currentController.nextContext?.(context.context, trials);
           
           context.context = c?.context || context.context || {};
@@ -159,7 +168,7 @@ module.exports = function(config) {
             Object.assign(subContext, context.context);
             currentTask = config.tasks[context.taskIndex];
             currentController = currentTask.controller?.(subContext);
-            context.context = currentTask.controller.initialContext?.(subContext);
+            context.context = currentController.initialContext?.(subContext);
           }
           else {
             config.error("No task found for taskIndex " + context.taskIndex + ".");
