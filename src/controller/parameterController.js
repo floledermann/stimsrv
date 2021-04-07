@@ -1,10 +1,7 @@
 
 
 function isConstantParameter(param) {
-  return (typeof param == "number" ||
-    typeof param == "string" || 
-    typeof param == "boolean" ||
-    Array.isArray(param))
+  return !(param?.next && typeof param.next == "function")
 }
 
 // outer factory is called at experiment initialization time
