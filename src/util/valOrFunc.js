@@ -15,7 +15,6 @@ valOrFunc.array = function(arg) {
 
 // apply valOrFunc to all properties of an object
 valOrFunc.allProperties = function(arg, ...args) {
-  debugger;
   let result = {};
   for (let key of Object.keys(arg)) {
     result[key] = valOrFunc.call(null, arg[key], ...args);
