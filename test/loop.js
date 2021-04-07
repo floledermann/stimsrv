@@ -5,6 +5,8 @@ const assert = require("assert");
 const {controllerTask, controllerTasks, tasksExperiment} = require("./_util.js");
 
 const loop = require("../src/tasks/loop.js");
+const sequence = require("../src/controller/sequence.js");
+
 
 
 describe("Loop", () => {
@@ -72,7 +74,7 @@ describe("Loop", () => {
           tasks: controllerTasks([           
             context => (currentContext = {param1: ++context.param1}),      // <- start
             loop({
-              initialContext: {param1: 98},
+              context: {param1: 98},
               loop: context => (context.param1 < 100),
               tasks: controllerTasks([
                 context => (currentContext = {param1: ++context.param1}),
@@ -115,6 +117,63 @@ describe("Loop", () => {
       assert.equal(currentContext.param1, "end");    
     });
 
+  });
+  
+  
+  describe("Context iterator", () => {
+
+    it("Iterator for individual parameter", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: "value1"}, [
+        loop({
+          context: { param1: sequence.loop(["value2","value3"]) },
+          tasks: controllerTasks([
+            context => (currentContext = context),
+            context => (currentContext = context),            
+          ])
+        }),
+        // this is never reached
+        controllerTask( context => (currentContext = {param1: "value4"}) )
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value3");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value3");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+    });
+    
+    it("Iterator for context object", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: "value1"}, [
+        loop({
+          context: sequence.loop([{param1: "value2"}, {param1: "value3"}]),
+          tasks: controllerTasks([
+            context => (currentContext = context),
+            context => (currentContext = context),            
+          ])
+        }),
+        // this is never reached
+        controllerTask( context => (currentContext = {param1: "value4"}) )
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value3");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value3");    
+      controller.response({});
+      assert.equal(currentContext.param1, "value2");    
+    });
+    
   });
   
 });

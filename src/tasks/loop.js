@@ -1,10 +1,11 @@
 
 const valOrFunc = require("../util/valOrFunc.js");
+const propertiesGenerator = require("../util/propertiesGenerator.js");
 
 module.exports = function(config) {
   
   config = Object.assign({
-    initialContext: {},
+    context: {},
     tasks: [],
     warn: console.warn,
     error: console.error,
@@ -14,6 +15,7 @@ module.exports = function(config) {
   
   let currentTask = null;
   let outerContext = null;
+  let contextGenerator = null;
   
   return {
     get name() {
@@ -56,7 +58,32 @@ module.exports = function(config) {
 
         // store for later return if config.modifyContext is false
         outerContext = context || {};
-        context = Object.assign({taskIndex: 0}, context, valOrFunc(config.initialContext, context));
+        
+        contextGenerator = null;
+        let localContext = config.context;
+        
+        if (typeof localContext == "function") {
+          localContext = localContext(context);
+        }
+        
+        if (localContext.next && typeof localContext.next == "function") {
+          // context is a generator in itself
+          contextGenerator = localContext;
+          localContext = {};
+        }
+        else {
+          localContext = valOrFunc.allProperties(localContext, context);
+          contextGenerator = propertiesGenerator(localContext);
+        }
+        
+        if (contextGenerator) {
+          let genContext = contextGenerator.next();
+          if (!genContext.done) {
+            Object.assign(localContext, genContext.value);
+          }
+        }
+        
+        context = Object.assign({}, context, localContext, {taskIndex: 0});
         
         if (context.taskIndex < config.tasks.length && config.tasks[context.taskIndex]?.controller) {
           // pass merged context to subtask, excluding taskIndex if not defined in sub-context
@@ -87,13 +114,14 @@ module.exports = function(config) {
           }
         }
         
+        // otherwise, advance loop counter, or loop at end
+
         // sub-task has ended, so copy context properties into own context
         // TODO: should copying of values from child context to parent context be done implicitly
         // like so, or should there be an explicit way?
         context = Object.assign({}, context, context.context);
         delete context.context;
         
-        // otherwise, advance loop counter, or loop at end
         context.taskIndex++;
         
         if (context.taskIndex >= config.tasks.length) {
@@ -108,8 +136,16 @@ module.exports = function(config) {
               context: config.modifyContext ? context : outerContext
             }
           }
-          // loop goes on, reset index
+          // loop goes on, reset index and generate new context if applicable
           context.taskIndex = 0;
+          
+          if (contextGenerator) {
+            let genContext = contextGenerator.next();
+            if (!genContext.done) {
+              Object.assign(context, genContext.value);
+            }
+          }
+
         }
 
         if (config.tasks[context.taskIndex]?.controller) {
