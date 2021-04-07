@@ -15,13 +15,13 @@ function mockStorage() {
 
 function controllerTask(taskOrControllerOrInitialContextFunc) {
   if (typeof taskOrControllerOrInitialContextFunc == "function") {
-    return { controller: { initialContext: taskOrControllerOrInitialContextFunc }};
+    return { controller: context => ({ initialContext: taskOrControllerOrInitialContextFunc })};
   }
   if (taskOrControllerOrInitialContextFunc?.controller) {
     // this is a full-fledged task - return unchanged
     return taskOrControllerOrInitialContextFunc;
   }
-  return { controller: taskOrControllerOrInitialContextFunc };
+  return { controller: context => taskOrControllerOrInitialContextFunc };
 }
 
 function controllerTasks(controllers) {
