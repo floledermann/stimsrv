@@ -4,7 +4,7 @@ function isConstantParameter(param) {
   return (typeof param == "number" ||
     typeof param == "string" || 
     typeof param == "boolean" ||
-    Array.isArray(parameters[key]))
+    Array.isArray(param))
 }
 
 // outer factory is called at experiment initialization time
@@ -26,19 +26,19 @@ module.exports = function(_parameters, conditions, context) {
   // make a copy of the parameters
   let parameters = Object.assign({}, _parameters);
   
+  console.log(parameters);
+  
   for (let key of Object.keys(parameters)) {
-    // primitive values -> copy to output
-    if (isConstantParameter(parameters[key])) {
-      parameters[key] = yieldForever(parameters[key]);
-    }
-    else if (typeof parameters[key] == "function") {
-      parameters[key] = parameters[key](context);
-      if (!typeof parameters[key].next == "function") {
-        throw "Parameter " + key + " factory must return a generator.";
+    // if its already an iterator, we don't have to do anything
+    if (!(parameters[key].next && typeof parameters[key].next == "function")) {
+      // function -> initialize with context
+      if (typeof parameters[key] == "function") {
+        parameters[key] = parameters[key](context);
       }
-    }
-    else {
-      throw "Parameter " + key + " must be a primitive value or a factory function.";
+      // primitive values -> copy to output
+      if (!(parameters[key].next && typeof parameters[key].next == "function")) {
+        parameters[key] = yieldForever(parameters[key]);
+      }
     }
   }
   
