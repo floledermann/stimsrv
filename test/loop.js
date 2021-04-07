@@ -174,6 +174,74 @@ describe("Loop", () => {
       assert.equal(currentContext.param1, "value2");    
     });
     
+    it("Non-iterator properties get set only once", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: "value1"}, [
+        loop({
+          context: {
+            param1: 10,
+            param2: sequence.loop([10,20])
+          },
+          tasks: controllerTasks([
+            context => (context.param1++, context.param2++, currentContext = context),
+            context => (context.param1++, context.param2++, currentContext = context),            
+          ])
+        }),
+        // this is never reached
+        controllerTask( context => (currentContext = {param1: "value4"}) )
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, 11);    
+      assert.equal(currentContext.param2, 11);    
+      controller.response({});
+      assert.equal(currentContext.param1, 12);    
+      assert.equal(currentContext.param2, 12);    
+      controller.response({});
+      assert.equal(currentContext.param1, 13);    
+      assert.equal(currentContext.param2, 21);    
+      controller.response({});
+      assert.equal(currentContext.param1, 14);    
+      assert.equal(currentContext.param2, 22);    
+      controller.response({});
+      assert.equal(currentContext.param1, 15);    
+      assert.equal(currentContext.param2, 11);    
+    });
+    
+    it("Exhausted iterators stop updating parameters", () => {
+      let currentContext = null;
+      let controller = tasksExperiment({param1: "value1"}, [
+        loop({
+          context: {
+            param1: sequence([10,20]),
+            param2: sequence.loop([10,20])
+          },
+          tasks: controllerTasks([
+            context => (context.param1++, context.param2++, currentContext = context),
+            context => (context.param1++, context.param2++, currentContext = context),            
+          ])
+        }),
+        // this is never reached
+        controllerTask( context => (currentContext = {param1: "value4"}) )
+      ]);
+      
+      controller.startExperiment();
+      assert.equal(currentContext.param1, 11);    
+      assert.equal(currentContext.param2, 11);    
+      controller.response({});
+      assert.equal(currentContext.param1, 12);    
+      assert.equal(currentContext.param2, 12);    
+      controller.response({});
+      assert.equal(currentContext.param1, 21);    
+      assert.equal(currentContext.param2, 21);    
+      controller.response({});
+      assert.equal(currentContext.param1, 22);    
+      assert.equal(currentContext.param2, 22);    
+      controller.response({});
+      assert.equal(currentContext.param1, 23);    
+      assert.equal(currentContext.param2, 11);    
+    });
+    
   });
   
 });

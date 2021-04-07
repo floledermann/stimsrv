@@ -9,7 +9,7 @@ describe("Utilities", () => {
 
   describe("propertiesGenerator", () => {
 
-    it("Immediately completes with no iterable properties", () => {
+    it("Immediately completes when no iterable properties are found", () => {
       
       let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"] });
       
@@ -32,7 +32,7 @@ describe("Utilities", () => {
       
     });
 
-    it("Iterates over iterator peroperties, then completes", () => {
+    it("Iterates over iterator properties, then completes", () => {
       
       let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"][Symbol.iterator]() });
       

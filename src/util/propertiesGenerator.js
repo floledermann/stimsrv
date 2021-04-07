@@ -26,7 +26,7 @@ function* propertiesGenerator(parameters) {
         allDone = false;
       }
       else {
-        result[key] = undefined;
+        delete result[key];
       }
     }
     
