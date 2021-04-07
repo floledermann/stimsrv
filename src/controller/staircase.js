@@ -2,11 +2,12 @@
 const Dimension = require("another-dimension");
 
 const matchProperties = require("../util/matchProperties.js");
+const valOrFunc = require("../util/valOrFunc.js");
 
 // see https://github.com/psychopy/psychopy/blob/release/psychopy/data/staircase.py
-module.exports = function(options) {
+module.exports = function(_options) {
   
-  options = Object.assign({
+  _options = Object.assign({
     startValue: 1,
     stepSize: 2,
     stepType: "db", // "linear", "log", "db", "multiply"
@@ -19,39 +20,10 @@ module.exports = function(options) {
     maxValue: Infinity,
     minReversals: 3,
     minTrials: 0,
-    isResponseCorrect: matchProperties
-  }, options);
-  
-  if (!options.startValue) {
-    throw "Staircase controller: startValue must be specified";
-  }
-  
-  if (typeof options.startValue == "string") {
-    options.startValue = Dimension(options.startValue);
-  }
-  
-  
-  function moveUp(currentIntensity) {
-    //console.log("Moving UP");
-    switch (options.stepType) {
-      case "db": return currentIntensity * 10.0**(options.stepSize/20.0); 
-      case "log": return currentIntensity * 10.0**options.stepSize; 
-      case "multiply": return currentIntensity * options.stepSize; 
-      case "linear": return currentIntensity + options.stepSize; 
-    }
-  }
-  
-  function moveDown(currentIntensity) {
-    //console.log("Moving DOWN");
-    switch (options.stepType) {
-      case "db": return currentIntensity / 10.0**(options.stepSize/20.0); 
-      case "log": return currentIntensity / 10.0**options.stepSize; 
-      case "multiply": return currentIntensity / options.stepSize; 
-      case "linear": return currentIntensity - options.stepSize; 
-    }
-  }
-  
-  return function() {
+    isResponseCorrect: () => matchProperties
+  }, _options);
+    
+  return function(context) {
     
     let direction = "down";
     let correctCounter = 0;
@@ -59,10 +31,40 @@ module.exports = function(options) {
     let reversalPoints = [];
     let reversalIntensities = [];
     
+    let options = valOrFunc.allProperties(_options, context);
+    
+    if (typeof options.startValue == "string") {
+      options.startValue = Dimension(options.startValue);
+    }
+
+    if (!options.startValue) {
+      throw "Staircase controller: startValue must be specified";
+    }  
+  
     let currentIntensity = options.startValue;
     if (currentIntensity instanceof Dimension) {
       // clone
       currentIntensity = Dimension(currentIntensity);
+    }
+
+    function moveUp(currentIntensity) {
+      //console.log("Moving UP");
+      switch (options.stepType) {
+        case "db": return currentIntensity * 10.0**(options.stepSize/20.0); 
+        case "log": return currentIntensity * 10.0**options.stepSize; 
+        case "multiply": return currentIntensity * options.stepSize; 
+        case "linear": return currentIntensity + options.stepSize; 
+      }
+    }
+    
+    function moveDown(currentIntensity) {
+      //console.log("Moving DOWN");
+      switch (options.stepType) {
+        case "db": return currentIntensity / 10.0**(options.stepSize/20.0); 
+        case "log": return currentIntensity / 10.0**options.stepSize; 
+        case "multiply": return currentIntensity / options.stepSize; 
+        case "linear": return currentIntensity - options.stepSize; 
+      }
     }
     
     return {
