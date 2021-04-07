@@ -28,7 +28,6 @@ function MainExperimentController(experiment, options) {
   let context = experiment.context || {}; 
   let contextGenerator = null;
   
-  debugger;
   if (typeof context == "function") {
     context = context({});
   }
