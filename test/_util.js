@@ -2,13 +2,23 @@
 const mainExperimentController = require("../src/controller/mainExperimentController.js");
 
 function mockStorage() {
+  
+  let participantIdPromise = null;
+  let lastParticipantData = null;
+  
   return {
-    lastParticipantData: null,
-    getNextParticipantId: function() {
-      return new Promise((resolve, reject) => resolve(1));
+    getLastParticipantData: function() {
+      if (participantIdPromise) {
+        return new Promise((resolve, reject) => participantIdPromise.then(() => resolve(lastParticipantData)));
+      }
+      return null;
     },
-    storeParticipantData: function(userIdPromise, data) {
-      this.lastParticipantData = data;
+    getNextParticipantId: function() {
+      participantIdPromise = new Promise((resolve, reject) => resolve(1));
+      return participantIdPromise;
+    },
+    storeParticipantData: function(_userIdPromise, data) {
+      lastParticipantData = data;
     }
   }
 }
@@ -29,14 +39,28 @@ function controllerTasks(controllers) {
 }
 
 function tasksExperiment(initialContext, tasks) {
-  return mainExperimentController({
-    storage: mockStorage(),
+  
+  let storage = mockStorage();
+  
+  let controller = mainExperimentController({
+    storage: storage,
     context: initialContext,
-    tasks: tasks
-  })
+    tasks: tasks,
+  });
+  
+  controller.getLastParticipantData = function() {
+    return storage.getLastParticipantData();
+  }
+  
+  return controller;
 }
 
 function controllersExperiment(initialContext, controllers) {
+  // first arg is optional
+  if (!controllers) {
+    controllers = initialContext;
+    initialContext = undefined;
+  }
   return tasksExperiment(initialContext, controllerTasks(controllers));
 }
 
