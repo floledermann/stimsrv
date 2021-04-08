@@ -21,7 +21,7 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 Experiments in stimsrv are implemented in JavaScript. Therefore, a single codebase defines both the user interface (which runs in a *client*, usually a web browser) and the flow of the experiment (which runs on a *server* (hence the name *stimsrv*), which potentialy controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, older and simple devices, and printed media, all controlled from a single experiment definition.
 
-A minimal experiment definition could look like this:
+A minimal experiment definition file could look like this:
 
 ```javascript
 const pause = require("stimsrv/src/tasks/pause.js");
@@ -47,11 +47,39 @@ You can run this experiment with
 npx stimsrv --open <experiment-file>
 ```
 
-This will start the stimsrv server and open a browser window showing the experiment start page (because of the `--open` parameter).
+This will start the stimsrv server and open a browser window (because of the `--open` parameter), showing the experiment start page. (Omit `--open` if you only want to start the server.)
 
 The experiment will display the message and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored (in the `data` directory by default), and the experiment is run again immediately (because by default `experiment.settings.loop` is `true`).
 
+A more complex experiment that actually delivers useful data could look like this:
+
+```javascript
+const pause = require("stimsrv/src/tasks/pause.js");
+
+module.exports = {
+  
+  name: "Minimal Experiment Example",
+    
+  tasks: [
+  
+    pause({
+      message: "Hello from stimsrv",
+      store: true  // by default, the pause task is not stored - store it so that we have some data
+    })
+    
+  ]
+}
+```
+
+### Philosophy
+
 stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating an experiment definition, plus a single file for each task that is not provided elsewhere. stimsrv takes care of packaging and delivering the experiment code for web browsers, and coordinating multiple clients, among other things.
+
+<!-- ### Device configuration -->
+
+<!-- ### Implementing tasks -->
+
+<!-- ### Context & controllers -->
 
 ### Terminology
 
