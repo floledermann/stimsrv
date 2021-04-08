@@ -1,7 +1,7 @@
 
 
 function isConstantParameter(param) {
-  return !(param?.next && typeof param.next == "function")
+  return !(typeof param == "function" || (param?.next && typeof param.next == "function"))
 }
 
 // outer factory is called at experiment initialization time
@@ -10,7 +10,6 @@ module.exports = function(_parameters, conditions) {
   Object.freeze(_parameters);
 
   return function(context) {
-  
     
     // all parameters should be generators, so convert primitive values into infinite generators
     function* yieldOnce(val) {
@@ -76,6 +75,7 @@ module.exports = function(_parameters, conditions) {
             
         return null; // end of experiment
       },
+      
       constantParameters: function() {
         
         let p = {};
