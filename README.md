@@ -4,13 +4,18 @@
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
 
+Main features:
+
+- Implemented in JavaScript, leveraging a modern, function-based programming style.
+
+
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
 
 ### Defining & running experiments
 
 Experiments in stimsrv are implemented in JavaScript. Therefore, a single codebase defines both the user interface (which runs in a *client*, usually a web browser) and the flow of the experiment (which runs on a *server* (hence the name *stimsrv*), which potentialy controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, older and simple devices, and printed media, all controlled from a single experiment definition.
 
-stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely, without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating an experiment definition, plus a single file for each task that is not provided elsewhere.
+stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating an experiment definition, plus a single file for each task that is not provided elsewhere. stimsrv takes care of packaging and delivering the experiment code for web browsers, and coordinating multiple clients, among other things.
 
 ### Terminology
 
