@@ -44,7 +44,7 @@ module.exports = function(_parameters, conditions) {
     let conditionsIterator = null;
     
     if (conditions) {
-      conditionsIterator = conditions();
+      conditionsIterator = conditions(context);
     }
 
     // return next condition, or null for end of experiment
