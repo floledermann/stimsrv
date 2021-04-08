@@ -4,11 +4,11 @@
 
 stimsrv (*stim*ulus *s*e*rv*er) is a system for running browser-based psychological experiments and user studies.
 
-To try stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv template example (coming soon).
+To try stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
 
 ### Defining & running experiments
 
-Experiments in stimsrv are implemented in JavaScript. Therefore, a single codebase defines both the user interface (which runs in a client, usually a web browser) and the flow of the experiment (which runs on a server, which potentialy controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, older and simple devices and printed media, all controlled from a single experiment definition.
+Experiments in stimsrv are implemented in JavaScript. Therefore, a single codebase defines both the user interface (which runs in a *client*, usually a web browser) and the flow of the experiment (which runs on a *server* (hence the name *stimsrv*), which potentialy controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, older and simple devices, and printed media, all controlled from a single experiment definition.
 
 
 
