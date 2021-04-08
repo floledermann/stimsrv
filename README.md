@@ -1,6 +1,8 @@
 ## stimsrv
 
+<div style="border-color: rgba(27,31,35,0.15); color: #d73a49; background-color: #fafbfc; padding:5px 16px; border-radius: 6px;">
 **This is alpha software, not ready to use.**
+</div>
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
 
