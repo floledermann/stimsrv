@@ -63,8 +63,6 @@ describe("MainController", () => {
       
       resultsP.then((results) => {
       
-        console.dir(results.results[0].trials);
-        
         assert.equal(results._type, "stimsrv.ExperimentResultsSingleParticipant");
         
         assert.strictEqual(results.errors?.length, 0);
