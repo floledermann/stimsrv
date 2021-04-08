@@ -22,7 +22,12 @@ const clients = require("../clients/index.js");
 const clientRoleMiddleware = require("./clientRoleMiddleware.js");
 const MainExperimentController = require("../controller/mainExperimentController.js");
 
-let options = mri(process.argv.slice(2));
+let options = mri(process.argv.slice(2), {
+  boolean: ["open"],
+  alias: {
+    open: "o"
+  }
+});
 
 // you can also run stimsrv in a folder without specifying experiment, 
 // in which case it will consider the local package as the experiment
@@ -142,17 +147,23 @@ let server = app.listen(port, () => {
   // https://stackoverflow.com/a/41407246/ for colors reference
   console.log("\x1b[32m\x1b[1m");  // output color to green
   console.log("******************************************************");
-  //console.log("**                                                  **");
   console.log("** stimsrv server running on:                       **");
-  ips.forEach(ip => {
+  
+  for (ip of ips) {
     let adrStr = "http://" + ip + ":" + port + "/";
     let padSize = 47 - adrStr.length;
     let pad = "                                       ".substring(0, padSize);
     console.log("**   " + adrStr + pad + "**"); 
-  });
-  //console.log("**                                                  **");
+  }
+  
   console.log("******************************************************");  
   console.log("\x1b[0m");   // reset output color
+  
+  if (options.open) {
+    const open = require("open");
+    let firstAdr = "http://" + ips[0] + ":" + port + "/";
+    open(firstAdr);
+  }
 });
 
 let io = socketio(server, {serveClient: false});
