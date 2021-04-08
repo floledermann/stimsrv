@@ -5,6 +5,8 @@ const stimsrvVersion = require("../../package.json").version;
 const valOrFunc = require("../util/valOrFunc.js");
 const propertiesGenerator = require("../util/propertiesGenerator.js");
 
+const filestorage = require("../storage/filestorage.js");
+
 const nextOnResponse = require("./nextOnResponse.js");
 
 function MainExperimentController(experiment, options) {
@@ -18,7 +20,10 @@ function MainExperimentController(experiment, options) {
     loop: true
   }, experiment.settings);
   
-  let storage = experiment.storage;
+  let storage = experiment.storage || filestorage({
+    destination: "./data",
+    format: "json"
+  });
   
   let clients = [];
   

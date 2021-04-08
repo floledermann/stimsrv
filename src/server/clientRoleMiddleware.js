@@ -7,8 +7,31 @@ const clientIdCookieName = "stimsrv-clientid";
 function factory(experiment) {
   
   let devicesById = {};
+  
+  let devices = experiment.devices || [
+    {
+      name: "Anyone",
+      id: "anyone",
+      ip: "."
+    }
+  ];
+  
+  let roles = experiment.roles || [
+    {
+      role: "experiment",
+      device: "anyone",
+      interfaces: ["display","response"],
+      description: "Experiment screen for stimulus display and participant response"
+    },
+    {
+      role: "supervisor",
+      device: "anyone",
+      interfaces: ["monitor", "control"],
+      description: "Supervisor screen and experiment control"
+    }
+  ];
 
-  experiment.devices.forEach( d => {
+  devices.forEach( d => {
     if (d.id) devicesById[d.id] = d
   });
   
@@ -32,19 +55,22 @@ function factory(experiment) {
         return false;
       }      
       
-      clientId = experiment.devices.find(d => matchDevice(req, d))?.id;
+      clientId = devices.find(d => matchDevice(req, d))?.id;
  
       if (!clientId) {
         // still not found -> autogenerate id
         // shorten the timestamp a bit for shorter auto-generated ids
-        clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
+        // clientId = hashids.encode(Date.now()-(new Date("2021-01-01").getTime()));
+        
+        // default id
+        clientId = experiment.settings?.defaultClientId || "anyone";
       }
       factory.setClientIdCookie(res, clientId);
     }
     
     req.clientId = clientId;
     
-    let potentialRoles = experiment.roles.filter(r => r.device == clientId);
+    let potentialRoles = roles.filter(r => r.device == clientId);
     let activeRole = null;
     
     if (req.query.role) {
