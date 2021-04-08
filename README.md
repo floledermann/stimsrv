@@ -11,6 +11,8 @@ Main features:
 - Run distributed experiments with multiple devices fulfilling different roles, coordinated by a central server.
 - Central control of experiment state and unidirectional data flow for deterministic experiment behaviour even in complex settings.
 - Provides wrappers and utility functions that help develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering to canvas).
+- Timestamp synchronization between server and clients, with temporal precision of a few milliseconds in local WiFi networks.
+- Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
