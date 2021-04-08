@@ -7,8 +7,11 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-base
 
 Main features:
 
-- Implemented in JavaScript, leveraging a modern, function-based programming style.
-
+- Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
+- Run distributed experiments with multiple devices fulfilling different roles, coordinated by a central server.
+- Central control of experiment state and unidirectional data flow for deterministic experiment behaviour even in complex settings.
+- Provides wrappers and utility functions that help develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering to canvas).
+- Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
 
