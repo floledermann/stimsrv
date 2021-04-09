@@ -6,9 +6,9 @@
   "exports": {
     ".": "./src/server/server.js",
     "./controller/*": "./src/controller/*.js",
-    "./stimuli/canvas/*": "./src/stimuli/canvas/*.js",
+    "./stimulus/canvas/*": "./src/stimulus/canvas/*.js",
     "./storage/*": "./src/storage/*.js",
-    "./tasks/*": "./src/tasks/*.js",
+    "./task/*": "./src/task/*.js",
     "./ui/*": "./src/ui/*.js",
     "./util/*": "./src/util/*.js"
   },
