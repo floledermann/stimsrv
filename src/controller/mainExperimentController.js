@@ -130,17 +130,18 @@ function MainExperimentController(experiment, options) {
       });
     }
     
-    trials = [];
     currentTaskTimeOffset = null;
     
     let nextContext = currentController?.nextContext?.(context, trials);
+    
+    trials = [];
+    
+    context = nextContext?.context || context;
     
     if (!nextContext?.continue) {
       taskIndex++;
     }
 
-    context = nextContext?.context || context;
-      
     if (taskIndex < experiment.tasks.length) {
       if (!nextContext?.continue) {
         //console.log("starting task " + taskIndex);
