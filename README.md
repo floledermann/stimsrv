@@ -99,7 +99,7 @@ module.exports = {
 }
 ```
 
-
+*(Note: currently the sloan task is not yet provided by stimsrv, so this is a hypothetical example!)*
 
 
 <!-- ### Device configuration -->
