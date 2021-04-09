@@ -3,38 +3,38 @@
 
 // Converted from SVG with Canvg / http://www.professorcloud.com/svg-to-canvas/
 
-const letterNames = ["C", "D", "H", "K", "N", "O", "R", "S", "V", "Z"];
+const letters = ["C", "D", "H", "K", "N", "O", "R", "S", "V", "Z"];
 
 const paths = {
   C: ctx => {
     ctx.moveTo(9.8974,5.9988);
     ctx.lineTo(7.818999999999999,5.9988);
-    ctx.bezierCurveTo(7.397639999999999,7.1578,6.3004999999999995,8.00100,4.999499999999999,8.00100);
-    ctx.bezierCurveTo(3.3609999999999993,8.00100,1.9982999999999995,6.63830,1.9982999999999995,4.99960);
-    ctx.bezierCurveTo(1.9982999999999995,3.36090,3.3609999999999998,1.99840,4.999499999999999,1.99840);
-    ctx.bezierCurveTo(6.300299999999999,1.99840,7.397399999999999,2.84136,7.818999999999999,4.00060);
+    ctx.bezierCurveTo(7.39764,7.1578,6.3005,8.00100,4.9995,8.00100);
+    ctx.bezierCurveTo(3.361,8.00100,1.9983,6.63830,1.9983,4.99960);
+    ctx.bezierCurveTo(1.9983,3.36090,3.361,1.99840,4.9995,1.99840);
+    ctx.bezierCurveTo(6.3003,1.99840,7.3974,2.84136,7.819,4.00060);
     ctx.lineTo(9.8974,4.00060);
-    ctx.bezierCurveTo(9.43953,1.718505,7.419499999999999,8.881784197001252e-16,4.999599999999999,8.881784197001252e-16);
-    ctx.bezierCurveTo(2.238199999999999,8.881784197001252e-16,-8.881784197001252e-16,2.23840,-8.881784197001252e-16,4.99960);
-    ctx.bezierCurveTo(-8.881784197001252e-16,7.760805,2.238199999999999,9.99920,4.999599999999999,9.99920);
-    ctx.bezierCurveTo(7.4193999999999996,9.99920,9.439699999999998,8.28070,9.8974,5.99880);
+    ctx.bezierCurveTo(9.43953,1.718505,7.4195,0,4.9996,0);
+    ctx.bezierCurveTo(2.238199999999999,0,0,2.23840,0,4.99960);
+    ctx.bezierCurveTo(0,7.760805,2.2382,9.99920,4.9996,9.99920);
+    ctx.bezierCurveTo(7.4194,9.99920,9.4397,8.28070,9.8974,5.99880);
     ctx.closePath();
   },
   D: ctx => {
     ctx.moveTo(9.9992,5.9996);
     ctx.lineTo(9.9992,4.0012);
-    ctx.bezierCurveTo(9.9992,1.7992999999999997,8.2007,0.0007999999999999119,5.9988,0.0007999999999999119);
-    ctx.lineTo(0,0.0007999999999999119);
+    ctx.bezierCurveTo(9.9992,1.7993,8.2007,0.0008,5.9988,0.0008);
+    ctx.lineTo(0,0.0008);
     ctx.lineTo(0,10);
     ctx.lineTo(5.9988,10);
     ctx.bezierCurveTo(8.20070,10,9.9992,8.2015,9.9992,5.9996);
     ctx.closePath();
     ctx.moveTo(8.0008,5.9996);
-    ctx.bezierCurveTo(8.0008,7.1004000000000005,7.09971,8.0018,5.9986,8.0018);
+    ctx.bezierCurveTo(8.0008,7.1004,7.09971,8.0018,5.9986,8.0018);
     ctx.lineTo(1.9987,8.0018);
     ctx.lineTo(1.9987,1.999299999999999);
     ctx.lineTo(5.9991,1.999299999999999);
-    ctx.bezierCurveTo(7.0999,1.999299999999999,8.0013,2.900389999999999,8.0013,4.001499999999999);
+    ctx.bezierCurveTo(7.0999,1.9993,8.0013,2.90039,8.0013,4.0015);
     ctx.closePath();
   },
   H: ctx => {
@@ -83,7 +83,7 @@ const paths = {
   O: ctx => {
     ctx.moveTo(10,5);
     ctx.bezierCurveTo(10,2.2396,7.76040,0,5,0);
-    ctx.bezierCurveTo(2.2396,1e-14,0,2.2396,0,5);
+    ctx.bezierCurveTo(2.2396,0,0,2.2396,0,5);
     ctx.bezierCurveTo(0,7.76040,2.2396,10,5,10);
     ctx.bezierCurveTo(7.76040,10,10,7.76040,10,5);
     ctx.closePath();
@@ -104,7 +104,7 @@ const paths = {
     ctx.translate(-7.017036266176826,-3.01240927243997);
     ctx.translate(7.0019000150080055,2.997999984991995);
     ctx.rotate(0);
-    ctx.arc(0,0,2.9981,-0.00010005836711271024,-1.5706962684264127,1);
+    ctx.arc(0,0,2.9981,-0.0001,-1.5706962684264127,1);
     ctx.rotate(0);
     ctx.translate(-7.0019,-2.998);
     ctx.lineTo(0,-0.0001);
@@ -125,7 +125,7 @@ const paths = {
   S: ctx => {
     ctx.moveTo(10,3.0006);
     ctx.bezierCurveTo(10,2.19912,9.60074,1.441,9.18111,0.9606);
-    ctx.lineTo(9.16074,0.9605999999999999);
+    ctx.lineTo(9.16074,0.9606);
     ctx.bezierCurveTo(8.4,0.10134,7.48004,0.00004,6.99964,0.00004);
     ctx.lineTo(3.000543,0.00004);
     ctx.bezierCurveTo(1.979042,0.00004,1.339443,0.5006,0.960543,0.8593);
@@ -155,11 +155,11 @@ const paths = {
     ctx.closePath();
   },
   V: ctx => {
-    ctx.moveTo(10,3.7793e-7);
-    ctx.lineTo(7.8385,3.7793e-7);
+    ctx.moveTo(10,0);
+    ctx.lineTo(7.8385,0);
     ctx.lineTo(5,7.12090037793);
-    ctx.lineTo(2.1585,3.779300001838237e-7);
-    ctx.lineTo(0,3.779300001838237e-7);
+    ctx.lineTo(2.1585,0);
+    ctx.lineTo(0,0);
     ctx.lineTo(3.9989,10.0);
     ctx.lineTo(6.0011,10.0);
     ctx.closePath();
@@ -183,12 +183,12 @@ const paths = {
 
 function pathAction(actionFunction) {
   
-  return function(ctx, name, size=20) {
+  return function(ctx, letter, size=20) {
     
-    let pathFunction = paths[name];
+    let pathFunction = paths[letter];
     
     if (!pathFunction) {
-      throw "Unknown Shape: " + name;
+      throw "Unknown Letter: " + letter;
     }
     
     let scale = size / 10;
@@ -227,7 +227,7 @@ let strokeVanishingWBW = strokeVanishingAction("#ffffff", "#000000");
 let strokeVanishingBWB = strokeVanishingAction("#000000", "#ffffff");
 
 module.exports = {
-  letterNames: letterNames,
+  letters: letters,
   stroke: stroke,
   fill: fill,
   strokeVanishing: strokeVanishingAction,
