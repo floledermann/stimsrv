@@ -3,8 +3,8 @@ const htmlButtons = require("../ui/htmlButtons.js");
 const parameterController = require("../controller/parameterController.js");
 const random = require("../controller/random.js");
 
-const canvasRenderer = require("../stimuli/canvas/canvasRenderer.js");
-const renderSnellen = require("../stimuli/canvas/snellen.js");
+const canvasRenderer = require("../stimulus/canvas/canvasRenderer.js");
+const renderSnellen = require("../stimulus/canvas/snellen.js");
 
 module.exports = function(parameters, options) {
   

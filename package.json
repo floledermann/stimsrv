@@ -20,7 +20,7 @@
     "test-debug": "mocha --inspect-brk --ignore test/_*.js test",
     "watch-server": "nodemon --ignore static --ignore data -e js,json,html ./src/server/server.js ./experiment-simple.js",
     "debug-server": "node --inspect-brk ./src/server/server.js ./experiment-simple.js",
-    "build-client": "rollup ./src/clients/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs"
+    "build-client": "rollup ./src/client/browser/client-browser.js --file static/client-browser.js --format iife --name stimsrvClient --plugin 'node-resolve={browser:true}' --plugin commonjs"
   },
   "repository": {
     "type": "git",

@@ -4,7 +4,7 @@ const assert = require("assert");
 
 const {controllerTask, controllerTasks, tasksExperiment} = require("./_util.js");
 
-const loop = require("../src/tasks/loop.js");
+const loop = require("../src/task/loop.js");
 const sequence = require("../src/controller/sequence.js");
 
 

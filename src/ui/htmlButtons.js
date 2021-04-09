@@ -2,7 +2,7 @@ const Dimension = require("another-dimension");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
-const getColorValueForIntensity = require("../stimuli/canvas/canvasRenderer.js").getColorValueForIntensity;
+const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
 
 function htmlButtons(buttonDefs, options) {
   

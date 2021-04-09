@@ -120,7 +120,7 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
 
 Promise.all([
   bundleClientCode(path.resolve(experimentFileName), path.join(__dirname, "../../static/experiment.js"), "experiment"),
-  bundleClientCode(path.join(__dirname, "../clients/browser/client-browser.js"), path.join(__dirname, "../../static/client-browser.js"), "stimsrvClient")
+  bundleClientCode(path.join(__dirname, "../client/browser/client-browser.js"), path.join(__dirname, "../../static/client-browser.js"), "stimsrvClient")
 ])
 .then(() => {
   console.log("Bundled experiment code for browser at static/experiment.js.");
