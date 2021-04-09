@@ -33,7 +33,7 @@ A minimal experiment definition file looks like this:
 
 ```javascript
 // Load the "pause" task
-const pause = require("stimsrv/src/tasks/pause.js");
+const pause = require("stimsrv/tasks/pause");
 
 // Export the experiment definition
 module.exports = {
@@ -66,8 +66,8 @@ After choosing one of the two available *roles* in the web browser (whch are the
 A more complex experiment that actually delivers useful data could look like this:
 
 ```javascript
-const pause = require("stimsrv/src/tasks/pause.js");
-const sloan = require("stimsrv/src/tasks/sloan.js");
+const pause = require("stimsrv/tasks/pause");
+const sloan = require("stimsrv/tasks/sloan");
 
 module.exports = {
   

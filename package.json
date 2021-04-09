@@ -3,6 +3,15 @@
   "version": "0.0.1",
   "description": "",
   "main": "./src/server/server.js",
+  "exports": {
+    ".": "./src/server/server.js",
+    "./controller/*": "./src/controller/*.js",
+    "./stimuli/canvas/*": "./src/stimuli/canvas/*.js",
+    "./storage/*": "./src/storage/*.js",
+    "./tasks/*": "./src/tasks/*.js",
+    "./ui/*": "./src/ui/*.js",
+    "./util/*": "./src/util/*.js"
+  },
   "bin": {
     "stimsrv": "./src/server/server.js"
   },
