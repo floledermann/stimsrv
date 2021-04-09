@@ -23,11 +23,44 @@ const clientRoleMiddleware = require("./clientRoleMiddleware.js");
 const MainExperimentController = require("../controller/mainExperimentController.js");
 
 let options = mri(process.argv.slice(2), {
-  boolean: ["open"],
+  boolean: ["open","verbose"],
   alias: {
     open: "o"
+  },
+  default: {
+    port: 8080
   }
 });
+
+const errorHelpers = {
+  'MODULE_NOT_FOUND': error => "No module found."
+}
+
+function exitError(message, error) {
+  
+  // https://stackoverflow.com/a/41407246/ for colors reference
+  console.log("\x1b[31m\x1b[1m");  // output color to red
+  
+  console.error("\n" + message + "\n");
+  
+  console.log("\x1b[0m");   // reset output color
+  
+  let helper = errorHelpers[error.code];
+  
+  if (helper !== undefined) {
+    if (helper) {
+      console.error(helper(error) + "\n");
+    }
+    if (options.verbose) {
+      throw error;
+    }
+  }
+  else {
+    throw error;
+  }
+  
+  process.exit(1);
+}
 
 // you can also run stimsrv in a folder without specifying experiment, 
 // in which case it will consider the local package as the experiment
@@ -37,7 +70,15 @@ if (!experimentFileName) {
   process.exit(1);
 }
 
-const experiment = require(path.resolve(experimentFileName));
+let experiment = null;
+
+try {
+  experiment = require(path.resolve(experimentFileName));
+}
+catch (e) {
+  let msg = "Experiment could not be loaded " + (options._[0] ? ("from " + options._[0]) : " - no experiment file specified!")
+  exitError(msg, e);
+}
 
 async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
@@ -127,7 +168,7 @@ app.use('/static', express.static(path.join(__dirname, "../../static")));
 
 app.use(clientRoleMiddleware(experiment));
 
-let port = 8080;
+let port = options.port || 8080;
 
 let server = app.listen(port, () => {
   
@@ -144,7 +185,6 @@ let server = app.listen(port, () => {
   }  
     
   //console.log("\x1b[32m%s\x1b[0m", "Green");
-  // https://stackoverflow.com/a/41407246/ for colors reference
   console.log("\x1b[32m\x1b[1m");  // output color to green
   console.log("******************************************************");
   console.log("** stimsrv server running on:                       **");
