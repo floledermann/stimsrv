@@ -83,8 +83,7 @@ module.exports = {
           startValue: "5mm",
           stepSize: 1.2,
           stepType: "multiply",
-          minReversals: context => context.minReversals,
-          minTrials: 2
+          minReversals: 5
       })
     }),
     
