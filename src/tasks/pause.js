@@ -35,7 +35,14 @@ module.exports = function(config) {
       }
       
       for (let key of Object.keys(message)) {
-        interfaces[key] = htmlContent(valOrFunc(message[key], context));
+        let [role, ui] = key.split(".");
+        if (!ui) {
+          ui = role;
+          role = "*";
+        }
+        if (role == "*" || role == context.role) {
+          interfaces[ui] = htmlContent(valOrFunc(message[ui], context));
+        }
       }
       
       // buttons: as specified by config.buttondisplay (single UI key or Array)
