@@ -80,19 +80,21 @@ module.exports = {
     }),
     
     sloan({
-      foregroundIntensity: 0,
-      backgroundIntensity: 1,
-      size:
+      backgroundIntensity: 1,      // white background
+      foregroundIntensity: 0,      // black foreground
+      size:                        // size will be changed using the staircase method with 5 reversals
         staircase({
           startValue: "5mm",
           stepSize: 1.2,
           stepType: "multiply",
           minReversals: 5
-      })
+      }),
+      // add the resulting logMAR score to the context
+      nextContext: trials => ({logMAR: sloan.logMAR(trials)})
     }),
     
     pause({
-      message: context => "Your visual acuity was determined at: " + context.logMAR + "logMAR."
+      message: context => "Your visual acuity was determined at logMAR " + context.logMAR + "."
     }),
     
   ]
