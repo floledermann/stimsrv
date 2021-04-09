@@ -79,8 +79,8 @@ function clientFactory(options) {
   }
 
   function error(message, data) {
-    console.error(message);
-    emitEvent("error", {
+    console.error("Error: " + message);
+    emitEvent("clientError", {
       message: message,
       data: data
     });

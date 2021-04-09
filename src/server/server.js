@@ -242,6 +242,13 @@ io.on("connection", (socket) => {
     controller.warn(message, data);
   });
   
+  // "error" cannot be used as an event in socket.io 😳
+  socket.on("clientError", (data) => {
+    let message = data.message;
+    delete data.message;
+    controller.error(message, data);
+  });
+  
   socket.onAny((messageType, data) => {
     console.log("Received message: " + messageType);
     console.log(data);
