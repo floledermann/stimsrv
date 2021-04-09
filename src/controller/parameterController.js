@@ -5,7 +5,7 @@ function isConstantParameter(param) {
 }
 
 // outer factory is called at experiment initialization time
-module.exports = function(_parameters, conditions) {
+module.exports = function(_parameters, conditions, nextContext) {
   
   Object.freeze(_parameters);
 
@@ -88,7 +88,9 @@ module.exports = function(_parameters, conditions) {
         
         return p;
         
-      }
+      },
+      
+      nextContext: nextContext
     }
   }
 }
