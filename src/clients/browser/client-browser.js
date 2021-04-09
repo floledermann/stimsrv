@@ -86,12 +86,18 @@ function clientFactory(options) {
     });
   }
   
-  let experiment = null;
-  let taskIndex = null;
-  let context = {};
-  
+  let experiment = null;  
   let currentTask = null;
   
+  let taskIndex = null;
+  let context = {};
+
+  let localContext = {
+    clientid: options.clientid,
+    device: options.device,
+    role: options.role.role,
+  };
+ 
   function prepareTask(task) {
     
     let uiOptions = getRendererOptions();
@@ -245,10 +251,14 @@ function clientFactory(options) {
       this.subscribeEvent("condition", data => {
         
         if (currentTask === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
+          
           this.error("Task data changed without initialization.", data);
-          currentTask = experiment.tasks[taskIndex].ui(data.context);
+          
           taskIndex = data.taskIndex;
           context = data.context;
+          let fullContext = Object.assign({}, context, localContext);
+          
+          currentTask = experiment.tasks[taskIndex].ui(fullContext);
           prepareTask(currentTask);
         }
         
@@ -257,9 +267,11 @@ function clientFactory(options) {
       
       this.subscribeEvent("task init", data => {
         
-        currentTask = experiment.tasks[data.taskIndex].ui(data.context);
         taskIndex = data.taskIndex;
         context = data.context;
+        let fullContext = Object.assign({}, context, localContext);
+        
+        currentTask = experiment.tasks[data.taskIndex].ui(fullContext);
         prepareTask(currentTask);
 
         if (data.condition) {

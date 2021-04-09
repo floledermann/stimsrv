@@ -17,7 +17,7 @@
 <script>
 
 let client = stimsrvClient({
-  clientid: "{{role.device}}",
+  clientid: "{{device.id}}",
   role: {{ role | dump | safe }},
   device: {{ device | dump | safe }},
   clientTimestamps: experiment.settings?.clientTimestamps || true

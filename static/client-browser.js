@@ -6316,12 +6316,18 @@ var stimsrvClient = (function () {
 	    });
 	  }
 	  
-	  let experiment = null;
-	  let taskIndex = null;
-	  let context = {};
-	  
+	  let experiment = null;  
 	  let currentTask = null;
 	  
+	  let taskIndex = null;
+	  let context = {};
+
+	  let localContext = {
+	    clientid: options.clientid,
+	    device: options.device,
+	    role: options.role.role,
+	  };
+	 
 	  function prepareTask(task) {
 	    
 	    let uiOptions = getRendererOptions();
@@ -6475,10 +6481,14 @@ var stimsrvClient = (function () {
 	      this.subscribeEvent("condition", data => {
 	        
 	        if (currentTask === null || data.taskIndex != taskIndex || !fastDeepEqual(context, data.context)) {
+	          
 	          this.error("Task data changed without initialization.", data);
-	          currentTask = experiment.tasks[taskIndex].ui(data.context);
+	          
 	          taskIndex = data.taskIndex;
 	          context = data.context;
+	          let fullContext = Object.assign({}, context, localContext);
+	          
+	          currentTask = experiment.tasks[taskIndex].ui(fullContext);
 	          prepareTask(currentTask);
 	        }
 	        
@@ -6487,9 +6497,11 @@ var stimsrvClient = (function () {
 	      
 	      this.subscribeEvent("task init", data => {
 	        
-	        currentTask = experiment.tasks[data.taskIndex].ui(data.context);
 	        taskIndex = data.taskIndex;
 	        context = data.context;
+	        let fullContext = Object.assign({}, context, localContext);
+	        
+	        currentTask = experiment.tasks[data.taskIndex].ui(fullContext);
 	        prepareTask(currentTask);
 
 	        if (data.condition) {
