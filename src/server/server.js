@@ -18,7 +18,6 @@ const bodyParser = require("body-parser");
 
 const Dimension = require("another-dimension");
 
-const clients = require("../clients/index.js");
 const clientRoleMiddleware = require("./clientRoleMiddleware.js");
 const MainExperimentController = require("../controller/mainExperimentController.js");
 
@@ -275,12 +274,6 @@ app.post("/setclientid", (req, res) => {
 });
 
 app.post("/selectrole", (req, res) => {
-  
-  let platform = "browser";
-  let client = clients[platform];
-
-  let selectedRole = req.body.role;
-  
   res.redirect("/?role=" + req.body.role);
 });
 
