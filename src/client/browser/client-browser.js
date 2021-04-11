@@ -38,6 +38,10 @@ function clientFactory(options) {
   }
 
   function emitEvent(eventType, data) {
+    
+    //console.log("emitting " + eventType);
+    //console.log(data);
+    
     let timingInfo = {};
     
     if (options.clientTimestamps) {
@@ -71,7 +75,7 @@ function clientFactory(options) {
   }
 
   function warn(message, data) {
-    console.warn(message);
+    console.warn("Warning: " + message);
     emitEvent("warning", {
       message: message,
       data: data
@@ -157,20 +161,29 @@ function clientFactory(options) {
       }
     }    
     
-    let config = Object.assign({}, options.device, screenConfig);
+    // provide defaults, but warn when used
+    let config = Object.assign({
+      pixeldensity: warnDefaults.value(warn, "pixeldensity", 96),
+      gamma: warnDefaults.value(warn, "gamma", 2.2),
+      viewingdistance: warnDefaults.value(warn, "viewingdistance", 600),
+      ambientIntensity: warnDefaults.value(warn, "ambientIntensity", 1/100)
+    }, options.device, screenConfig);
+    
     config.id = options.device.id;
+    
     if (screenConfig) {
       config.screenId = screenConfig.id;
     }
     delete config.screens;
     
+    /*
     warnDefaults(warn, config, {
       pixeldensity: 96,
       gamma: 2.2,
       viewingdistance: 600,
       ambientIntensity: 1/100
     });
-    
+    */
     // set callback functions
     Object.assign(config, {
       warn: warn,
