@@ -15,4 +15,20 @@ function warnDefaults(warningFunction, object, defaults) {
   return object;
 }
 
+// treat this with caution - this will not work for boolean operations on falsy (false, 0, etc.) values!
+// (since the object is always truthy)
+
+warnDefaults.value = function(warningFunction, name, defaultValue) {
+  let warned = false;
+  return {
+    valueOf: function() {
+      if (!warned) {
+        warningFunction("No value for " + name + " provided, using default of " + defaultValue + ".");
+        warned = true;
+      }
+      return defaultValue;
+    }
+  }
+}
+
 module.exports = warnDefaults;
