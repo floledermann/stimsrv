@@ -39,7 +39,7 @@ function sloanTask(config) {
       return {
         interfaces: {
           display: renderer,
-          response: htmlButtons(config.letters.map(l => ({
+          response: htmlButtons(c => c.letters.map(l => ({
             label: l,
             response: {letter: l}
           }))),
