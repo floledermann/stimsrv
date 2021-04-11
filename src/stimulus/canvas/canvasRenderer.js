@@ -16,7 +16,14 @@ function clamp(value, min=0, max=1) {
       
 function getColorValueForIntensity(intensity, options) {
   
-  let colorInterpolator = d3.interpolateRgb.gamma(options.gamma || 1.0)(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
+  let colorInterpolator = d3.interpolateRgb;
+  
+  // don't use gamma for extremes (to avoid unneccessary warnings)
+  if (intensity > 0 && intensity < 1) {
+    colorInterpolator = colorInterpolator.gamma(options.gamma || 1.0);
+  }
+  
+  colorInterpolator = colorInterpolator(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
   
   let realIntensity = options.lowIntensity + intensity * (options.highIntensity - options.lowIntensity); 
   
@@ -48,8 +55,6 @@ function canvasRenderer(renderFunc, options) {
   
   let runtime = null;
   
-  let colorInterpolator = null;
-  
   let lastCondition = null;
   
   return {
@@ -66,8 +71,6 @@ function canvasRenderer(renderFunc, options) {
         pixelDensity: runtime.pixeldensity,
         viewingDistance: runtime.viewingdistance
       });
-      
-      colorInterpolator = d3.interpolateRgb.gamma(runtime.gamma)(options.minimumIntensityColor, options.maximumIntensityColor);
       
       function resize(widthpx, heightpx) {
         
