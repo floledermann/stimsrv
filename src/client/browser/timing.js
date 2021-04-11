@@ -1,4 +1,4 @@
-const protocol = require("../protocol.js");
+const protocol = require("./protocol.js");
 
 function clientFactory(socket) {
   return {

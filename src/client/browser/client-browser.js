@@ -4,7 +4,7 @@ const deepEqual = require("fast-deep-equal");
 
 const warnDefaults = require("../../util/warnDefaults.js");
 
-const timing = require("./browser/timing.js");
+const timing = require("./timing.js");
 
 function clientFactory(options) {
   
@@ -14,7 +14,7 @@ function clientFactory(options) {
     // device
     // role
     root: document.body,
-    clientTimestamps: true
+    clientTimestamps: false
   }, options);
           
   for (let ui of options.role.interfaces) {

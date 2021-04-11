@@ -20,7 +20,7 @@ let client = stimsrvClient({
   clientid: "{{device.id}}",
   role: {{ role | dump | safe }},
   device: {{ device | dump | safe }},
-  clientTimestamps: experiment.settings?.clientTimestamps || true
+  clientTimestamps: experiment.settings?.clientTimestamps || false
 });
 
 client.connect();
