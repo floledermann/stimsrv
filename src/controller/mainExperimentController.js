@@ -293,6 +293,13 @@ function MainExperimentController(experiment, options) {
     //io.sockets.emit(message, data);
   }
   
+  // override console warn & error for logging
+  let _warn = console.warn;
+  let _error = console.error;
+  
+  console.warn = warn;
+  console.error = error;
+  
   function warn(message, data) {
     let obj = {
       message: message,
@@ -308,6 +315,11 @@ function MainExperimentController(experiment, options) {
       currentTrial.warnings.push(Object.assign({}, obj, {timeOffset: relativeTime(currentTrial.trialTimeOffset)}));
     }
     warnings.push(obj);
+    
+    if (_warn) {
+      _warn("Warning: " + message);
+      if (data) _warn(data);
+    }
   }
   
   function error(message, data) {
@@ -325,6 +337,11 @@ function MainExperimentController(experiment, options) {
       currentTrial.errors.push(Object.assign({}, obj, {timeOffset: relativeTime(currentTrial.trialTimeOffset)}));
     }
     errors.push(obj);
+
+    if (_error) {
+      _error("Error: " + message);
+      if (data) _error(data);
+    }
   }
   
   // public API
