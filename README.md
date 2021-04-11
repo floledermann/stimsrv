@@ -17,7 +17,7 @@ Main features:
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
 
-*Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended only for local use in private networks!*
+*Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private networks only!*
 
 ### Defining & running experiments
 
@@ -104,8 +104,7 @@ module.exports = {
 }
 ```
 
-*(Note: currently the sloan task is not yet provided by stimsrv, so this is a hypothetical example!)*
-
+*(A variant of this experiment can be found in the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples))*
 
 <!-- ### Device configuration -->
 
