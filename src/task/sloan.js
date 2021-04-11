@@ -52,7 +52,7 @@ function sloanTask(config) {
       parameters: config, 
       nextContext: (context, trials) => {
         return nextContext ? {
-          context: Object.assign(context, nextContext(trials))
+          context: Object.assign(context, nextContext(context, trials))
         } : null;
       }
     })
@@ -85,7 +85,7 @@ sloanTask.logMAR = function(trials, viewingdistance, pixeldensity) {
   if (minCorrectSize < Infinity) {
     if (!["arcmin","arcsec","deg"].includes(minCorrectSize.unit)) {
       if (minCorrectSize.unit == "px" && !pixeldensity) {
-        console.warn("logMAR: Stimulus size is specified in pixels but pixel density not specified!");
+        console.warn("logMAR: Stimulus size is specified in pixels but pixel density is not specified!");
       }
       else {
         Dimension.configure({
@@ -93,7 +93,7 @@ sloanTask.logMAR = function(trials, viewingdistance, pixeldensity) {
         });
       }
       if (!viewingdistance) {
-        console.warn("logMAR: Stimulus size is specified in " + minCorrectSize.unit + " but viewing distance not specified - use angular units (arcmin, arcsec) to specifiy stimulus size or specify viewing distance for logMAR calculation.");
+        console.warn("logMAR: Stimulus size is specified in " + minCorrectSize.unit + " but viewing distance is not specified - use angular units (arcmin, arcsec) to specifiy stimulus size or specify viewing distance for logMAR calculation.");
       }
       else {
         Dimension.configure({
