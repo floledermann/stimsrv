@@ -41,6 +41,6 @@ module.exports = function(parameters, options) {
         }
       }
     },
-    controller: parameterController(parameters, null)
+    controller: parameterController({parameters: parameters});
   }
 }

@@ -5,9 +5,15 @@ function isConstantParameter(param) {
 }
 
 // outer factory is called at experiment initialization time
-module.exports = function(_parameters, conditions, nextContext) {
+module.exports = function(config) {
   
-  Object.freeze(_parameters);
+  config = Object.assign({
+    parameters: {},
+    conditions: null,
+    nextContext: null
+  }, config);
+  
+  Object.freeze(config.parameters);
 
   return function(context) {
     
@@ -23,28 +29,28 @@ module.exports = function(_parameters, conditions, nextContext) {
     }
     
     // make a copy of the parameters
-    let parameters = Object.assign({}, _parameters);
+    let parameterIterators = Object.assign({}, config.parameters);
     
-    //console.log(parameters);
+    //console.log(parameterIterators);
     
-    for (let key of Object.keys(parameters)) {
+    for (let key of Object.keys(parameterIterators)) {
       // if its already an iterator, we don't have to do anything
-      if (!(parameters[key].next && typeof parameters[key].next == "function")) {
+      if (!(parameterIterators[key].next && typeof parameterIterators[key].next == "function")) {
         // function -> initialize with context
-        if (typeof parameters[key] == "function") {
-          parameters[key] = parameters[key](context);
+        if (typeof parameterIterators[key] == "function") {
+          parameterIterators[key] = parameterIterators[key](context);
         }
         // primitive values -> copy to output
-        if (!(parameters[key].next && typeof parameters[key].next == "function")) {
-          parameters[key] = yieldForever(parameters[key]);
+        if (!(parameterIterators[key].next && typeof parameterIterators[key].next == "function")) {
+          parameterIterators[key] = yieldForever(parameterIterators[key]);
         }
       }
     }
     
     let conditionsIterator = null;
     
-    if (conditions) {
-      conditionsIterator = conditions(context);
+    if (config.conditions) {
+      conditionsIterator = config.conditions(context);
     }
 
     // return next condition, or null for end of experiment
@@ -55,8 +61,8 @@ module.exports = function(_parameters, conditions, nextContext) {
         
         let done = false;
         
-        for (key of Object.keys(parameters)) {
-          let param = parameters[key].next(lastCondition, lastResponse, trials);
+        for (key of Object.keys(parameterIterators)) {
+          let param = parameterIterators[key].next(lastCondition, lastResponse, trials);
           if (param.done) {
             done = true;
           }
@@ -80,9 +86,9 @@ module.exports = function(_parameters, conditions, nextContext) {
         
         let p = {};
         
-        for (key of Object.keys(_parameters)) {
-          if (isConstantParameter(_parameters[key])) {
-            p[key] = _parameters[key];
+        for (key of Object.keys(config.parameters)) {
+          if (isConstantParameter(config.parameters[key])) {
+            p[key] = config.parameters[key];
           }
         }
         
@@ -90,7 +96,7 @@ module.exports = function(_parameters, conditions, nextContext) {
         
       },
       
-      nextContext: nextContext
+      nextContext: config.nextContext
     }
   }
 }

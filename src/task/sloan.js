@@ -48,11 +48,13 @@ function sloanTask(config) {
         }
       }
     },
-    controller: parameterController(config, null, (context, trials) => {
-      debugger;
-      return nextContext ? {
-        context: Object.assign(context, nextContext(trials))
-      } : null;
+    controller: parameterController({
+      parameters: config, 
+      nextContext: (context, trials) => {
+        return nextContext ? {
+          context: Object.assign(context, nextContext(trials))
+        } : null;
+      }
     })
   }
 }
