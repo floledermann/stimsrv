@@ -6178,6 +6178,19 @@ var stimsrvClient = (function () {
 	  return object;
 	}
 
+	warnDefaults.value = function(warningFunction, name, defaultValue) {
+	  let warned = false;
+	  return {
+	    valueOf: function() {
+	      if (!warned) {
+	        warningFunction("No value for " + name + " provided, using default of " + defaultValue + ".");
+	        warned = true;
+	      }
+	      return defaultValue;
+	    }
+	  }
+	};
+
 	var warnDefaults_1 = warnDefaults;
 
 	var protocol = {
@@ -6244,7 +6257,7 @@ var stimsrvClient = (function () {
 	    // device
 	    // role
 	    root: document.body,
-	    clientTimestamps: true
+	    clientTimestamps: false
 	  }, options);
 	          
 	  for (let ui of options.role.interfaces) {
@@ -6268,6 +6281,10 @@ var stimsrvClient = (function () {
 	  }
 
 	  function emitEvent(eventType, data) {
+	    
+	    //console.log("emitting " + eventType);
+	    //console.log(data);
+	    
 	    let timingInfo = {};
 	    
 	    if (options.clientTimestamps) {
@@ -6301,7 +6318,7 @@ var stimsrvClient = (function () {
 	  }
 
 	  function warn(message, data) {
-	    console.warn(message);
+	    console.warn("Warning: " + message);
 	    emitEvent("warning", {
 	      message: message,
 	      data: data
@@ -6387,20 +6404,29 @@ var stimsrvClient = (function () {
 	      }
 	    }    
 	    
-	    let config = Object.assign({}, options.device, screenConfig);
+	    // provide defaults, but warn when used
+	    let config = Object.assign({
+	      pixeldensity: warnDefaults_1.value(warn, "pixeldensity", 96),
+	      gamma: warnDefaults_1.value(warn, "gamma", 2.2),
+	      viewingdistance: warnDefaults_1.value(warn, "viewingdistance", 600),
+	      ambientIntensity: warnDefaults_1.value(warn, "ambientIntensity", 1/100)
+	    }, options.device, screenConfig);
+	    
 	    config.id = options.device.id;
+	    
 	    if (screenConfig) {
 	      config.screenId = screenConfig.id;
 	    }
 	    delete config.screens;
 	    
-	    warnDefaults_1(warn, config, {
+	    /*
+	    warnDefaults(warn, config, {
 	      pixeldensity: 96,
 	      gamma: 2.2,
 	      viewingdistance: 600,
 	      ambientIntensity: 1/100
 	    });
-	    
+	    */
 	    // set callback functions
 	    Object.assign(config, {
 	      warn: warn,
