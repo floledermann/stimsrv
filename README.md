@@ -106,6 +106,8 @@ module.exports = {
 
 *(A variant of this experiment can be found in the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples#examples-in-this-repository))*
 
+### Experiment results
+
 When you complete the tasks of this example in your web browser, the experiment results will be written to the `data` subdirectory in your experiment directory as a JSON file. Opening the results file will let you inspect the results of the experiment:
 
 ```javascript
@@ -121,7 +123,9 @@ When you complete the tasks of this example in your web browser, the experiment 
       "timeOffset": 5883
     },
     {
-      "message": "logMAR: Stimulus size is specified in mm but viewing distance is not specified - use angular units (arcmin, arcsec) to specifiy stimulus size or specify viewing distance for logMAR calculation.",
+      "message": "logMAR: Stimulus size is specified in mm but viewing distance is not specified - \
+       use angular units (arcmin, arcsec) to specifiy stimulus size or specify viewing distance for \
+       logMAR calculation.",
       "timeOffset": 20363
     }
   ],
