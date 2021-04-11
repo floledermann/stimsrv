@@ -23,7 +23,7 @@ function sloanTask(config) {
   let nextContext = config.nextContext;
   
   delete config.nextContext;
-
+  
   let options = {
     dimensions: ["size"]
   };
@@ -59,7 +59,7 @@ function sloanTask(config) {
   }
 }
 
-sloanTask.logMAR = function(trials) {
+sloanTask.logMAR = function(trials, viewingdistance, pixeldensity) {
   let maxIncorrectSize = 0;
   let minCorrectSize = Infinity;
   for (let trial of trials) {
@@ -83,6 +83,24 @@ sloanTask.logMAR = function(trials) {
   }
   
   if (minCorrectSize < Infinity) {
+    if (!["arcmin","arcsec","deg"].includes(minCorrectSize.unit)) {
+      if (minCorrectSize.unit == "px" && !pixeldensity) {
+        console.warn("logMAR: Stimulus size is specified in pixels but pixel density not specified!");
+      }
+      else {
+        Dimension.configure({
+          pixelDensity: pixeldensity
+        });
+      }
+      if (!viewingdistance) {
+        console.warn("logMAR: Stimulus size is specified in " + minCorrectSize.unit + " but viewing distance not specified - use angular units (arcmin, arcsec) to specifiy stimulus size or specify viewing distance for logMAR calculation.");
+      }
+      else {
+        Dimension.configure({
+          viewingDistance: viewingdistance
+        });
+      }
+    }
     let detail = Dimension(minCorrectSize / 5, minCorrectSize.unit).toDimension("arcmin");
     return Math.log10(detail).toFixed(2);
   }
