@@ -4,6 +4,7 @@ module.exports = function(htmlString, options) {
   options = Object.assign({
     wrapperTag: "div",
     wrapperClass: "content",
+    parentStyle: null,
     style: null
   }, options);
   
@@ -22,7 +23,8 @@ module.exports = function(htmlString, options) {
       let wrapper = document.createElement(options.wrapperTag || "div");
       
       if (options.wrapperClass) wrapper.className = options.wrapperClass;
-      if (options.style) parent.style.cssText = options.style;
+      if (options.style) wrapper.style.cssText = options.style;
+      if (options.parentStyle) parent.style.cssText = options.parentStyle;
       
       wrapper.innerHTML = htmlString;
       
