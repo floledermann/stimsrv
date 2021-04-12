@@ -1,4 +1,4 @@
-## stimsrv
+## stimsrv — browser-based psychological experiments and user studies
 
 !! | This is alpha software, not ready to use. | !!
 ---|-------------------------------------------|---
