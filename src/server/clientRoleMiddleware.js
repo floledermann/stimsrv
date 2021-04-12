@@ -19,13 +19,13 @@ function factory(experiment) {
   let roles = experiment.roles || [
     {
       role: "experiment",
-      device: "anyone",
+      devices: "anyone",
       interfaces: ["display","response"],
       description: "Experiment screen for stimulus display and participant response"
     },
     {
       role: "supervisor",
-      device: "anyone",
+      devices: "anyone",
       interfaces: ["monitor", "control"],
       description: "Supervisor screen and experiment control"
     }
@@ -70,7 +70,13 @@ function factory(experiment) {
     
     req.clientId = clientId;
     
-    let potentialRoles = roles.filter(r => r.device == clientId);
+    for (let role of roles) {
+      if (!Array.isArray(role.devices)) {
+        role.devices = [role.devices];
+      }
+    }
+    
+    let potentialRoles = roles.filter(r => r.devices.includes(clientId));
     let activeRole = null;
     
     if (req.query.role) {
@@ -82,7 +88,7 @@ function factory(experiment) {
     }
     
     if (activeRole) {
-      req.clientDevice = devicesById[activeRole.device]
+      req.clientDevice = devicesById[clientId];
     }
     
     // on new experiment, always show role selection screen
