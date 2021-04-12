@@ -60,7 +60,8 @@ body {
 }
 
 .content {
-  white-space: pre;
+  max-width: 45em;
+  white-space: pre-wrap;
   text-align: center;
   line-height: 1.7;
 }
