@@ -63,7 +63,7 @@ npx stimsrv --open experiment-1.js
 
 This will start the stimsrv server and open a browser window (because of the `--open` parameter), showing the experiment start page. (Omit `--open` if you only want to start the server and want to start the client(s) manually. The server will show the URL to connect to in its output.)
 
-After choosing one of the two available *roles* in the web browser (which are provided by defaults and [can be changed](#device-configuration--roles)), the experiment will display the message "Hello from stimsrv" and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately (again, all of this is the default behaviour which can be changed if desired).
+After choosing one of the two available *roles* in the web browser (which are provided by default and [can be changed](#device-configuration--roles)), the experiment will display the message "Hello from stimsrv" and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately (again, all of this is the default behaviour which can be changed if desired).
 
 A more complex experiment that actually delivers useful data could look like this:
 
@@ -109,7 +109,7 @@ module.exports = {
 
 ### Experiment results
 
-Once all tasks of an experiment are completed, the experiment results will be stored. By default, results data is written to the `data` subdirectory relative to the experiment specification as a JSON file. The results file contains information for each trial of each task of the experiment, plus additional information such as errors and warnings that occured during the experiment run.
+Once all tasks of an experiment are completed, the experiment results will be stored. By default, results data is written to the `data` subdirectory relative to the experiment specification, as a JSON file. The results file contains information for each trial of each task of the experiment, plus additional information such as timestamps and errors and warnings that may have occured during the experiment run.
 
 For the example above, a results file could look like this:
 
@@ -161,7 +161,7 @@ For the example above, a results file could look like this:
 // ... rest of the results data
 ```
 
-What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the relationship of pixels on the screen to visual acuity of the participant. To accurately establish the visual acuity of the participant, information about the configuration of the devices in the experiment, such as pixel density and viewing distance has to be added to the experiment specification. This is covered in the next section.
+What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the visual acuity of the participant. To make the calculation valid, information about the configuration of the devices in the experiment, such as pixel density and viewing distance, has to be added to the experiment specification. This is covered in the next section.
 
 ### Device configuration & roles
 
