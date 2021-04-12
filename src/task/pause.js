@@ -4,17 +4,24 @@ const htmlContent = require("../ui/htmlContent.js");
 const htmlButtons = require("../ui/htmlButtons.js");
 const nextOnResponse = require("../controller/nextOnResponse.js");
 
-module.exports = function(config) {
+let defaults = {
+  background: "#000000",
+  textcolor: "#ffffff",
+  buttondisplay: "response",
+  button: "Continue",
+  store: false  // do not store by default
+}
+
+function pause(config) {
   
   config = Object.assign({
+    // dynamic default message, must be created here
     message: {
       display: "The experiment is paused." + (config.buttondisplay == "control" ? "" : " Press button to continue."),
       "*": "Experiment paused" + (config.buttondisplay == "control" ? ". Press button to continue." : ", waiting for user.")
-    },
-    buttondisplay: "response",
-    button: "Continue",
-    store: false  // do not store by default
-  }, config);
+    }
+  },
+  defaults, config);
   
   return {
     name: "pause",
@@ -25,8 +32,7 @@ module.exports = function(config) {
       
       let interfaces = {
       }
-      
-      
+           
       // message UIs: all by default, or specified by individual keys
       let message = valOrFunc(config.message, context);
       
@@ -34,15 +40,29 @@ module.exports = function(config) {
         message = {"*": message}
       }
       
+      let parentStyle = "";
+      if (config.background) parentStyle += "background: " + valOrFunc(config.background, context) + ";";
+      if (config.textcolor) parentStyle += "color: " + valOrFunc(config.textcolor, context) + ";";
+      
+      // make sure "*" is applied last, to make "role.*" work as override regardless of order
+      let fallback = message["*"];
+            
       for (let key of Object.keys(message)) {
+        // fallback is handled explicitly (see above)
+        if (key == "*") continue;
+        
         let [role, ui] = key.split(".");
         if (!ui) {
           ui = role;
           role = "*";
         }
         if (role == "*" || role == context.role) {
-          interfaces[ui] = htmlContent(valOrFunc(message[ui], context));
+          interfaces[ui] = htmlContent(valOrFunc(message[key], context), { style: parentStyle });
         }
+      }
+      
+      if (!interfaces["*"] && fallback) {
+        interfaces["*"] = htmlContent(valOrFunc(fallback, context), { style: parentStyle });
       }
       
       // buttons: as specified by config.buttondisplay (single UI key or Array)
@@ -66,3 +86,9 @@ module.exports = function(config) {
   }
 
 }
+
+pause.defaults = function(_defaults) {
+  Object.assign(defaults, _defaults);
+}
+
+module.exports = pause;
