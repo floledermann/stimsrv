@@ -165,6 +165,14 @@ nunjucks.configure([path.resolve("views"), path.join(__dirname, "../../views")],
 
 app.use('/static', express.static(path.join(__dirname, "../../static")));
 
+function ignoreFavicon(req, res, next) {
+  if (req.originalUrl.endsWith('favicon.ico')) {
+    res.status(204).end();
+  }
+  next();
+}
+app.use(ignoreFavicon);
+
 app.use(clientRoleMiddleware(experiment));
 
 let port = options.port || 8080;
