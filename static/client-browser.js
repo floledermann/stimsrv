@@ -6357,6 +6357,7 @@ var stimsrvClient = (function () {
 	      // clear ui
 	      let wrapper = document.getElementById("interface-" + ui);
 	      wrapper.innerHTML = "";
+	      wrapper.style.cssText = ""; // this may be set by tasks
 	    
 	      // setup new ui
 	      if (task.interfaces[ui]) {
