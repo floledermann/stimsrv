@@ -10,20 +10,20 @@ Main features:
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
 - Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be done on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow for deterministic experiment behaviour even in complex, distributed settings.
-- Provides wrappers and utility functions that help develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering the stimulus).
+- Provides utilities that help develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering the stimulus).
 - Timestamp synchronization between multiple clients accomplishes temporal precision of a few milliseconds in local WiFi networks.
 - Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution and viewing distance.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
 
-*Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private networks only!*
+*Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
 ### Defining & running experiments
 
-Experiments in stimsrv are implemented in JavaScript. Therefore, a single experiment specification defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment definition.
+Experiments in stimsrv are implemented in JavaScript. A single *experiment specification* defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
 
-To use stimsrv, install [Node.js](https://nodejs.org/) and run the following command on the command line in your project directory:
+To use stimsrv, install [Node.js](https://nodejs.org/) and run the following command in your project directory:
 
 ```
 npm install stimsrv
@@ -53,21 +53,22 @@ module.exports = {
 }
 ```
 
-After saving the file (e.g. as `my-experiment.js`), you can run this experiment from your project directory with:
+After saving the file (e.g. as `experiment-1.js`), you can run this experiment from your project directory with:
 
 ```
-npx stimsrv --open <experiment-file>
+npx stimsrv --open experiment-1.js
 ```
 
-(Replace `<experiment-file>` with the name of your experiment file.)
+(Replace `experiment-1.js` with the actual name of your experiment file.)
 
-This will start the stimsrv server and open a browser window (because of the `--open` parameter), showing the experiment start page. (Omit `--open` if you only want to start the server and want to start the client(s) manually.)
+This will start the stimsrv server and open a browser window (because of the `--open` parameter), showing the experiment start page. (Omit `--open` if you only want to start the server and want to start the client(s) manually. The server will show the URL to connect to in its output.)
 
-After choosing one of the two available *roles* in the web browser (whch are the defaults and can be changed), the experiment will display the message "Hello from stimsrv" and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately (because by default `experiment.settings.loop` is `true`).
+After choosing one of the two available *roles* in the web browser (which are provided by defaults and [can be changed](#device-configuration--roles)), the experiment will display the message "Hello from stimsrv" and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately (again, all of this is the default behaviour which can be changed if desired).
 
 A more complex experiment that actually delivers useful data could look like this:
 
 ```javascript
+// load the tasks and controllers used in the experiment
 const pause = require("stimsrv/task/pause");
 const sloan = require("stimsrv/task/sloan");
 const staircase = require("stimsrv/controller/staircase");
@@ -162,13 +163,21 @@ For the example above, a results file could look like this:
 
 What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the relationship of pixels on the screen to visual acuity of the participant. To accurately establish the visual acuity of the participant, information about the configuration of the devices in the experiment, such as pixel density and viewing distance has to be added to the experiment specification. This is covered in the next section.
 
-### Device configuration
+### Device configuration & roles
 
 *(... coming soon ...)*
 
-<!-- ### Implementing tasks -->
+### Implementing tasks
 
-<!-- ### Context & controllers -->
+*(... coming soon ...)*
+
+### Context & controllers
+
+*(... coming soon ...)*
+
+### Experiment settings & data storage
+
+*(... coming soon ...)*
 
 
 ### Philosophy
