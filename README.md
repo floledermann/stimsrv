@@ -53,13 +53,13 @@ module.exports = {
 }
 ```
 
-After saving the file (e.g. as `experiment-1.js`), you can run this experiment from your project directory with:
+After saving the file (e.g. as `experiment-simple.js`), you can run this experiment from your project directory with:
 
 ```
-npx stimsrv --open experiment-1.js
+npx stimsrv --open experiment-simple.js
 ```
 
-(Replace `experiment-1.js` with the actual name of your experiment file.)
+(Replace `experiment-simple.js` with the actual name of your experiment file.)
 
 This will start the stimsrv server and open a browser window (because of the `--open` parameter), showing the experiment start page. (Omit `--open` if you only want to start the server and want to start the client(s) manually. The server will show the URL to connect to in its output.)
 
@@ -161,7 +161,7 @@ For the example above, a results file could look like this:
 // ... rest of the results data
 ```
 
-What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the visual acuity of the participant. To make the calculation valid, information about the configuration of the devices in the experiment, such as pixel density and viewing distance, has to be added to the experiment specification. This is covered in the next section.
+What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the visual acuity of the participant! To make the experiment results valid, information about the configuration of the devices in the experiment, such as pixel density and viewing distance, has to be added to the experiment specification. This is covered in the next section.
 
 ### Device configuration & roles
 
