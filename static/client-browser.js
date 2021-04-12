@@ -6178,6 +6178,9 @@ var stimsrvClient = (function () {
 	  return object;
 	}
 
+	// treat this with caution - this will not work for boolean operations on falsy (false, 0, etc.) values!
+	// (since the object is always truthy)
+
 	warnDefaults.value = function(warningFunction, name, defaultValue) {
 	  let warned = false;
 	  return {
