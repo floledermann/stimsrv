@@ -195,6 +195,20 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 - ***Trial***: A single run of a task. Usually, the participant is presented with a specific stimulus, and reacts with a specific response. (Example: in a single trial, above task may display the letter "B" to the participant, and wait for their response. For the next trial, another letter may be displayed.) A single task may run multiple trials, until a condition for going to the next task is met.
 - ***Condition***: A set of properties that define the stimulus for a trial. In the example above, the condition specifies the specific letter to be shown, plus other aspects of the presentation (e.g. the font size to use, the contrast ratio etc.).
 - ***Response***: A set of properties that define the response of the participant. In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed).
-- ***Result***: The result of a trial contains the condition, the response plus additional information, such as timing information.
+- ***Result***: The result of a trial. Contains information about the condition, the response, the context plus additional information, such as timing information.
 
+
+<!-- 
+### Tasks collection
+
+#### Tasks provided as part of stimsrv
+
+#### Official extension tasks
+
+#### Tasks developed by 3rd parties
+
+### Experiments examples
+-->
+
+<!-- ### Credits & acknowledgements -->
 
