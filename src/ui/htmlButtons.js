@@ -1,4 +1,6 @@
+
 const Dimension = require("another-dimension");
+const deepEqual = require("fast-deep-equal");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
@@ -11,7 +13,8 @@ function htmlButtons(buttonDefs, options) {
     wrapperClass: "buttons",
     buttonTag: "button",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
-    broadcastEvents: null
+    broadcastEvents: null,
+    alwaysRerender: false
   }, options);
   
   // single string -> convert to array
@@ -23,11 +26,14 @@ function htmlButtons(buttonDefs, options) {
   let document = null;
   let wrapper = null;
   
+  let lastButtonDefs = null;
+  
   return {
     initialize: function(parent, _runtime) {
       
       runtime = _runtime;
       document = parent.ownerDocument;
+      lastButtonDefs = null;
       
       wrapper = document.createElement(options.wrapperTag);
       if (options.wrapperClass) {
@@ -40,71 +46,80 @@ function htmlButtons(buttonDefs, options) {
       
       let _buttonDefs = valOrFunc.array(buttonDefs, condition);
       
-      //TODO: check if change/rerender is needed
-      wrapper.innerHTML = "";
-      for (let [index, buttonDef] of _buttonDefs.entries()) {
+      // check if change/rerender is needed
+      if (options.alwaysRerender || !deepEqual(_buttonDefs, lastButtonDefs)) {
         
-        let buttonCondition = Object.assign({}, condition, buttonDef.response);
-        
-        let el = document.createElement(options.buttonTag);
-        el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
-        
-        if (buttonDef.style) {
-          el.style.cssText = buttonDef.style;
-        }
-        
-        if (buttonDef.canvas) {
+        lastButtonDefs = _buttonDefs;
+      
+        wrapper.innerHTML = "";
+        for (let [index, buttonDef] of _buttonDefs.entries()) {
           
-          // TODO: reuse canvasRenderer - this requires some refactoring there
-          // to get rid of fixed binding to specific canvas
+          let buttonCondition = Object.assign({}, condition, buttonDef.response);
           
-          let canvas = document.createElement("canvas");
+          let el = document.createElement(options.buttonTag);
+          el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
-          canvas.width = Math.round(60 * (devicePixelRatio || 1));
-          canvas.height = Math.round(40 * (devicePixelRatio || 1));
+          if (buttonDef.style) {
+            el.style.cssText = buttonDef.style;
+          }
           
-          canvas.style.width = "60px";
-          canvas.style.height = "40px";
-          
-          el.appendChild(canvas);
-                    
-          let ctx = canvas.getContext("2d");
-          
-          buttonDef.canvas(ctx, buttonCondition);
-        }
-        
-        let evt = options.buttonEvent;
-        
-        if (!Array.isArray(evt)) {
-          evt = [evt];
-        }
-        
-        evt.forEach(eventType => {
-          el.addEventListener(eventType, function(e) {
+          if (buttonDef.canvas) {
             
-            // to prevent touchstart from also triggering mousedown
-            // but we want to keep mousedown for visual feedback
-            // should we make this configurable?
-            if (e.type == "touchstart") {
-              e.preventDefault();
-            }
+            // TODO: reuse canvasRenderer - this requires some refactoring there
+            // to get rid of fixed binding to specific canvas
             
-            runtime.response(buttonDef.response || {label: buttonDef.label});
+            let canvas = document.createElement("canvas");
             
-            if (options.broadcastEvents) {
-              if (Array.isArray(options.broadcastEvents)) {
-                let evt = options.broadcastEvents[index];
-                if (evt) {
-                  broadcastVal(runtime, valOrFunc(evt,condition,buttonDef,index));
+            canvas.width = Math.round(60 * (devicePixelRatio || 1));
+            canvas.height = Math.round(40 * (devicePixelRatio || 1));
+            
+            canvas.style.width = "60px";
+            canvas.style.height = "40px";
+            
+            el.appendChild(canvas);
+                      
+            let ctx = canvas.getContext("2d");
+            
+            buttonDef.canvas(ctx, buttonCondition);
+          }
+          
+          let evt = options.buttonEvent;
+          
+          if (!Array.isArray(evt)) {
+            evt = [evt];
+          }
+          
+          evt.forEach(eventType => {
+            el.addEventListener(eventType, function(e) {
+              
+              // to prevent touchstart from also triggering mousedown
+              // but we want to keep mousedown for visual feedback
+              // should we make this configurable?
+              if (e.type == "touchstart") {
+                e.preventDefault();
+              }
+              
+              runtime.response(buttonDef.response || {label: buttonDef.label});
+              
+              if (options.broadcastEvents) {
+                if (Array.isArray(options.broadcastEvents)) {
+                  let evt = options.broadcastEvents[index];
+                  if (evt) {
+                    broadcastVal(runtime, valOrFunc(evt,condition,buttonDef,index));
+                  }
+                }
+                else {
+                  broadcastVal(runtime, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
                 }
               }
-              else {
-                broadcastVal(runtime, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
-              }
-            }
+            });
           });
-        });
-        wrapper.appendChild(el);
+          
+          // remove focus after clicking
+          el.addEventListener("mouseup", function() { this.blur(); });
+          
+          wrapper.appendChild(el);
+        }
       }
     }
   }
