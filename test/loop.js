@@ -14,7 +14,7 @@ describe("Loop", () => {
   describe("Basic loop operation", () => {
 
 
-    it("Tasks in loop are called, looping at end", () => {
+    it("Loop is iterated only once if context does not change and loop is not a callback", () => {
       
       let currentContext = null;
       
@@ -23,7 +23,7 @@ describe("Loop", () => {
           tasks: controllerTasks([
             context => (currentContext = {param1: "value2"}),
             context => (currentContext = {param1: "value3"}),
-          ])
+          ]),
         }),
         // this is never reached
         controllerTask( context => (currentContext = {param1: "value4"}) )
@@ -35,15 +35,15 @@ describe("Loop", () => {
       controller.response({});
       assert.equal(currentContext.param1, "value3");
       
+      // loop ends - nothing to change
+      
+      controller.response({});
+      assert.equal(currentContext.param1, "value4");
+      
+      // experiment main loop
+
       controller.response({});
       assert.equal(currentContext.param1, "value2");
-      
-      controller.response({});
-      assert.equal(currentContext.param1, "value3");
-      
-      controller.response({});
-      assert.equal(currentContext.param1, "value2");
-      
     });
 
 
@@ -277,7 +277,7 @@ describe("Loop", () => {
     });
     
 
-    it("Non-iterator properties get set only once", () => {
+    it("Non-iterator properties get set at each iteration, but don't cause loop to continue", () => {
       
       let currentContext = null;
       
@@ -285,15 +285,15 @@ describe("Loop", () => {
         loop({
           context: {
             param1: 10,
-            param2: sequence.loop([10,20])
+            param2: sequence([10,20])
           },
           tasks: controllerTasks([
             context => (context.param1++, context.param2++, currentContext = context),
             context => (context.param1++, context.param2++, currentContext = context),
           ])
         }),
-        // this is never reached
-        controllerTask( context => (currentContext = {param1: "value4"}) )
+        // this is reached after param2 iterator is exhausted
+        controllerTask( context => (context.param1 = "end", currentContext = context) )
       ]);
 
       controller.startExperiment();
@@ -305,16 +305,16 @@ describe("Loop", () => {
       assert.equal(currentContext.param2, 12);
 
       controller.response({});
-      assert.equal(currentContext.param1, 13);
+      assert.equal(currentContext.param1, 11);
       assert.equal(currentContext.param2, 21);
 
       controller.response({});
-      assert.equal(currentContext.param1, 14);
+      assert.equal(currentContext.param1, 12);
       assert.equal(currentContext.param2, 22);
 
       controller.response({});
-      assert.equal(currentContext.param1, 15);
-      assert.equal(currentContext.param2, 11);
+      assert.equal(currentContext.param1, "end");
+      assert.equal(currentContext.param2, 22);
 
     });
 
@@ -357,6 +357,57 @@ describe("Loop", () => {
       controller.response({});
       assert.equal(currentContext.param1, 23);
       assert.equal(currentContext.param2, 11);
+
+    });
+    
+
+    it("Loop goes on if loop callback returns true", () => {
+      
+      let currentContext = null;
+      
+      let controller = tasksExperiment({param1: "value1"}, [
+        loop({
+          context: {
+            param1: sequence([10]),
+            param2: sequence([10,20])
+          },
+          loop: context => true,
+          tasks: controllerTasks([
+            context => (context.param1++, context.param2++, currentContext = context),
+            context => (context.param1++, context.param2++, currentContext = context),
+          ])
+        }),
+        // this is never reached
+        controllerTask( context => (context.param1 = "end", currentContext = context) )
+      ]);
+
+      controller.startExperiment();
+      assert.equal(currentContext.param1, 11);
+      assert.equal(currentContext.param2, 11);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 12);
+      assert.equal(currentContext.param2, 12);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 13);
+      assert.equal(currentContext.param2, 21);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 14);
+      assert.equal(currentContext.param2, 22);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 15);
+      assert.equal(currentContext.param2, 23);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 16);
+      assert.equal(currentContext.param2, 24);
+
+      controller.response({});
+      assert.equal(currentContext.param1, 17);
+      assert.equal(currentContext.param2, 25);
 
     });
 

@@ -139,7 +139,25 @@ module.exports = function(config) {
           
           if (context.taskIndex >= config.tasks.length) {
             // stop loop?
-            if (!valOrFunc(config.loop, context)) {
+            let shouldContinue = valOrFunc(config.loop, context);
+            
+            if (shouldContinue && contextGenerator) {
+              
+              let genContext = contextGenerator.next();
+              
+              // even if exhausted, assign final value
+              Object.assign(context, genContext.value);
+              
+              if (genContext.done) {
+                // if iterator is exhausted and loop is not a function,
+                // the context will nexer change, so break the loop
+                if (!(typeof config.loop == "function")) {
+                  shouldContinue = false;
+                }
+              }
+            }
+            
+            if (!shouldContinue) {
               delete context.taskIndex;
               // override with outer context for "local" context parameters
               // (this is needed e.g. for nested loop counters)
@@ -152,13 +170,6 @@ module.exports = function(config) {
             // loop goes on, reset index and generate new context if applicable
             context.taskIndex = 0;
             
-            if (contextGenerator) {
-              let genContext = contextGenerator.next();
-              if (!genContext.done) {
-                Object.assign(context, genContext.value);
-              }
-            }
-
           }
 
           if (config.tasks[context.taskIndex]?.controller) {

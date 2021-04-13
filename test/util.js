@@ -19,7 +19,7 @@ describe("Utilities", () => {
       
     });
 
-    it("Returns values only for iterators", () => {
+    it("Returns values for constants and iterators", () => {
       
       let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"][Symbol.iterator]() });
       
@@ -27,7 +27,7 @@ describe("Utilities", () => {
       
       assert(!result.done);  
       assert(typeof result.value == "object");
-      assert(Object.keys(result.value).length == 1);
+      assert(Object.keys(result.value).length == 3);
       assert.equal(result.value.prop3, "a");     
       
     });
@@ -46,6 +46,42 @@ describe("Utilities", () => {
       
       result = gen.next();     
       assert(result.done);     
+      
+    });
+
+    it("Exhausted iterators are set to final value", () => {
+      
+      let iterator = function*() {
+        yield "a";
+        yield "b";
+        return "end";
+      };
+      
+      let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: iterator() });
+      
+      let result = gen.next();     
+      result = gen.next();     
+      result = gen.next(); 
+      
+      assert(result.done); 
+      assert.equal(result.value.prop1, 1);
+      assert.equal(result.value.prop2, "a");
+      assert.equal(result.value.prop3, "end");
+      
+    });
+
+    it("Exhausted iterators are removed if final value is not present", () => {
+      
+      let gen = propertiesGenerator({ prop1: 1, prop2: "a", prop3: ["a","b"][Symbol.iterator]() });
+      
+      let result = gen.next();          
+      result = gen.next();          
+      result = gen.next();     
+      
+      assert(result.done); 
+      assert.equal(result.value.prop1, 1);
+      assert.equal(result.value.prop2, "a");
+      assert.strictEqual(result.value.prop3, undefined);
       
     });
 

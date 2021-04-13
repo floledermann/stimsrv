@@ -5,10 +5,14 @@ function* propertiesGenerator(parameters) {
   
   // include only properties which are generators
   let iterableParameters = {};
+  let constantParameters = {};
   
   for (let key of Object.keys(parameters)) {
     if (parameters[key].next && typeof parameters[key].next == "function") {
       iterableParameters[key] = parameters[key];
+    }
+    else {
+      constantParameters[key] = parameters[key];
     }
   }
     
@@ -19,6 +23,9 @@ function* propertiesGenerator(parameters) {
     // reset to check whether any iterator is still active
     allDone = true;
     
+    // constant parameters should be present, but don't cause the iterator to continue
+    Object.assign(result, constantParameters);
+    
     for (key of Object.keys(iterableParameters)) {
       let param = iterableParameters[key].next();
       if (!param.done) {
@@ -26,7 +33,13 @@ function* propertiesGenerator(parameters) {
         allDone = false;
       }
       else {
-        delete result[key];
+        // exhausted properties get their final value, or will be removed from the result
+        if (param.value === undefined || param.value === null) {
+          delete result[key];
+        }
+        else {
+          result[key] = param.value;
+        }
       }
     }
     
