@@ -6360,22 +6360,27 @@ var stimsrvClient = (function () {
 	      wrapper.style.cssText = ""; // this may be set by tasks
 	    
 	      // setup new ui
-	      if (task.interfaces[ui]) {
-	        task.interfaces[ui].initialize?.(wrapper, uiOptions);
-	      }
-	      else {
-	        task.interfaces["*"]?.initialize?.(wrapper, uiOptions);
+	      ui = task.interfaces[options.role.role + "." + ui]
+	           || task.interfaces[ui]
+	           || task.interfaces[options.role.role + ".*"]
+	           || task.interfaces["*"];
+	           
+	      if (ui) {
+	        ui.initialize?.(wrapper, uiOptions);
 	      }
 	    }
 	  }
 	  
 	  function showCondition(task, condition) {
 	    for (let ui of options.role.interfaces) {
-	      if (task.interfaces[ui]) {
-	        task.interfaces[ui].render?.(condition);
-	      }
-	      else {
-	        task.interfaces["*"]?.render?.(condition);
+	      
+	      ui = task.interfaces[options.role.role + "." + ui]
+	           || task.interfaces[ui]
+	           || task.interfaces[options.role.role + ".*"]
+	           || task.interfaces["*"];
+	           
+	      if (ui) {
+	        ui.render?.(condition);
 	      }
 	    }
 	  }
