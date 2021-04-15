@@ -1,4 +1,4 @@
-## stimsrv — browser-based psychological experiments and user studies
+# stimsrv — browser-based psychological experiments and user studies
 
 !! | This is alpha software, not ready to use. | !!
 ---|-------------------------------------------|---
@@ -19,7 +19,7 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
-### Defining & running experiments
+## Defining & running experiments
 
 Experiments in stimsrv are implemented in JavaScript. A single *experiment specification* defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
 
@@ -75,7 +75,7 @@ const staircase = require("stimsrv/controller/staircase");
 
 module.exports = {
   
-  name: "A small experiment to test visual acuity",
+  name: "A small experiment to test visual acuity using Sloan letters",
     
   tasks: [
   
@@ -83,6 +83,7 @@ module.exports = {
       message: "Press 'Continue' when you are ready to start the experiment"
     }),
     
+    // Task that shows Sloan letters and offers buttons for response
     sloan({
       backgroundIntensity: 1,      // white background
       foregroundIntensity: 0,      // black foreground
@@ -107,7 +108,7 @@ module.exports = {
 
 *(A variant of this experiment can be found in the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples#examples-in-this-repository))*
 
-### Experiment results
+## Experiment results
 
 Once all tasks of an experiment are completed, the experiment results will be stored. By default, results data is written to the `data` subdirectory relative to the experiment specification, as a JSON file. The results file contains information for each trial of each task of the experiment, plus additional information such as timestamps and errors and warnings that may have occured during the experiment run.
 
@@ -163,30 +164,30 @@ For the example above, a results file could look like this:
 
 What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the visual acuity of the participant! To make the experiment results valid, information about the configuration of the devices in the experiment, such as pixel density and viewing distance, has to be added to the experiment specification. This is covered in the next section.
 
-### Device configuration & roles
+## Device configuration & roles
 
 *(... coming soon ...)*
 
-### Implementing tasks
+## Implementing tasks
 
 *(... coming soon ...)*
 
-### Context & controllers
+## Context & controllers
 
 *(... coming soon ...)*
 
-### Experiment settings & data storage
+## Experiment settings & data storage
 
 *(... coming soon ...)*
 
 
-### Philosophy
+## Philosophy
 
 Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each task that you need to implement for your experiment. Because experiment definitions are JavaScript files, all features of the language (such as inline functions or iterators) can be used to configure an experiment. The stimsrv server takes care of packaging and delivering the experiment code for web browsers and coordinating multiple clients, among other things.
 
 The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible Science.
 
-### Terminology
+## Terminology
 
 - ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
 - ***Task***: Part of an experiment, usually presenting some stimulus to the participant and expecting some kind of response from them. (Example: A Task may show letters of the alphabet to the participant and let the participant respond with corresponding on-screen buttons). A sequence of tasks is run during an experiment.
@@ -199,16 +200,16 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 
 
 <!-- 
-### Tasks collection
+## Tasks collection
 
-#### Tasks provided as part of stimsrv
+### Tasks provided as part of stimsrv
 
-#### Official extension tasks
+### Official extension tasks
 
-#### Tasks developed by 3rd parties
+### Tasks developed by 3rd parties
 
-### Experiments examples
+## Experiments examples
 -->
 
-<!-- ### Credits & acknowledgements -->
+<!-- ## Credits & acknowledgements -->
 
