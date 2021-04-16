@@ -32,7 +32,8 @@ let options = mri(process.argv.slice(2), {
 });
 
 const errorHelpers = {
-  'MODULE_NOT_FOUND': error => "No module found."
+  // TODO: this also suppresses module not found errors e.g. in tasks, which is not helpful!
+  //'MODULE_NOT_FOUND': error => "No module found."
 }
 
 function exitError(message, error) {
@@ -86,7 +87,7 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
     external: ["fs/promises", "path"],
     plugins: [
       rollupResolve({browser: true}),
-      rollupCommonJS()
+      rollupCommonJS(),
     ],
     onwarn: function(warning, rollupWarn) {
       // ignore waring for circular dependencies on d3
@@ -111,7 +112,7 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
     // remove node-specific libraries
     globals: {
       "fs/promises": "null",
-      "path": "null"
+      "path": "null",
     }
   }); 
   
@@ -164,6 +165,16 @@ nunjucks.configure([path.resolve("views"), path.join(__dirname, "../../views")],
 });
 
 app.use('/static', express.static(path.join(__dirname, "../../static")));
+
+for (let task of experiment.tasks) {
+  if (task.resources) {
+    let resources = task.resources;
+    if (!Array.isArray(resources)) resources = [resources];
+    for (let res of resources) {
+      app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context, res.path)));
+    }
+  }
+}
 
 function ignoreFavicon(req, res, next) {
   if (req.originalUrl.endsWith('favicon.ico')) {
