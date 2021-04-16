@@ -15,7 +15,7 @@ Main features:
 - Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution and viewing distance.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
-To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the stimsrv experiment template (coming soon).
+To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the [stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template).
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
@@ -29,7 +29,7 @@ To use stimsrv, install [Node.js](https://nodejs.org/) and run the following com
 npm install stimsrv
 ```
 
-(The *stimsrv experiment template* (coming soon) provides scripts for Windows to perform such tasks without using the command line.)
+(The *[stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template)* provides scripts for Windows to perform such tasks without using the command line.)
 
 A minimal experiment definition file looks like this:
 
@@ -110,7 +110,7 @@ module.exports = {
 
 ## Experiment results
 
-Once all tasks of an experiment are completed, the experiment results will be stored. By default, results data is written to the `data` subdirectory relative to the experiment specification, as a JSON file. The results file contains information for each trial of each task of the experiment, plus additional information such as timestamps and errors and warnings that may have occured during the experiment run.
+By default, results data is written to the `data` subdirectory relative to the experiment specification, as a JSON file, after each run of the experiment. The results file contains information for each trial of each task of the experiment, plus additional information such as timestamps, errors and warnings that may have occured during the experiment run.
 
 For the example above, a results file could look like this:
 
