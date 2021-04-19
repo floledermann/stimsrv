@@ -176,6 +176,7 @@ for (let task of experiment.tasks) {
     if (!Array.isArray(resources)) resources = [resources];
     for (let res of resources) {
       if (typeof res == "string") {
+        console.log("Serving static: " + "/static/task/" + task.name + "/ : " + path.resolve(experimentDirectory, res));
         app.use("/static/task/" + task.name + "/", express.static(path.resolve(experimentDirectory, res)));
       }
       else if (res.path) {
