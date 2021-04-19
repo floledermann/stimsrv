@@ -19,13 +19,19 @@ module.exports = function(config) {
   let outerContext = null;
   let contextGenerator = null;
   
+  let taskResources = [];
+  for (let t of config.tasks) {
+    taskResources = taskResources.concat(t.resources || []);
+  }
+  
   return {
     get name() {
-      return currentTask?.name;
+      return currentTask?.name || "loop";
     },
     get store() {
       return currentTask?.store;
     },
+    resources: taskResources,
     // this is called on client - it cannot return a (changed) context, but only set up internal configuration
     ui: function(context) {   
     
