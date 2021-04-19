@@ -1,9 +1,9 @@
 let sequence = function(choices, options) {
   
   options = Object.assign({
-    stepCount: 1,   // repeat each item stepCount times
-    loop: false,    // loop after sequence is exhausted
-    loopCount: undefined  // stop after loopCount loops
+    stepCount: 1,         // repeat each item stepCount times
+    loop: false,          // loop after sequence is exhausted
+    loopCount: undefined, // stop after loopCount loops
   }, options);
   
   return function*() {

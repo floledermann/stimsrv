@@ -26,7 +26,7 @@ function randomRange(from, to, options) {
 
 function randomShuffle(choices, options) {
   options = Object.assign({
-    loop: true
+    loop: false
   }, options);
   
   function shuffled(arr) {
