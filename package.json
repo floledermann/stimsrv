@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/server/server.js",
     "./controller/*": "./src/controller/*.js",
+    "./stimulus/*": "./src/stimulus/*.js",
     "./stimulus/canvas/*": "./src/stimulus/canvas/*.js",
     "./storage/*": "./src/storage/*.js",
     "./task/*": "./src/task/*.js",
