@@ -178,8 +178,8 @@ for (let task of experiment.tasks) {
       if (typeof res == "string") {
         app.use("/static/task/" + task.name + "/", express.static(path.resolve(experimentDirectory, res)));
       }
-      else if (res.context && res.path) {
-        app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context, res.path)));
+      else if (res.path) {
+        app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context || experimentDirectory, res.path)));
       }
       else {
         throw new Error("Cannot resolve resource specification " + res);
