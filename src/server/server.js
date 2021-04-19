@@ -71,9 +71,13 @@ if (!experimentFileName) {
 }
 
 let experiment = null;
+let experimentFullPath = null;
+let experimentDirectory = null;
 
 try {
-  experiment = require(path.resolve(experimentFileName));
+  experimentFullPath = path.resolve(experimentFileName);
+  experimentDirectory = path.dirname(experimentFullPath);
+  experiment = require(experimentFullPath);
 }
 catch (e) {
   let msg = "Experiment could not be loaded " + (options._[0] ? ("from " + options._[0]) : " - no experiment file specified!")
@@ -171,7 +175,15 @@ for (let task of experiment.tasks) {
     let resources = task.resources;
     if (!Array.isArray(resources)) resources = [resources];
     for (let res of resources) {
-      app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context, res.path)));
+      if (typeof res == "string") {
+        app.use("/static/task/" + task.name + "/", express.static(path.resolve(experimentDirectory, res)));
+      }
+      else if (res.context && res.path) {
+        app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context, res.path)));
+      }
+      else {
+        throw new Error("Cannot resolve resource specification " + res);
+      }
     }
   }
 }
