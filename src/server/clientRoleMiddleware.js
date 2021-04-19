@@ -92,7 +92,7 @@ function factory(experiment) {
     }
     
     // on new experiment, always show role selection screen
-    if (req.method == "GET" && (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp)) {
+    if (req.method == "GET" && req.path == "/" && (!req.clientRole || req.session.experimentTimestamp != req.app.locals.experimentTimestamp)) {
       
       req.session.experimentTimestamp = req.app.locals.experimentTimestamp;
       
