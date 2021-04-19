@@ -38,7 +38,7 @@ function randomShuffle(choices, options) {
     return result;
   }
   
-  shuffledChoices = shuffled(choices);
+  let shuffledChoices = shuffled(choices);
   let index = 0;
   
   return function*() {
