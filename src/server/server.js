@@ -89,7 +89,7 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
     input: inputFileName,
-    // external: ["fs/promises", "path", "shim-globals"],
+    external: ["fs/promises", "path", "shim-globals"],
     plugins: [
       rollupResolve({browser: true}),
       rollupCommonJS(),
