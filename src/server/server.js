@@ -6,6 +6,7 @@ const { networkInterfaces } = require('os');
 const rollup = require("rollup");
 const rollupResolve = require("@rollup/plugin-node-resolve").nodeResolve;
 const rollupCommonJS = require("@rollup/plugin-commonjs");
+const rollupInject = require("@rollup/plugin-inject");
       
 const mri = require("mri");
 const express = require("express");
@@ -88,10 +89,14 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
     input: inputFileName,
-    external: ["fs/promises", "path"],
+    // external: ["fs/promises", "path", "shim-globals"],
     plugins: [
       rollupResolve({browser: true}),
       rollupCommonJS(),
+      rollupInject({
+        __dirname: ['shim-globals', 'dirname'],
+        __filename: ['shim-globals', 'filename'],
+      }),
     ],
     onwarn: function(warning, rollupWarn) {
       // ignore waring for circular dependencies on d3
@@ -117,6 +122,7 @@ async function bundleClientCode(inputFileName, outputFileName, globalName) {
     globals: {
       "fs/promises": "null",
       "path": "null",
+      "shim-globals": "{dirname:'',filename:''}"
     }
   }); 
   
@@ -176,11 +182,14 @@ for (let task of experiment.tasks) {
     if (!Array.isArray(resources)) resources = [resources];
     for (let res of resources) {
       if (typeof res == "string") {
-        console.log("Serving static: " + "/static/task/" + task.name + "/ : " + path.resolve(experimentDirectory, res));
-        app.use("/static/task/" + task.name + "/", express.static(path.resolve(experimentDirectory, res)));
+        let resolvedPath = path.resolve(experimentDirectory, res);
+        console.log("Serving static: " + "/static/resources/" + task.name + "/ : " + resolvedPath);
+        app.use("/static/resources/" + task.name + "/", express.static(resolvedPath));
       }
-      else if (res.path) {
-        app.use("/static/task/" + task.name + "/", express.static(path.resolve(res.context || experimentDirectory, res.path)));
+      else if (res.path && res.id) {
+        let resolvedPath = path.resolve(res.context || experimentDirectory, res.path);
+        console.log("Serving static: " + "/static/resources/" + res.id + "/ : " + resolvedPath);
+        app.use("/static/resources/" + res.id + "/", express.static(resolvedPath));
       }
       else {
         throw new Error("Cannot resolve resource specification " + res);

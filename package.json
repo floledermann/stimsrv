@@ -35,6 +35,7 @@
   "homepage": "https://github.com/floledermann/stimsrv#readme",
   "dependencies": {
     "@rollup/plugin-commonjs": "17.1.0",
+    "@rollup/plugin-inject": "4.0.2",
     "@rollup/plugin-node-resolve": "11.2.0",
     "another-dimension": "0.2.3",
     "body-parser": "1.19.0",

@@ -6384,6 +6384,11 @@ var stimsrvClient = (function () {
 	      }
 	    }
 	  }
+	  
+	  function getResourceURL(id, path) {
+	    return "/static/resources/" + id + "/" + path;
+	  }
+
 
 	  function getRendererOptions() {
 	    
@@ -6441,7 +6446,8 @@ var stimsrvClient = (function () {
 	      warn: warn,
 	      error: error,
 	      event: event,
-	      response: response
+	      response: response,
+	      getResourceURL: getResourceURL
 	    });
 	    
 	    return config;
@@ -6548,7 +6554,9 @@ var stimsrvClient = (function () {
 	        console.log("Server restarted - reloading experiment");
 	        window.location.reload();
 	      });
-	    }
+	    },
+	    
+	    
 	  };
 	  
 
