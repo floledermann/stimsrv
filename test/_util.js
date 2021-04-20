@@ -1,5 +1,5 @@
 
-const mainExperimentController = require("../src/controller/mainExperimentController.js");
+const mainExperimentController = require("../src/server/mainExperimentController.js");
 
 function mockStorage() {
   

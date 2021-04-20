@@ -7,7 +7,7 @@ const propertiesGenerator = require("../util/propertiesGenerator.js");
 
 const filestorage = require("../storage/filestorage.js");
 
-const nextOnResponse = require("./nextOnResponse.js");
+const nextOnResponse = require("../controller/nextOnResponse.js");
 
 function MainExperimentController(experiment, options) {
   

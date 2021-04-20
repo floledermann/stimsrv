@@ -20,7 +20,7 @@ const bodyParser = require("body-parser");
 const Dimension = require("another-dimension");
 
 const clientRoleMiddleware = require("./clientRoleMiddleware.js");
-const MainExperimentController = require("../controller/mainExperimentController.js");
+const MainExperimentController = require("./mainExperimentController.js");
 
 let options = mri(process.argv.slice(2), {
   boolean: ["open","verbose"],
