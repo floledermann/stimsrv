@@ -85,6 +85,11 @@ catch (e) {
   exitError(msg, e);
 }
 
+const adapters = {
+  'browser': require("./clientAdapter/browser.js")(experiment),
+  'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment)
+};
+
 async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
@@ -298,11 +303,17 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, res) => {
-  res.render("experiment.html", {
-    experiment: experiment,
-    role: req.clientRole,
-    device: req.clientDevice
-  });
+  
+  let clientType = req.clientDevice.client || "browser";
+  let adapter = adapters[clientType];
+  
+  if (!adapter) {
+    throw new Error("No client adapter found for client type '" + clientType + "'");
+  }
+  
+  console.log("Adapter: " + clientType);
+  
+  adapter.render(req, res);
   
 });
 

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ experiment.name }}{% endblock %}
+
+{% block head %}
+{# refresh in case there is no JS at all #}
+<meta http-equiv="refresh" content="{{experiment.settings.simpleBrowserRefresh or 5}}">
+{% endblock %}
+
+{% block bodyclass %}{% for role in roles %}has-role-{{role}} {% endfor %}{% endblock %}
+
+{% block body %}
+<style>
+
+</style>
+
+Simple Browser Client
+
+{% for ui in role.interfaces %}
+<section class="{{ui}}">
+{{ui}}
+</section>
+{% endfor %}
+
+<script>
+
+</script>
+
+{% endblock %}
