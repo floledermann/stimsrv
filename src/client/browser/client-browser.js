@@ -187,14 +187,6 @@ function clientFactory(options) {
     }
     delete config.screens;
     
-    /*
-    warnDefaults(warn, config, {
-      pixeldensity: 96,
-      gamma: 2.2,
-      viewingdistance: 600,
-      ambientIntensity: 1/100
-    });
-    */
     // set callback functions
     Object.assign(config, {
       warn: warn,

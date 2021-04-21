@@ -85,11 +85,6 @@ catch (e) {
   exitError(msg, e);
 }
 
-const adapters = {
-  'browser': require("./clientAdapter/browser.js")(experiment),
-  'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment)
-};
-
 async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
@@ -247,11 +242,12 @@ let server = app.listen(port, () => {
 
 let controller = MainExperimentController(experiment, experiment.settings);
 
-clients = {};
-for (let device of experiment.devices) {
-  clients[device.id] = adapters[device.client || "browser"](device);
-  controller.addClient(clients[device.id]);
-}
+const adapters = {
+  'browser': require("./clientAdapter/browser.js")(experiment, controller),
+  'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment, controller)
+};
+
+let clients = {};
 
 controller.startExperiment();
 
@@ -309,12 +305,21 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => {
   
-  let client = clients[req.clientDevice.id];
+  let client = clients[req.clientDevice.id + "." + req.clientRole.role];
   
-  // temporary override for development
-  if (req.clientRole.role == "stationB") {
-    client = clients["stationB"];
+  if (!client) {
+    clientType = req.clientDevice.client || "browser";
+    
+    // temporary override for development
+    if (req.clientRole.role == "stationB") {
+      clientType = "browser-simple";
+    }
+    
+    client = adapters[clientType](req.clientDevice, req.clientRole);
+    clients[req.clientDevice.id + "." + req.clientRole.role] = client;
+    controller.addClient(client);
   }
+
   
   if (!client) {
     throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");

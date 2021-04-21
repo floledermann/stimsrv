@@ -106,6 +106,10 @@ function canvasRenderer(renderFunc, options) {
       observer.observe(parent);
     },
     
+    renderToCanvas: function(ctx, condition, context, config) {
+      console.log("RENDER TO CANVAS");
+    },
+    
     // contract: if render() returns a string or element, then replace the parent content
     render: function(condition) {
       
