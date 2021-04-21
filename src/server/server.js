@@ -150,13 +150,6 @@ const app = express();
 app.locals.experiment = experiment;
 
 Dimension.configure({ toJSON: d => d.toString() });
-    
-let controller = MainExperimentController(experiment, experiment.settings);
-controller.startExperiment();
-
-// is this still needed as a global?
-//app.locals.clients = {};
-//app.locals.roles = {};
 
 app.use(cookieParser());
 
@@ -251,6 +244,18 @@ let server = app.listen(port, () => {
   }
 });
 
+
+let controller = MainExperimentController(experiment, experiment.settings);
+
+clients = {};
+for (let device of experiment.devices) {
+  clients[device.id] = adapters[device.client || "browser"](device);
+  controller.addClient(clients[device.id]);
+}
+
+controller.startExperiment();
+
+
 let io = socketio(server, {serveClient: false});
 
 io.on("connection", (socket) => {
@@ -304,16 +309,18 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => {
   
-  let clientType = req.clientDevice.client || "browser";
-  let adapter = adapters[clientType];
+  let client = clients[req.clientDevice.id];
   
-  if (!adapter) {
-    throw new Error("No client adapter found for client type '" + clientType + "'");
+  // temporary override for development
+  if (req.clientRole.role == "stationB") {
+    client = clients["stationB"];
   }
   
-  console.log("Adapter: " + clientType);
+  if (!client) {
+    throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");
+  }
   
-  adapter.render(req, res);
+  client.render(req, res);
   
 });
 
