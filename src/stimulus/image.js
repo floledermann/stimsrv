@@ -9,7 +9,8 @@ module.exports = function(config) {
     style: {
       maxWidth: "100%",
       maxHeight: "100%",
-    }
+    },
+    fullscreen: false
   }, config);
   
   let imgEl = null;
@@ -20,6 +21,22 @@ module.exports = function(config) {
       context = _context;
       imgEl = parent.ownerDocument.createElement("img");
       parent.appendChild(imgEl);
+      
+      if (config.fullscreen) {
+        let fsButton = parent.ownerDocument.createElement("button");
+        fsButton.textContent = "Fullscreen";
+        Object.assign(fsButton.style, {
+          position: "absolute",
+          top: "0.3em",
+          right: "0.3em"
+        });
+        fsButton.addEventListener("click", function() {
+          imgEl.requestFullscreen({
+            navigationUI: "hide"
+          });
+        });
+        parent.appendChild(fsButton);
+      }
     },
     render: function(condition) {
       Object.assign(imgEl.style, valOrFunc(config.style, condition, context));
