@@ -277,11 +277,13 @@ function MainExperimentController(experiment, options) {
   
   function addClient(client) {
     clients.push(client);
-    client.message("task init", {
-      taskIndex: taskIndex,
-      context: context,
-      condition: currentTrial?.condition
-    });
+    if (taskIndex > -1) {
+      client.message("task init", {
+        taskIndex: taskIndex,
+        context: context,
+        condition: currentTrial?.condition
+      });
+    }
   }
   
   function removeClient(client) {
