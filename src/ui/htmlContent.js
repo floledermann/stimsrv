@@ -23,7 +23,14 @@ module.exports = function(htmlString, options) {
       let wrapper = document.createElement(options.wrapperTag || "div");
       
       if (options.wrapperClass) wrapper.className = options.wrapperClass;
-      if (options.style) wrapper.style.cssText = options.style;
+      if (options.style) {
+        if (typeof options.style == "string") {
+          wrapper.style.cssText = options.style;
+        }
+        if (typeof options.style == "object") {
+          Object.assign(wrapper.style, options.style);
+        }
+      }
       if (options.parentStyle) parent.style.cssText = options.parentStyle;
       
       wrapper.innerHTML = htmlString;
