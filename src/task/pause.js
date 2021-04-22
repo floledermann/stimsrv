@@ -9,7 +9,10 @@ let defaults = {
   textcolor: "#ffffff",
   buttondisplay: "response",
   button: "Continue",
-  store: false  // do not store by default
+  store: false,  // do not store by default
+  messageStyle: {
+    padding: "2em"
+  },
 }
 
 function pause(config) {
@@ -57,12 +60,12 @@ function pause(config) {
           role = "*";
         }
         if (role == "*" || role == context.role) {
-          interfaces[ui] = htmlContent(valOrFunc(message[key], context), { parentStyle: parentStyle, style: config.style });
+          interfaces[ui] = htmlContent(valOrFunc(message[key], context), { parentStyle: parentStyle, style: config.messageStyle });
         }
       }
       
       if (!interfaces["*"] && fallback) {
-        interfaces["*"] = htmlContent(valOrFunc(fallback, context), { parentStyle: parentStyle, style: config.style });
+        interfaces["*"] = htmlContent(valOrFunc(fallback, context), { parentStyle: parentStyle, style: config.messageStyle });
       }
       
       // buttons: as specified by config.buttondisplay (single UI key or Array)
