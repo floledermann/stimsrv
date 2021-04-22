@@ -50,12 +50,12 @@ function canvasRenderer(renderFunc, options) {
   options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
   
   let ctx = null;
-  let width = null;
-  let height = null;
   
   let runtime = null;
   
   let lastCondition = null;
+  
+  let dppx = 1;
   
   return {
     initialize: function(parent, _runtime) {
@@ -65,7 +65,7 @@ function canvasRenderer(renderFunc, options) {
       let document = parent.ownerDocument;
       
       let canvas = document.createElement("canvas");
-      let dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
+      dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
       
       Dimension.configure({
         pixelDensity: runtime.pixeldensity,
@@ -79,11 +79,8 @@ function canvasRenderer(renderFunc, options) {
         widthpx = Math.round(widthpx/2 + 0.5) * 2;
         heightpx = Math.round(heightpx/2 + 0.5) * 2;
         
-        width = widthpx * dppx;
-        height = heightpx * dppx;
-        
-        canvas.width = width;      
-        canvas.height = height;
+        canvas.width = widthpx * dppx;      
+        canvas.height = heightpx * dppx;
         
         canvas.style.width = widthpx + "px";
         canvas.style.height = heightpx + "px";
@@ -106,15 +103,11 @@ function canvasRenderer(renderFunc, options) {
       observer.observe(parent);
     },
     
-    renderToCanvas: function(ctx, condition, context, config) {
-      console.log("RENDER TO CANVAS");
-    },
-    
-    // contract: if render() returns a string or element, then replace the parent content
-    render: function(condition) {
+    renderToCanvas: function(ctx, condition) {
       
-      lastCondition = condition;
-      
+      let width = ctx.canvas.width;
+      let height = ctx.canvas.height;
+        
       condition = Object.assign({
         lowIntensity: 0,
         // highIntensity: 1.0,
@@ -198,7 +191,16 @@ function canvasRenderer(renderFunc, options) {
       }
       
       renderFunc(ctx, condition);   
-
+    },
+    
+    // contract: if render() returns a string or element, then replace the parent content
+    render: function(condition) {
+      
+      // remember for redrawing on resize
+      lastCondition = condition;
+      
+      this.renderToCanvas(ctx, condition);
+      
     }
   }
 }

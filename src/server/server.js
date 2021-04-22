@@ -303,7 +303,18 @@ io.on("connection", (socket) => {
   
 });
 
-app.get("/", (req, res) => {
+app.post("/setclientid", (req, res) => {
+  if (req.body.clientid) {
+    clientRoleMiddleware.setClientIdCookie(res, req.body.clientid); 
+  }  
+  res.redirect(req.body.next || "/");
+});
+
+app.post("/selectrole", (req, res) => {
+  res.redirect("/?role=" + req.body.role);
+});
+
+app.get(["/","/image/"], (req, res) => {
   
   let client = clients[req.clientDevice.id + "." + req.clientRole.role];
   
@@ -330,15 +341,5 @@ app.get("/", (req, res) => {
 });
 
 
-app.post("/setclientid", (req, res) => {
-  if (req.body.clientid) {
-    clientRoleMiddleware.setClientIdCookie(res, req.body.clientid); 
-  }  
-  res.redirect(req.body.next || "/");
-});
-
-app.post("/selectrole", (req, res) => {
-  res.redirect("/?role=" + req.body.role);
-});
 
 
