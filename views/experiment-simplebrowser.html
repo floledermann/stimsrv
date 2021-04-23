@@ -5,7 +5,7 @@
 {% block head %}
 {# refresh in case there is no JS at all #}
 <noscript>
-<meta http-equiv="refresh" content="{{experiment.settings.simpleBrowserRefresh or 5}}">
+<meta http-equiv="refresh" content="{{delay}}">
 </noscript>
 
 {% endblock %}
@@ -30,7 +30,7 @@ data: {{ data  | dump | safe }}
 
 <script>
 // simple refresh as fallback
-let timer = window.setTimeout(function(){window.location.reload();}, 5000);
+let timer = window.setTimeout(function(){window.location.reload();}, {{delay}}*1000);
 
 var xhr = new XMLHttpRequest();
 

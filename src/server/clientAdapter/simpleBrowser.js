@@ -143,6 +143,7 @@ module.exports = function(experiment, controller) {
             data: lastMessageData,
             role: req.clientRole,
             imageSize: [imageWidth/(client.devicePixelRatio || 1), imageHeight/(client.devicePixelRatio || 1)],
+            delay: experiment.settings.simpleBrowserRefresh || 5
           });
         }
       }
