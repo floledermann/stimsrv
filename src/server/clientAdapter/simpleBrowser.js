@@ -22,9 +22,10 @@ module.exports = function(experiment, controller) {
     
     if (client.imageSize) {
       let [w,h] = client.imageSize.split("x").map(n => +n);
-      imageWidth = (w || imageWidth) * (client.devicePixelRatio || 1);
-      imageHeight = (h || imageHeight) * (client.devicePixelRatio || 1);
+      imageWidth = w || imageWidth;
+      imageHeight = h || imageHeight;
     }
+      console.log(imageWidth);
     
     let localContext = {
       clientid: client.id,
