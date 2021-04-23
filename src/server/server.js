@@ -195,7 +195,9 @@ function ignoreFavicon(req, res, next) {
   if (req.originalUrl.endsWith('favicon.ico')) {
     res.status(204).end();
   }
-  next();
+  else {
+    next();
+  }
 }
 app.use(ignoreFavicon);
 
@@ -314,23 +316,27 @@ app.post("/selectrole", (req, res) => {
   res.redirect("/?role=" + req.body.role);
 });
 
-app.get(["/","/image/"], (req, res) => {
+app.get("*", (req, res) => {
   
-  let client = clients[req.clientDevice.id + "." + req.clientRole.role];
+  let client = null;
   
-  if (!client) {
-    clientType = req.clientDevice.client || "browser";
+  if (req.clientDevice && req.clientRole) {
     
-    // temporary override for development
-    if (req.clientRole.role == "stationB") {
-      clientType = "browser-simple";
+    client = clients[req.clientDevice.id + "." + req.clientRole.role];
+  
+    if (!client) {
+      clientType = req.clientDevice.client || "browser";
+      
+      // temporary override for development
+      if (req.clientRole.role == "stationB") {
+        clientType = "browser-simple";
+      }
+      
+      client = adapters[clientType](req.clientDevice, req.clientRole);
+      clients[req.clientDevice.id + "." + req.clientRole.role] = client;
+      controller.addClient(client);
     }
-    
-    client = adapters[clientType](req.clientDevice, req.clientRole);
-    clients[req.clientDevice.id + "." + req.clientRole.role] = client;
-    controller.addClient(client);
   }
-
   
   if (!client) {
     throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");
