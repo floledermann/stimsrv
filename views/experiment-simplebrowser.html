@@ -7,7 +7,6 @@
 <noscript>
 <meta http-equiv="refresh" content="{{delay}}">
 </noscript>
-
 {% endblock %}
 
 {% block bodyclass %}{% for role in roles %}has-role-{{role}} {% endfor %}{% endblock %}
@@ -16,6 +15,12 @@
 <style>
 
 </style>
+
+{#
+<script>
+document.write(window.innerWidth);
+</script>
+#}
 
 {% for ui in role.interfaces %}
 <section class="interface-{{ui}}">
@@ -38,6 +43,7 @@ xhr.onreadystatechange = function () {
   if (xhr.readyState == 4) { // DONE
     var status = xhr.status;
     if (status === 0 || (status >= 200 && status < 400)) {
+      document.write("Got it!");
       // The request has been completed successfully
       if (xhr.responseText == "reload") {
         window.location.reload();
@@ -55,9 +61,13 @@ xhr.ontimeout = function () {
 }
 xhr.send();
 
-// if we made it to here, is it safe to clear the timeout?
-//window.clearTimeout(timer);
+document.write(xhr.readyState);
 
+// if we made it to here, is it safe to clear the timeout?
+if (xhr.readyState > 0) {
+  document.write("Hello " + window.innerWidth);
+  window.clearTimeout(timer);
+}
 </script>
 
 {% endblock %}
