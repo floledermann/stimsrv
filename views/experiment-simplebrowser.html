@@ -4,7 +4,10 @@
 
 {% block head %}
 {# refresh in case there is no JS at all #}
+<noscript>
 <meta http-equiv="refresh" content="{{experiment.settings.simpleBrowserRefresh or 5}}">
+</noscript>
+
 {% endblock %}
 
 {% block bodyclass %}{% for role in roles %}has-role-{{role}} {% endfor %}{% endblock %}
@@ -16,16 +19,18 @@
 
 {% for ui in role.interfaces %}
 <section class="interface-{{ui}}">
-<img src="/image/?role={{role.role}}">
+<img src="/image/?role={{role.role}}" width="{{imageSize[0]}}" height="{{imageSize[1]}}">
 </section>
 {% endfor %}
 
-{{ message }}
-
-{{ data  | dump | safe }}
+<!--
+message: {{ message }}
+data: {{ data  | dump | safe }}
+-->
 
 <script>
-
+// simple refresh as fallback
+let timer = window.setTimeout(function(){window.location.reload();}, 5000);
 </script>
 
 {% endblock %}

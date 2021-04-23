@@ -17,6 +17,15 @@ module.exports = function(experiment, controller) {
     let currentContext = null;
     let currentCondition = null;
     
+    let imageWidth = 200;
+    let imageHeight = 200;
+    
+    if (client.imageSize) {
+      let [w,h] = client.imageSize.split("x").map(n => +n);
+      imageWidth = (w || imageWidth) * (client.devicePixelRatio || 1);
+      imageHeight = (h || imageHeight) * (client.devicePixelRatio || 1);
+    }
+    
     let localContext = {
       clientid: client.id,
       device: client,
@@ -65,7 +74,7 @@ module.exports = function(experiment, controller) {
       
       render: function(req, res) {
         if (req.path == "/image/") {
-          const canvas = createCanvas(200, 200);
+          const canvas = createCanvas(imageWidth, imageHeight);
           const ctx = canvas.getContext('2d');
           
           let uiOptions = Object.assign({
@@ -93,7 +102,7 @@ module.exports = function(experiment, controller) {
               warn("Task is missing renderToCanvas() method required for rendering for browser-simple.");
             }
             ctx.fillStyle = "#000000";
-            ctx.fillRect(0,0,200,200);
+            ctx.fillRect(0,0,imageWidth,imageHeight);
           }
 
           
@@ -107,6 +116,7 @@ module.exports = function(experiment, controller) {
             message: lastMessage,
             data: lastMessageData,
             role: req.clientRole,
+            imageSize: [imageWidth/(client.devicePixelRatio || 1), imageHeight/(client.devicePixelRatio || 1)],
           });
         }
       }
