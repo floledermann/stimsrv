@@ -31,6 +31,33 @@ data: {{ data  | dump | safe }}
 <script>
 // simple refresh as fallback
 let timer = window.setTimeout(function(){window.location.reload();}, 5000);
+
+var xhr = new XMLHttpRequest();
+
+xhr.onreadystatechange = function () {
+  if (xhr.readyState == 4) { // DONE
+    var status = xhr.status;
+    if (status === 0 || (status >= 200 && status < 400)) {
+      // The request has been completed successfully
+      if (xhr.responseText == "reload") {
+        window.location.reload();
+      }
+    } else {
+      // Error with request - retry?
+    }
+  }
+};
+
+xhr.open("GET", "/update/?role={{role.role}}", true);
+xhr.timeout = 60 * 1000; // 1 minute
+xhr.ontimeout = function () {
+  // re-initiate connection
+}
+xhr.send();
+
+// if we made it to here, is it safe to clear the timeout?
+//window.clearTimeout(timer);
+
 </script>
 
 {% endblock %}
