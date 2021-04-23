@@ -134,7 +134,7 @@ function canvasRenderer(renderFunc, options) {
         }
         else {
           condition[key] = Dimension(cond, "px").toNumber("px");  
-          console.log("Converting " + cond + " to " + condition[key]);
+          //console.log("Converting " + cond + " to " + condition[key]);
         }
       }
       
