@@ -30,7 +30,7 @@ data: {{ data  | dump | safe }}
 
 <script>
 // simple refresh as fallback
-let timer = window.setTimeout(function(){window.location.reload();}, {{delay}}*1000);
+var timer = window.setTimeout(function(){window.location.reload();}, {{delay}}*1000);
 
 var xhr = new XMLHttpRequest();
 
