@@ -103,7 +103,7 @@ function canvasRenderer(renderFunc, options) {
       observer.observe(parent);
     },
     
-    renderToCanvas: function(ctx, condition) {
+    renderToCanvas: function(ctx, condition, uiOptions) {
       
       let width = ctx.canvas.width;
       let height = ctx.canvas.height;
@@ -117,6 +117,15 @@ function canvasRenderer(renderFunc, options) {
         rotate: 0
       }, condition);
       
+      if (uiOptions) {
+        console.log(uiOptions.pixeldensity);
+        console.log(uiOptions.viewingdistance);
+        Dimension.configure({
+          pixelDensity: uiOptions.pixeldensity,
+          viewingDistance: uiOptions.viewingdistance
+        });
+      }
+      
       // convert dimensions to pixels
       for (let key of options.dimensions) {
         let cond = condition[key];
@@ -125,6 +134,7 @@ function canvasRenderer(renderFunc, options) {
         }
         else {
           condition[key] = Dimension(cond, "px").toNumber("px");  
+          console.log("Converting " + cond + " to " + condition[key]);
         }
       }
       
