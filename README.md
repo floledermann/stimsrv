@@ -1,6 +1,6 @@
 # stimsrv — browser-based psychological experiments and user studies
 
-!! | This is alpha software, not ready to use. | !!
+!! | This is alpha software - everything may still change without prior notice! | !!
 ---|-------------------------------------------|---
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
