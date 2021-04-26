@@ -39,9 +39,14 @@ module.exports = function(config) {
       }
     },
     render: function(condition) {
+      
+      let baseURL = condition.baseURL || valOrFunc(config.baseURL, condition);
+      if (!(baseURL.endsWith("/"))) baseURL += "/";
+      
       Object.assign(imgEl.style, (condition.style || valOrFunc(config.style, condition)));
-      imgEl.src = (condition.baseURL || valOrFunc(config.baseURL, condition)) + 
-                  (condition.image || valOrFunc(config.image, condition));
+      
+      imgEl.src = baseURL + (condition.image || valOrFunc(config.image, condition));
+                  
     }
   }
 }
