@@ -176,8 +176,8 @@ for (let task of experiment.tasks) {
     for (let res of resources) {
       if (typeof res == "string") {
         let resolvedPath = path.resolve(experimentDirectory, res);
-        console.log("Serving static: " + "/static/resources/" + task.name + "/ : " + resolvedPath);
-        app.use("/static/resources/" + task.name + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resources/" + res + "/ : " + resolvedPath);
+        app.use("/static/resources/" + res + "/", express.static(resolvedPath));
       }
       else if (res.path && res.id) {
         let resolvedPath = path.resolve(res.context || experimentDirectory, res.path);
@@ -339,6 +339,7 @@ app.get("*", (req, res) => {
   }
   
   if (!client) {
+    console.log(req.path);
     throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");
   }
   
