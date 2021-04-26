@@ -8,4 +8,8 @@ function resource(id, path, context) {
   }
 }
 
+resource.url = function(spec) {
+  return "/static/resource/" + (spec.id || spec);
+}
+
 module.exports = resource;

@@ -169,26 +169,42 @@ nunjucks.configure([path.resolve("views"), path.join(__dirname, "../../views")],
 
 app.use('/static', express.static(path.join(__dirname, "../../static")));
 
-for (let task of experiment.tasks) {
-  if (task.resources) {
-    let resources = task.resources;
+function serveResources(resources) {
+  
+  if (!resources) return;
+  
     if (!Array.isArray(resources)) resources = [resources];
+    
     for (let res of resources) {
-      if (typeof res == "string") {
+      
+      if (Array.isArray(res)) {
+        // recurse into sub-arrays - this makes collecting across tasks easier
+        serveResources(res);
+      }
+      else if (typeof res == "string") {
+        // resource specified as string is looked up relative to experiment dir, 
+        // and served under that name
         let resolvedPath = path.resolve(experimentDirectory, res);
-        console.log("Serving static: " + "/static/resources/" + res + "/ : " + resolvedPath);
-        app.use("/static/resources/" + res + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res + "/ : " + resolvedPath);
+        app.use("/static/resource/" + res + "/", express.static(resolvedPath));
       }
       else if (res.path && res.id) {
+        // resource specified with context uses specified context dir 
         let resolvedPath = path.resolve(res.context || experimentDirectory, res.path);
-        console.log("Serving static: " + "/static/resources/" + res.id + "/ : " + resolvedPath);
-        app.use("/static/resources/" + res.id + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res.id + "/ : " + resolvedPath);
+        app.use("/static/resource/" + res.id + "/", express.static(resolvedPath));
       }
       else {
         throw new Error("Cannot resolve resource specification " + res);
       }
     }
-  }
+  
+}
+
+serveResources(experiment.resources);
+
+for (let task of experiment.tasks) {
+  serveResources(task.resources);
 }
 
 function ignoreFavicon(req, res, next) {
@@ -336,14 +352,20 @@ app.get("*", (req, res) => {
       clients[req.clientDevice.id + "." + req.clientRole.role] = client;
       controller.addClient(client);
     }
+    
+    if (!client) {
+      console.log(req.path);
+      throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");
+    }
+    
+    client.render(req, res);
+    
+    return;
+    
   }
   
-  if (!client) {
-    console.log(req.path);
-    throw new Error("No client adapter found for client id '" + req.clientDevice.id + "'");
-  }
-  
-  client.render(req, res);
+  console.log("No resource found for path " + req.path);
+  res.status(404).send("Resource not found!")
   
 });
 
