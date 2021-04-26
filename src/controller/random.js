@@ -37,11 +37,11 @@ function randomShuffle(choices, options) {
     }
     return result;
   }
-  
-  let shuffledChoices = shuffled(choices);
-  let index = 0;
-  
+    
   return function*() {
+    
+    let shuffledChoices = shuffled(choices);
+    let index = 0;
     
     while (true) {
       
