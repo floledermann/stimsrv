@@ -60,5 +60,6 @@ function randomShuffle(choices, options) {
 randomPick.pick = randomPick;
 randomPick.range = randomRange;
 randomPick.shuffle = randomShuffle;
+randomPick.sequence = randomShuffle;
 
 module.exports = randomPick;
