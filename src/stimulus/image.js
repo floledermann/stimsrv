@@ -4,7 +4,7 @@ const valOrFunc = require("stimsrv/util/valOrFunc");
 module.exports = function(config) {
   
   config = Object.assign({
-    image: (condition, context) => condition.image,
+    image: condition => condition.image,
     baseURL: "",
     style: {
       maxWidth: "100%",
@@ -39,8 +39,9 @@ module.exports = function(config) {
       }
     },
     render: function(condition) {
-      Object.assign(imgEl.style, valOrFunc(config.style, condition, context));
-      imgEl.src = valOrFunc(config.baseURL, condition, context) + valOrFunc(config.image, condition, context);
+      Object.assign(imgEl.style, (condition.style || valOrFunc(config.style, condition)));
+      imgEl.src = (condition.baseURL || valOrFunc(config.baseURL, condition)) + 
+                  (condition.image || valOrFunc(config.image, condition));
     }
   }
 }
