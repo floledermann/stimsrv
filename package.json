@@ -25,7 +25,7 @@
     "url": "git+https://github.com/floledermann/stimsrv.git"
   },
   "author": "Florian Ledermann <florian.ledermann@tuwien.ac.at>",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/floledermann/stimsrv/issues"
   },
