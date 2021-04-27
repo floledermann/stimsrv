@@ -349,13 +349,14 @@ app.get("*", (req, res) => {
     
     client = clients[req.clientDevice.id + "." + req.clientRole.role];
   
-    if (!client) {
+    // allow override through query param
+    if (!client || req.query.client) {
       clientType = req.clientDevice.client || "browser";
       
-      // temporary override for development
-      //if (req.clientRole.role == "stationB") {
-      //  clientType = "browser-simple";
-      //}
+      // allow override through query param
+      if (req.query.client) {
+        clientType = req.query.client
+      }
       
       client = adapters[clientType](req.clientDevice, req.clientRole);
       clients[req.clientDevice.id + "." + req.clientRole.role] = client;
