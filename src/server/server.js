@@ -185,14 +185,14 @@ function serveResources(resources) {
         // resource specified as string is looked up relative to experiment dir, 
         // and served under that name
         let resolvedPath = path.resolve(experimentDirectory, res);
-        console.log("Serving static: " + "/static/resource/" + res + "/ : " + resolvedPath);
-        app.use("/static/resource/" + res + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res + " : " + resolvedPath);
+        app.use("/static/resource/" + res, express.static(resolvedPath));
       }
       else if (res.path && res.id) {
         // resource specified with context uses specified context dir 
         let resolvedPath = path.resolve(res.context || experimentDirectory, res.path);
-        console.log("Serving static: " + "/static/resource/" + res.id + "/ : " + resolvedPath);
-        app.use("/static/resource/" + res.id + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res.id + " : " + resolvedPath);
+        app.use("/static/resource/" + res.id, express.static(resolvedPath));
       }
       else {
         throw new Error("Cannot resolve resource specification " + res);
