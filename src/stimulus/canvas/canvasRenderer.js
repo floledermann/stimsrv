@@ -2,6 +2,8 @@
 const Dimension = require("another-dimension");
 const d3 = require("d3-interpolate");
 
+const resource = require("../../util/resource.js");
+
 function clamp(value, min=0, max=1) {
   if (value < min) {
     client.warn("Clamping intensity value " + value.toFixed(3) + " to 1.");
@@ -44,7 +46,8 @@ function canvasRenderer(renderFunc, options) {
     minimumIntensityColor: "#000000",
     maximumIntensityColor: "#ffffff",
     dimensions: [],
-    intensities: []  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
+    intensities: [],  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
+    fonts: []
   }, options);
   
   options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
@@ -88,11 +91,18 @@ function canvasRenderer(renderFunc, options) {
       
       resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
       
+      for (let font of options.fonts) {
+        let f = new FontFace(font.family, "url(" + resource.url(font.resource) + ")");
+        f.load().then(() => {
+          document.fonts.add(f);
+        });
+      }
+      
       parent.appendChild(canvas);
       
       ctx = canvas.getContext('2d');
       
-      // TODO: dynmaically resize if parent resizes, but how to re-render?
+      // TODO: dynamically resize if parent resizes, but how to re-render?
       let observer = new ResizeObserver((entries) => {
         //let entry = entries.find((entry) => entry.target === parent);
         resize(options.width || parent.clientWidth, options.height || parent.clientHeight)
@@ -118,8 +128,8 @@ function canvasRenderer(renderFunc, options) {
       }, condition);
       
       if (uiOptions) {
-        console.log(uiOptions.pixeldensity);
-        console.log(uiOptions.viewingdistance);
+        //console.log(uiOptions.pixeldensity);
+        //console.log(uiOptions.viewingdistance);
         Dimension.configure({
           pixelDensity: uiOptions.pixeldensity,
           viewingDistance: uiOptions.viewingdistance
@@ -211,7 +221,9 @@ function canvasRenderer(renderFunc, options) {
       
       this.renderToCanvas(ctx, condition);
       
-    }
+    },
+    
+    fonts: options.fonts
   }
 }
 
