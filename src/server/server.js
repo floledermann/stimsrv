@@ -234,19 +234,28 @@ let server = app.listen(port, () => {
       }
     }
   }  
-    
+  
+  function pad(str, size) {
+    str = str + ""; // convert to string
+    let padSize = size - str.length;
+    return str + ("                                                    ".substring(0, padSize));
+  }
+  
   //console.log("\x1b[32m%s\x1b[0m", "Green");
   console.log("\x1b[32m\x1b[1m");  // output color to green
   console.log("******************************************************");
   console.log("** stimsrv server running on:                       **");
   
-  for (ip of ips) {
+  for (let ip of ips) {
     let adrStr = "http://" + ip + ":" + port + "/";
-    let padSize = 47 - adrStr.length;
-    let pad = "                                       ".substring(0, padSize);
-    console.log("**   " + adrStr + pad + "**"); 
+    console.log("**   " + pad(adrStr, 47) + "**"); 
   }
   
+  console.log("**                                                  **");  
+  console.log("** Client IDs in this experiment:                   **"); 
+  for (let client of (experiment.devices || [{id:"anyone"}])) {
+    console.log("**  - " + pad(client.id, 46) + "**");
+  }
   console.log("******************************************************");  
   console.log("\x1b[0m");   // reset output color
   
