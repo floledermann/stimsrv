@@ -211,11 +211,16 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 ## Experiments examples
 -->
 
-<!-- ## License, credits & acknowledgements
+## License, credits & acknowledgements
 
-...
-This isn't legal advice, please consider consulting a lawyer and see the full license for all details.
+stimsrv is licensed under the [GNU Affero General Public License, Version 3](https://www.gnu.org/licenses/agpl-3.0.en.html). Roughly speaking, this license allows you to use and modify stimsrv free of charge, provided that you publish the modified or extended code under the same license.
 
--->
+(This isn't legal advice, please consider consulting a lawyer and see the [full license](https://www.gnu.org/licenses/agpl-3.0.en.html) for all details.)
+
+If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
+
+stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at the [Research Group Cartography, TU Wien, Austria](https://cartography.tuwien.ac.at/).
+
+
 
 
