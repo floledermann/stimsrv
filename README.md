@@ -3,6 +3,8 @@
 ! | This is alpha version software - everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
+|&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-Credits--acknowledgements)&nbsp;—&nbsp;|
+
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
 
 Main features:
@@ -19,7 +21,6 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
-|&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-Credits--acknowledgements)&nbsp;—&nbsp;|
 
 ## Defining & running experiments
 
