@@ -60,10 +60,13 @@ function canvasRenderer(renderFunc, options) {
   
   let dppx = 1;
   
+  let resourcesPromise = null;
+  
   return {
     initialize: function(parent, _runtime) {
       
       runtime = _runtime;
+      lastCondition = null;
       
       let document = parent.ownerDocument;
       
@@ -90,12 +93,14 @@ function canvasRenderer(renderFunc, options) {
       }
       
       resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
-      
-      for (let font of options.fonts) {
-        let f = new FontFace(font.family, "url(" + resource.url(font.resource) + ")");
-        f.load().then(() => {
-          document.fonts.add(f);
-        });
+         
+      if (options.fonts) {
+        resourcesPromise = Promise.all(options.fonts.map(font => {
+          let fontFace = new FontFace(font.family, "url(" + resource.url(font.resource) + ")");
+          return fontFace.load().then(() => {
+            document.fonts.add(fontFace);
+          });
+        }));
       }
       
       parent.appendChild(canvas);
@@ -210,7 +215,15 @@ function canvasRenderer(renderFunc, options) {
         ctx.translate(trans[0], trans[1]);
       }
       
-      renderFunc(ctx, condition);   
+      // wait for resources to be loaded
+      if (resourcesPromise) {
+        resourcesPromise.then(() => {
+          renderFunc(ctx, condition);
+        });
+      }
+      else {
+        renderFunc(ctx, condition);
+      }
     },
     
     // contract: if render() returns a string or element, then replace the parent content
