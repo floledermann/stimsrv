@@ -19,6 +19,8 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting unsupervised online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
+|&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-Credits--acknowledgements)&nbsp;—&nbsp;|
+
 ## Defining & running experiments
 
 Experiments in stimsrv are implemented in JavaScript. A single *experiment specification* defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
@@ -181,13 +183,13 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 *(... coming soon ...)*
 
 
-## Philosophy
+## Design Philosophy & Terminology
 
 Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each task that you need to implement for your experiment. Because experiment definitions are JavaScript files, all features of the language (such as inline functions or iterators) can be used to configure an experiment. The stimsrv server takes care of packaging and delivering the experiment code for web browsers and coordinating multiple clients, among other things.
 
 The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible Science.
 
-## Terminology
+### Terminology
 
 - ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
 - ***Task***: Part of an experiment, usually presenting some stimulus to the participant and expecting some kind of response from them. (Example: A Task may show letters of the alphabet to the participant and let the participant respond with corresponding on-screen buttons). A sequence of tasks is run during an experiment.
@@ -211,7 +213,7 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 ## Experiments examples
 -->
 
-## License, credits & acknowledgements
+## License, Credits & Acknowledgements
 
 stimsrv is licensed under the [GNU Affero General Public License, Version 3](https://www.gnu.org/licenses/agpl-3.0.en.html). Roughly speaking, this license allows you to use and modify stimsrv free of charge, provided that you publish the modified or extended code under the same license.
 
