@@ -3,7 +3,7 @@
 ! | This is alpha version software - everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
-|&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-Credits--acknowledgements)&nbsp;—&nbsp;|
+|&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-credits--acknowledgements)&nbsp;—&nbsp;|
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
 
@@ -165,7 +165,7 @@ For the example above, a results file could look like this:
 // ... rest of the results data
 ```
 
-What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately calculate the visual acuity of the participant! To make the experiment results valid, information about the configuration of the devices in the experiment, such as pixel density and viewing distance, has to be added to the experiment specification. This is covered in the next section.
+What springs to mind are two warnings at the beginning of the file. These warnings indicate that the experiment hasn't been sufficiently specified to accurately establish the visual acuity of the participant! To make the experiment results valid, additional information about the devices in the experiment (such as their pixel density and viewing distance) has to be added to the experiment specification. This is covered in the next section.
 
 ## Device configuration & roles
 
@@ -222,7 +222,7 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
 
-stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at the [Research Group Cartography, TU Wien, Austria](https://cartography.tuwien.ac.at/).
+stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at the [Research Unit Cartography, TU Wien, Austria](https://cartography.tuwien.ac.at/).
 
 
 
