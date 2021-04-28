@@ -1,7 +1,7 @@
 # stimsrv — browser-based psychological experiments and user studies
 
-!! | This is alpha software - everything may still change without prior notice! | !!
----|-------------------------------------------|---
+! | This is alpha version software - everything may still change without prior notice | !
+--|-----------------------------------------------------------------------------------|--
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
 
@@ -198,18 +198,20 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 - ***Response***: A set of properties that define the response of the participant. In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed).
 - ***Result***: The result of a trial. Contains information about the condition, the response, the context plus additional information, such as timing information.
 
-
-<!-- 
-## Tasks collection
+<!--
+## Available tasks
 
 ### Tasks provided as part of stimsrv
 
 ### Official extension tasks
 
 ### Tasks developed by 3rd parties
-
+-->
+<!--
 ## Experiments examples
 -->
 
-<!-- ## Credits & acknowledgements -->
+## License, credits & acknowledgements
+
+
 
