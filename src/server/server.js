@@ -185,14 +185,14 @@ function serveResources(resources) {
         // resource specified as string is looked up relative to experiment dir, 
         // and served under that name
         let resolvedPath = path.resolve(experimentDirectory, res);
-        console.log("Serving static: " + "/static/resource/" + res + "/ : " + resolvedPath);
-        app.use("/static/resource/" + res + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res + " : " + resolvedPath);
+        app.use("/static/resource/" + res, express.static(resolvedPath));
       }
       else if (res.path && res.id) {
         // resource specified with context uses specified context dir 
         let resolvedPath = path.resolve(res.context || experimentDirectory, res.path);
-        console.log("Serving static: " + "/static/resource/" + res.id + "/ : " + resolvedPath);
-        app.use("/static/resource/" + res.id + "/", express.static(resolvedPath));
+        console.log("Serving static: " + "/static/resource/" + res.id + " : " + resolvedPath);
+        app.use("/static/resource/" + res.id, express.static(resolvedPath));
       }
       else {
         throw new Error("Cannot resolve resource specification " + res);
@@ -234,19 +234,28 @@ let server = app.listen(port, () => {
       }
     }
   }  
-    
+  
+  function pad(str, size) {
+    str = str + ""; // convert to string
+    let padSize = size - str.length;
+    return str + ("                                                    ".substring(0, padSize));
+  }
+  
   //console.log("\x1b[32m%s\x1b[0m", "Green");
   console.log("\x1b[32m\x1b[1m");  // output color to green
   console.log("******************************************************");
   console.log("** stimsrv server running on:                       **");
   
-  for (ip of ips) {
+  for (let ip of ips) {
     let adrStr = "http://" + ip + ":" + port + "/";
-    let padSize = 47 - adrStr.length;
-    let pad = "                                       ".substring(0, padSize);
-    console.log("**   " + adrStr + pad + "**"); 
+    console.log("**   " + pad(adrStr, 47) + "**"); 
   }
   
+  console.log("**                                                  **");  
+  console.log("** Client IDs in this experiment:                   **"); 
+  for (let client of (experiment.devices || [{id:"anyone"}])) {
+    console.log("**  - " + pad(client.id, 46) + "**");
+  }
   console.log("******************************************************");  
   console.log("\x1b[0m");   // reset output color
   
@@ -340,13 +349,14 @@ app.get("*", (req, res) => {
     
     client = clients[req.clientDevice.id + "." + req.clientRole.role];
   
-    if (!client) {
+    // allow override through query param
+    if (!client || req.query.client) {
       clientType = req.clientDevice.client || "browser";
       
-      // temporary override for development
-      //if (req.clientRole.role == "stationB") {
-      //  clientType = "browser-simple";
-      //}
+      // allow override through query param
+      if (req.query.client) {
+        clientType = req.query.client
+      }
       
       client = adapters[clientType](req.clientDevice, req.clientRole);
       clients[req.clientDevice.id + "." + req.clientRole.role] = client;

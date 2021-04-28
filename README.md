@@ -211,7 +211,11 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 ## Experiments examples
 -->
 
-## License, credits & acknowledgements
+<!-- ## License, credits & acknowledgements
 
+...
+This isn't legal advice, please consider consulting a lawyer and see the full license for all details.
+
+-->
 
 
