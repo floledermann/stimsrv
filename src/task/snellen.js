@@ -19,14 +19,15 @@ module.exports = function(config) {
     stimulusDisplay: "display",
     responseDisplay: "response",
     monitorDisplay: "monitor",
-    dimensions: ["size"]
+    dimensions: ["size"],
+    responseCondition: {size: "27arcmin"}
   }, config);
 
-  let parameters = pick.without(config, ["stimulusDisplay","responseDisplay","monitorDisplay","dimensions"]);
+  let parameters = pick.without(config, ["stimulusDisplay","responseDisplay","monitorDisplay","dimensions","responseCondition"]);
     
   let renderer = canvasRenderer(renderSnellen, config);
   
-  let buttonCanvas = htmlButtons.buttonCanvas(renderSnellen, {size: "27arcmin"}, config);
+  let buttonCanvas = htmlButtons.buttonCanvas(renderSnellen, config.responseCondition, config);
 
   return {
     
