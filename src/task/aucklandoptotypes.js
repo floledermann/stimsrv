@@ -59,10 +59,14 @@ module.exports = function(parameters) {
         interfaces: {
           display: renderer,
           response: htmlButtons(parameters.shapes.map(name => ({
-            label: firstCap(name),
-            canvas: buttonCanvas,
-            response: {shape: name}
-          }))),
+              label: firstCap(name),
+              canvas: buttonCanvas,
+              response: {shape: name}
+            })),
+            {
+              wrapperClass: "buttons buttons-tao"
+            }
+          ),
           monitor: renderer,
           control: null
         }
