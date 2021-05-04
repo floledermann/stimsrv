@@ -39,16 +39,19 @@ var timer = window.setTimeout(function(){window.location.reload();}, {{delay}}*1
 
 var xhr = new XMLHttpRequest();
 
+
 xhr.onreadystatechange = function () {
   if (xhr.readyState == 4) { // DONE
     var status = xhr.status;
     if (status === 0 || (status >= 200 && status < 400)) {
       // The request has been completed successfully
-      if (xhr.responseText == "reload") {
+      window.location.reload();
+      /*if (xhr.responseText == "reload") {
         window.location.reload();
-      }
+      }*/
     } else {
       // Error with request - retry?
+      window.location.reload();
     }
   }
 };
@@ -64,6 +67,7 @@ xhr.send();
 if (xhr.readyState > 0) {
   //document.write("Hello " + window.innerWidth);
   window.clearTimeout(timer);
+  timeout = window.setTimeout(function(){window.location.reload();}, 59*1000);
 }
 </script>
 
