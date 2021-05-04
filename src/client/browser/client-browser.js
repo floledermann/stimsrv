@@ -300,6 +300,23 @@ function clientFactory(options) {
         console.log("Server restarted - reloading experiment");
         window.location.reload();
       });
+      
+      if (options.role.fullscreenButton) {
+        let fsButton = document.createElement("button");
+        fsButton.className = "requestFullscreen";
+        fsButton.addEventListener("click", function() {
+          document.body.requestFullscreen({ navigationUI: "hide"}).then(() => {
+            document.body.classList.add("fullscreen");
+          });
+        });
+        document.addEventListener("fullscreenchange", function() {
+          if (!document.fullscreenElement) {
+            document.body.classList.remove("fullscreen");
+          }
+        });
+        document.body.appendChild(fsButton);
+      }
+      
     },
     
     
