@@ -51,7 +51,7 @@ function filestorage(options) {
     catch (error) {
       if (error.code === 'ENOENT') {
         let absPath = path.resolve(options.destination);
-        console.warn("Destination folder " + absPath + " does not exist - creating folder...");
+        console.log("Destination folder " + absPath + " does not exist - creating folder...");
         await fs.mkdir(options.destination, { recursive: true });
       } else {
         throw error;
@@ -135,7 +135,7 @@ function filestorage(options) {
     }
     catch (error) {
       if (error.code === 'ENOENT') {
-        console.warn("Lock file " + lockFileName + " does not exist any more.");
+        console.log("Lock file " + lockFileName + " does not exist any more.");
       } else {
         throw error;
       }      
