@@ -59,6 +59,10 @@ function htmlButtons(buttonDefs, options) {
           let el = document.createElement(options.buttonTag);
           el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
+          if (buttonDef.className) {
+            el.className = buttonDef.className;
+          }
+          
           if (buttonDef.style) {
             el.style.cssText = buttonDef.style;
           }

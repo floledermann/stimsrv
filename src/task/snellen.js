@@ -40,11 +40,13 @@ module.exports = function(config) {
       let interfaces = {};
       
       let responseButtons = htmlButtons([
-        {label: "Left", canvas: buttonCanvas, response: {angle: 180}},
-        {label: "Up", canvas: buttonCanvas, response: {angle: 270}},
-        {label: "Down", canvas: buttonCanvas, response: {angle: 90}},
-        {label: "Right", canvas: buttonCanvas, response: {angle: 0}}
-      ]);
+        {label: "Left", canvas: buttonCanvas, className: "compass-w", response: {angle: 180}},
+        {label: "Up", canvas: buttonCanvas, className: "compass-n", response: {angle: 270}},
+        {label: "Down", canvas: buttonCanvas, className: "compass-s", response: {angle: 90}},
+        {label: "Right", canvas: buttonCanvas, className: "compass-e", response: {angle: 0}}
+      ],{
+        wrapperClass: "buttons compass"
+      });
       
       for (let ui of valOrFunc.array(config.stimulusDisplay, context)) {
         interfaces[ui] = renderer;

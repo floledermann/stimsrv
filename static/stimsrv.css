@@ -88,6 +88,26 @@ body {
   margin: 0.3em;
 }
 
+/* compass buttons */
+
+.buttons.compass {
+  display: grid;
+  grid-template-areas: 
+            "nw n ne"
+            "w center e"
+            "sw s se";
+}
+
+.buttons.compass button.compass-nw { grid-area: nw; }
+.buttons.compass button.compass-n { grid-area: n; }
+.buttons.compass button.compass-ne { grid-area: ne; }
+.buttons.compass button.compass-w { grid-area: w; }
+.buttons.compass button.compass-center { grid-area: center; }
+.buttons.compass button.compass-e { grid-area: e; }
+.buttons.compass button.compass-sw { grid-area: sw; }
+.buttons.compass button.compass-s { grid-area: s; }
+.buttons.compass button.compass-se { grid-area: se; }
+
 h1 {
   font-size: 1.3em;
 }
