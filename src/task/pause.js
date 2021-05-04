@@ -1,4 +1,6 @@
 
+const Dimension = require("another-dimension");
+
 const valOrFunc = require("../util/valOrFunc.js");
 const htmlContent = require("../ui/htmlContent.js");
 const htmlButtons = require("../ui/htmlButtons.js");
@@ -44,8 +46,16 @@ function pause(config) {
       }
       
       let parentStyle = "";
-      if (config.background) parentStyle += "background: " + valOrFunc(config.background, context) + ";";
-      if (config.textcolor) parentStyle += "color: " + valOrFunc(config.textcolor, context) + ";";
+      let bgColor = null;
+      let fgColor = null;
+      if (config.background) {
+        bgColor = valOrFunc(config.background, context);
+        parentStyle += "background: " + bgColor + ";";
+      }
+      if (config.textcolor) {
+        fgColor = valOrFunc(config.textcolor, context);
+        parentStyle += "color: " + fgColor + ";";
+      }
       
       // make sure "*" is applied last, to make "role.*" work as override regardless of order
       let fallback = message["*"];
@@ -60,12 +70,16 @@ function pause(config) {
           role = "*";
         }
         if (role == "*" || role == context.role) {
-          interfaces[ui] = htmlContent(valOrFunc(message[key], context), { parentStyle: parentStyle, style: config.messageStyle });
+          let msg = valOrFunc(message[key], context);
+          interfaces[ui] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle });
+          interfaces[ui].renderToCanvas = canvasMessage(msg, bgColor, fgColor);
         }
       }
       
       if (!interfaces["*"] && fallback) {
-        interfaces["*"] = htmlContent(valOrFunc(fallback, context), { parentStyle: parentStyle, style: config.messageStyle });
+        let msg = valOrFunc(fallback, context);
+        interfaces["*"] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle });
+        interfaces["*"].renderToCanvas = canvasMessage(msg, bgColor, fgColor);
       }
       
       // buttons: as specified by config.buttondisplay (single UI key or Array)
@@ -88,6 +102,74 @@ function pause(config) {
     controller: nextOnResponse()
   }
 
+}
+
+function canvasMessage(msg, bgColor, fgColor) {
+  
+  let top = "0mm";
+  let left = "23mm";
+  let fontSize = "3mm";
+  
+  return function(ctx, condition, uiOptions) {
+    
+    //console.log("###########");
+    //console.log(uiOptions);
+      
+    let width = ctx.canvas.width;
+    let height = ctx.canvas.height;
+    
+    ctx.resetTransform();
+    
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0,0,width,height);
+    
+    ctx.fillStyle = fgColor;
+    ctx.strokeStyle = fgColor;
+    
+    // strange race condition produces unexpected results for unit conversion -- investigate
+    //Dimension.configure(uiOptions);
+    
+    function mmToPx(v) {
+      return v * uiOptions.pixeldensity / 25.4;
+    }
+    
+    ctx.translate(Math.round(width / 2) - mmToPx(Dimension(left).value), Math.round(height / 2) - mmToPx(Dimension(top).value));
+    
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top"
+    
+    let fontSizePx = mmToPx(Dimension(fontSize).value);
+    ctx.font = fontSizePx + "px sans-serif";
+    
+    //console.log("Font size in px: " + fontSizePx);
+    
+    let lines = msg.split("\n");
+    let maxWidth = 300 * uiOptions.devicePixelRatio;
+  
+    for (let i=0; i<lines.length; i++) {
+      let line = lines[i];
+      let nextLine = "";
+      let measure = ctx.measureText(line);
+      while (measure.width > maxWidth && line.includes(" ")) {
+        let splitPoint = line.lastIndexOf(" ");
+        nextLine = line.substring(splitPoint+1) + " " + nextLine;
+        line = line.substring(0,splitPoint);
+        lines[i] = line;
+        measure = ctx.measureText(line);
+      }
+      if (nextLine != "") {
+        lines.splice(i+1, 0, nextLine);
+      }
+    }
+    
+    ctx.translate(0,-lines.length * fontSizePx * 1.5 / 2);
+    
+    for (let line of lines) {
+      ctx.fillText(line, 0, 0);
+      ctx.translate(0, fontSizePx * 1.5);
+    }
+
+  }
 }
 
 pause.defaults = function(_defaults) {
