@@ -76,6 +76,11 @@ function htmlButtons(buttonDefs, options) {
             canvas.style.width = "60px";
             canvas.style.height = "40px";
             
+            Dimension.configure({
+              pixelDensity: runtime.pixeldensity,
+              viewingDistance: runtime.viewingdistance
+            });
+            
             el.appendChild(canvas);
                       
             let ctx = canvas.getContext("2d");
