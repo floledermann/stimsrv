@@ -123,6 +123,13 @@ function clientFactory(options) {
         ui.initialize?.(wrapper, uiOptions);
       }
     }
+    
+    document.body.classList.add("current-task-" + task.name);
+
+  }
+  
+  function endTask(task) {
+    document.body.classList.remove("current-task-" + task.name);
   }
   
   function showCondition(task, condition) {
@@ -269,13 +276,19 @@ function clientFactory(options) {
         
         if (currentTask === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
           
-          this.error("Task data changed without initialization.", data);
+          this.error("Task specification changed without initialization.", data);
           
+          // TODO: throw exception and remove following code if we are sure this never happens
           taskIndex = data.taskIndex;
           context = data.context;
           let fullContext = Object.assign({}, context, localContext);
           
+          if (currentTask) {
+            endTask(currentTask);
+          }
+        
           currentTask = experiment.tasks[taskIndex].ui(fullContext);
+          currentTask.name = experiment.tasks[data.taskIndex].name;
           prepareTask(currentTask);
         }
         
@@ -288,7 +301,15 @@ function clientFactory(options) {
         context = data.context;
         let fullContext = Object.assign({}, context, localContext);
         
+        if (currentTask) {
+          endTask(currentTask);
+        }
+        
         currentTask = experiment.tasks[data.taskIndex].ui(fullContext);
+        // hack: add name to ui part of task
+        if (!currentTask.name) {
+          currentTask.name = experiment.tasks[data.taskIndex].name;
+        }
         prepareTask(currentTask);
 
         if (data.condition) {

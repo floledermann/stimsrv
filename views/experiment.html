@@ -2,7 +2,7 @@
 
 {% block title %}{{ experiment.name }}{% endblock %}
 
-{% block bodyclass %}{% for role in roles %}has-role-{{role}} {% endfor %}is-device-{{device.id}}{% endblock %}
+{% block bodyclass %}is-device-{{device.id}} has-role-{{role.role}}{% endblock %}
 
 {% block body %}
 <style>

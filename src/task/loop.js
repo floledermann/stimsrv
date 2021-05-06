@@ -50,6 +50,9 @@ module.exports = function(config) {
       return {
         get interfaces() {
           return currentTask.interfaces;
+        },
+        get name() {
+          return currentTask?.name || config.tasks[context.taskIndex]?.name || "loop";
         }
       }
     },
