@@ -101,8 +101,9 @@ body {
 
 /* compass buttons */
 
-.buttons.compass {
+section .buttons.compass {
   display: grid;
+  grid-template-columns: none;
   grid-template-areas: 
             "nw n ne"
             "w center e"
