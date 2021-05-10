@@ -54,6 +54,12 @@ function htmlButtons(buttonDefs, options) {
         wrapper.innerHTML = "";
         for (let [index, buttonDef] of _buttonDefs.entries()) {
           
+          if (typeof buttonDef == "string") {
+            buttonDef = {
+              label: buttonDef
+            }
+          }
+          
           let buttonCondition = Object.assign({}, condition, buttonDef.response);
           
           let el = document.createElement(options.buttonTag);
