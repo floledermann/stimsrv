@@ -6,16 +6,21 @@ const valOrFunc = require("../util/valOrFunc.js");
 
 const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
 
-function htmlButtons(buttonDefs, config) {
-  
-  config = Object.assign({
+let defaults = {
     wrapperTag: "div",
     wrapperClass: "buttons",
     buttonTag: "button",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null,
     alwaysRerender: false,
-  }, config);
+    delay: 500,
+    clickSound: false,
+    hideAfterResponse: true
+};
+
+function htmlButtons(buttonDefs, config) {
+  
+  config = Object.assign({}, defaults, config);
   
   // single string -> convert to array
   if (typeof buttonDefs != 'function' && !Array.isArray(buttonDefs)) {
@@ -27,6 +32,10 @@ function htmlButtons(buttonDefs, config) {
   let wrapper = null;
   
   let lastButtonDefs = null;
+  
+  let respondedToCurrentCondition = false;
+  
+  let clickSound = null;
   
   return {
     initialize: function(parent, _runtime) {
@@ -40,9 +49,16 @@ function htmlButtons(buttonDefs, config) {
         wrapper.className = config.wrapperClass;
       }
       parent.appendChild(wrapper);
+      
+      if (config.clickSound) {
+        clickSound = new Audio(config.clickSound);
+      }
+      
     },
     
     render: function(condition) {
+      
+      respondedToCurrentCondition = false;
       
       let _buttonDefs = valOrFunc.array(buttonDefs, condition);
       
@@ -114,7 +130,19 @@ function htmlButtons(buttonDefs, config) {
                 e.preventDefault();
               }
               
-              runtime.response(buttonDef.response || {label: buttonDef.label});
+              if (!respondedToCurrentCondition) {         
+                runtime.response(buttonDef.response || {label: buttonDef.label});     
+              }
+              
+              respondedToCurrentCondition = true;
+              
+              if (clickSound) {
+                clickSound.play();
+              }
+              
+              if (config.hideAfterResponse) {
+                wrapper.style.display = "none";
+              }
               
               if (config.broadcastEvents) {
                 if (Array.isArray(config.broadcastEvents)) {
@@ -135,6 +163,17 @@ function htmlButtons(buttonDefs, config) {
           
           wrapper.appendChild(el);
         }
+        
+      }
+      
+      if (config.delay) {
+        wrapper.style.display = "none";
+        setTimeout(function() {
+          wrapper.style.display = "";
+        }, config.delay);
+      }
+      else {
+        wrapper.style.display = "";
       }
     }
   }
@@ -210,7 +249,10 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
     renderFunc(ctx, condition);
   }
 }
-  
+
+htmlButtons.defaults = function(_defaults) {
+  Object.assign(defaults, _defaults);
+}
 
 function broadcastVal(runtime, evt) {
   let type = null;
