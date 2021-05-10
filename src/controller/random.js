@@ -1,3 +1,5 @@
+const deepEqual = require("fast-deep-equal");
+
 function randomPick(choices, options) {
   return function*() {
     while (true) {
@@ -26,16 +28,27 @@ function randomRange(from, to, options) {
 
 function randomShuffle(choices, options) {
   options = Object.assign({
-    loop: false
+    loop: false,
+    multiple: 1,
+    preventContinuation: true
   }, options);
-  
+    
   function shuffled(arr) {
     const result = arr.slice();
     for (let i = result.length - 1; i > 0; i--) {
       const rand = Math.floor(Math.random() * (i + 1));
       [result[i], result[rand]] = [result[rand], result[i]];
     }
+    console.log(result);
     return result;
+  }
+  
+  if (options.multiple > 1) {
+    let multipledChoices = [];
+    for (let i=0; i<options.multiple; i++) {
+      multipledChoices = multipledChoices.concat(choices);
+    }
+    choices = multipledChoices;
   }
     
   return function*() {
@@ -50,7 +63,13 @@ function randomShuffle(choices, options) {
       
       if (index == shuffledChoices.length) {
         if (!options.loop) return;
+        let lastItem = choices[choices.length-1];
         shuffledChoices = shuffled(choices);
+        if (options.preventContinuation) {
+          while (deepEqual(shuffledChoices[0], lastItem)) {
+            shuffledChoices = shuffled(choices);
+          }
+        }
         index = 0;
       }
     }
