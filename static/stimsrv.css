@@ -71,6 +71,11 @@ body {
   line-height: 1.7;
 }
 
+.content img {
+  display: block;
+  margin: 0 auto;
+}
+
 .buttons {
   /* flex parent */
   display: flex;
