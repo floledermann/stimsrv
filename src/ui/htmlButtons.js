@@ -6,16 +6,16 @@ const valOrFunc = require("../util/valOrFunc.js");
 
 const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
 
-function htmlButtons(buttonDefs, options) {
+function htmlButtons(buttonDefs, config) {
   
-  options = Object.assign({
+  config = Object.assign({
     wrapperTag: "div",
     wrapperClass: "buttons",
     buttonTag: "button",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null,
-    alwaysRerender: false
-  }, options);
+    alwaysRerender: false,
+  }, config);
   
   // single string -> convert to array
   if (typeof buttonDefs != 'function' && !Array.isArray(buttonDefs)) {
@@ -35,9 +35,9 @@ function htmlButtons(buttonDefs, options) {
       document = parent.ownerDocument;
       lastButtonDefs = null;
       
-      wrapper = document.createElement(options.wrapperTag);
-      if (options.wrapperClass) {
-        wrapper.className = options.wrapperClass;
+      wrapper = document.createElement(config.wrapperTag);
+      if (config.wrapperClass) {
+        wrapper.className = config.wrapperClass;
       }
       parent.appendChild(wrapper);
     },
@@ -47,7 +47,7 @@ function htmlButtons(buttonDefs, options) {
       let _buttonDefs = valOrFunc.array(buttonDefs, condition);
       
       // check if change/rerender is needed
-      if (options.alwaysRerender || !deepEqual(_buttonDefs, lastButtonDefs)) {
+      if (config.alwaysRerender || !deepEqual(_buttonDefs, lastButtonDefs)) {
         
         lastButtonDefs = _buttonDefs;
       
@@ -62,7 +62,7 @@ function htmlButtons(buttonDefs, options) {
           
           let buttonCondition = Object.assign({}, condition, buttonDef.response);
           
-          let el = document.createElement(options.buttonTag);
+          let el = document.createElement(config.buttonTag);
           el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
           if (buttonDef.className) {
@@ -98,7 +98,7 @@ function htmlButtons(buttonDefs, options) {
             buttonDef.canvas(ctx, buttonCondition);
           }
           
-          let evt = options.buttonEvent;
+          let evt = config.buttonEvent;
           
           if (!Array.isArray(evt)) {
             evt = [evt];
@@ -116,15 +116,15 @@ function htmlButtons(buttonDefs, options) {
               
               runtime.response(buttonDef.response || {label: buttonDef.label});
               
-              if (options.broadcastEvents) {
-                if (Array.isArray(options.broadcastEvents)) {
-                  let evt = options.broadcastEvents[index];
+              if (config.broadcastEvents) {
+                if (Array.isArray(config.broadcastEvents)) {
+                  let evt = config.broadcastEvents[index];
                   if (evt) {
                     broadcastVal(runtime, valOrFunc(evt,condition,buttonDef,index));
                   }
                 }
                 else {
-                  broadcastVal(runtime, valOrFunc(options.broadcastEvents,condition,buttonDef,index));
+                  broadcastVal(runtime, valOrFunc(config.broadcastEvents,condition,buttonDef,index));
                 }
               }
             });
@@ -140,14 +140,14 @@ function htmlButtons(buttonDefs, options) {
   }
 }
 
-htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
+htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
 
-  options = Object.assign({
+  config = Object.assign({
     dimensions: [],
     intensities: []
-  }, options);
+  }, config);
   
-  options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);  
+  config.intensities = config.intensities.concat(["foregroundIntensity","backgroundIntensity"]);  
   
   return function(ctx, buttonCondition) {   
   
@@ -160,7 +160,7 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
    }, buttonCondition, conditionOverride);
     
     // convert dimensions to pixels
-    for (let key of options?.dimensions) {
+    for (let key of config?.dimensions) {
       let cond = condition[key];
       if (Array.isArray(cond)) {
         condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
@@ -171,7 +171,7 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, options) {
     }
     
     // convert intensities to color values
-    for (let key of options.intensities) {
+    for (let key of config.intensities) {
       let cond = condition[key];
       if (typeof cond == "number") {
         //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
