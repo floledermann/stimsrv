@@ -15,6 +15,7 @@ let defaults = {
   messageStyle: {
     padding: "2em"
   },
+  name: "pause"
 }
 
 function pause(config) {
@@ -29,7 +30,7 @@ function pause(config) {
   defaults, config);
   
   return {
-    name: "pause",
+    name: config.name,
     store: config.store,
     ui: function(context) {
     
