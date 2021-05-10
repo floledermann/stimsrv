@@ -15,7 +15,7 @@ let defaults = {
   messageStyle: {
     padding: "2em"
   },
-  name: "pause"
+  name: "pause",
 }
 
 function pause(config) {
