@@ -39,7 +39,6 @@ function randomShuffle(choices, options) {
       const rand = Math.floor(Math.random() * (i + 1));
       [result[i], result[rand]] = [result[rand], result[i]];
     }
-    console.log(result);
     return result;
   }
   
