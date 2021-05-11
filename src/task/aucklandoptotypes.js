@@ -49,13 +49,15 @@ module.exports = function(config) {
   let renderer = canvasRenderer(renderTAO, options);
   
   let buttonOverrides = {size: "27arcmin", vanishing: false};
-  if (parameters.vanishing) {
+  if (config.vanishing) {
     Object.assign(buttonOverrides, {
       backgroundIntensity: 1,
       foregroundIntensity: 0
     });
-    
   }
+  
+  renderer.backgroundColor = config.vanishing ? "#7f7f7f" : "#ffffff";
+  
   let buttonCanvas = htmlButtons.buttonCanvas(renderTAO, buttonOverrides, options);
 
   function firstCap(str) {
