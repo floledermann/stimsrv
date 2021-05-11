@@ -83,6 +83,7 @@ module.exports = function(experiment, controller) {
                          
         if (currentDisplay.renderToCanvas) {
           currentDisplay.renderToCanvas(ctx, currentCondition, uiOptions);
+          console.log("## browser-simple rendered");
         }
         else {
           warn("Task UI is missing renderToCanvas() method required for rendering for browser-simple.");
