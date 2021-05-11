@@ -16,7 +16,7 @@ module.exports = function(config) {
     size: "10mm",
     middleBar: true,
     pixelAlign: true,
-    stimulusDisplay: "display",
+    stimulusDisplay: "display", // TODO: these three should be a common pattern handled by a helper class
     responseDisplay: "response",
     monitorDisplay: "monitor",
     dimensions: ["size"],
