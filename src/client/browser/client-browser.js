@@ -214,7 +214,7 @@ function clientFactory(options) {
   let client = {
     connect: function() {
     
-      socket = socketio({ transports: ["websocket"] }); //.connect();
+      socket = socketio(); //{ transports: ["websocket"] }); //.connect();
       
       socket.onAny(handleIncomingEvent);
         

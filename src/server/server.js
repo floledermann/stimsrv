@@ -279,7 +279,7 @@ let clients = {};
 controller.startExperiment();
 
 
-let io = socketio(server, {serveClient: false, transports: ["websocket"] });
+let io = socketio(server, {serveClient: false }); // , transports: ["websocket"]
 
 io.on("connection", (socket) => {
   console.log("New user connected");
