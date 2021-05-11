@@ -128,7 +128,6 @@ module.exports = function(experiment, controller) {
           let fullContext = Object.assign({}, currentContext, localContext);
           
           currentTaskUI = experiment.tasks[data.taskIndex].ui(fullContext);
-          debugger;
           currentDisplay = currentTaskUI.interfaces[role.role + ".display"] || currentTaskUI.interfaces["display"] || currentTaskUI.interfaces["*"];
 
           if (data.condition) {
