@@ -52,6 +52,9 @@ function htmlButtons(buttonDefs, config) {
       
       if (config.clickSound) {
         clickSound = new Audio(config.clickSound);
+        // attempt at better preloading for mobile - does not work
+        //clickSound.volume = 0.0;
+        //clickSound.play();
       }
       
     },
