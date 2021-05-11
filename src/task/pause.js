@@ -73,14 +73,20 @@ function pause(config) {
         if (role == "*" || role == context.role) {
           let msg = valOrFunc(message[key], context);
           interfaces[ui] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle });
+          // the following is needed for browser-simple - integrate
           interfaces[ui].renderToCanvas = canvasMessage(msg, bgColor, fgColor);
+          interfaces[ui].backgroundColor = bgColor;
+          interfaces[ui].foregroundColor = fgColor;
         }
       }
       
       if (!interfaces["*"] && fallback) {
         let msg = valOrFunc(fallback, context);
         interfaces["*"] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle });
+        // the following is needed for browser-simple - integrate
         interfaces["*"].renderToCanvas = canvasMessage(msg, bgColor, fgColor);
+        interfaces["*"].backgroundColor = bgColor;
+        interfaces["*"].foregroundColor = fgColor;
       }
       
       // buttons: as specified by config.buttondisplay (single UI key or Array)

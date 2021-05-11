@@ -193,11 +193,13 @@ function canvasRenderer(renderFunc, options) {
       if (condition.backgroundIntensity) {
         ctx.fillStyle = condition.backgroundIntensity;
         ctx.fillRect(0,0,width,height);
+        this.backgroundColor = condition.backgroundIntensity; // HACK for browser-simple, refactor
       }
       
       if (condition.foregroundIntensity) {
         ctx.fillStyle = condition.foregroundIntensity;
         ctx.strokeStyle = condition.foregroundIntensity;
+        this.foregroundColor = condition.foregroundIntensity; // HACK for browser-simple, refactor
       }
       
       // move origin to center
@@ -238,6 +240,8 @@ function canvasRenderer(renderFunc, options) {
     
     fonts: options.fonts,
     resources: options.fonts.map(f => f.resource),
+    backgroundColor: "#ffffff",
+    foregroundColor: "#000000"
   }
 }
 

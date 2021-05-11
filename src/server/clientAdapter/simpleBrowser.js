@@ -15,6 +15,7 @@ module.exports = function(experiment, controller) {
     
     let taskIndex = -1;
     let currentTaskUI = null;
+    let currentDisplay = null;
     let currentContext = null;
     let currentCondition = null;
     
@@ -52,14 +53,14 @@ module.exports = function(experiment, controller) {
     
     function renderCurrentImage(response) {
       
-      let ui = currentTaskUI.interfaces[role.role + ".display"] || currentTaskUI.interfaces["display"] || currentTaskUI.interfaces["*"];
+      //let ui = currentTaskUI.interfaces[role.role + ".display"] || currentTaskUI.interfaces["display"] || currentTaskUI.interfaces["*"];
       
       const canvas = Canvas.createCanvas(imageWidth, imageHeight);
       const ctx = canvas.getContext('2d');
         
-      if (ui) {
-        if (ui.fonts) {
-          for (let font of ui.fonts) {
+      if (currentDisplay) {
+        if (currentDisplay.fonts) {
+          for (let font of currentDisplay.fonts) {
             //console.log("Register Font: " + font.family + " from " + resource.path(font.resource));
             Canvas.registerFont(resource.path(font.resource), { family: font.family });
           }
@@ -80,15 +81,15 @@ module.exports = function(experiment, controller) {
           getResourceURL: getResourceURL
         });
                          
-        if (ui.renderToCanvas) {
-          ui.renderToCanvas(ctx, currentCondition, uiOptions);
+        if (currentDisplay.renderToCanvas) {
+          currentDisplay.renderToCanvas(ctx, currentCondition, uiOptions);
         }
         else {
           warn("Task UI is missing renderToCanvas() method required for rendering for browser-simple.");
         }
       }
       
-      if (!ui || !ui.renderToCanvas) {       
+      if (!currentDisplay || !currentDisplay.renderToCanvas) {       
         ctx.fillStyle = "#000000";
         ctx.fillRect(0,0,imageWidth,imageHeight);
       }
@@ -127,6 +128,8 @@ module.exports = function(experiment, controller) {
           let fullContext = Object.assign({}, currentContext, localContext);
           
           currentTaskUI = experiment.tasks[data.taskIndex].ui(fullContext);
+          debugger;
+          currentDisplay = currentTaskUI.interfaces[role.role + ".display"] || currentTaskUI.interfaces["display"] || currentTaskUI.interfaces["*"];
 
           if (data.condition) {
             showCondition(currentTaskUI, data.condition);
@@ -155,7 +158,9 @@ module.exports = function(experiment, controller) {
             data: lastMessageData,
             role: req.clientRole,
             imageSize: [imageWidth/(client.devicePixelRatio || 1), imageHeight/(client.devicePixelRatio || 1)],
-            delay: experiment.settings.simpleBrowserRefresh || 5
+            delay: experiment.settings.simpleBrowserRefresh || 5,
+            backgroundColor: currentDisplay?.backgroundColor || "#000000",
+            foregroundColor: currentDisplay?.foregroundColor || "#ffffff"
           });
         }
       }
