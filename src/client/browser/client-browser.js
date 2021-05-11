@@ -99,7 +99,7 @@ function clientFactory(options) {
   let localContext = {
     clientid: options.clientid,
     device: options.device,
-    role: options.role.role,
+    role: options.role.role, // TODO: this should be the whole role object, but check/test this
   };
  
   function prepareTask(task) {

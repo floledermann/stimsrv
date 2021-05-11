@@ -31,7 +31,7 @@ module.exports = function(experiment, controller) {
     let localContext = {
       clientid: client.id,
       device: client,
-      role: role, 
+      role: role.role, // TODO: this should be the whole role object, but check/test this
     };
 
     function getResourceURL(id, path) {
