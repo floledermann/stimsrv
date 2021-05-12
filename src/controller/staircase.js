@@ -10,16 +10,16 @@ module.exports = function(_options) {
   _options = Object.assign({
     startValue: 1,
     stepSize: 2,
+    stepSizeFine: 1,
     stepType: "db", // "linear", "log", "db", "multiply"
     minReversals: 3,
     minTrials: 0,
     numUp: 1,
     numDown: 3,
+    numReversalsFine: Infinity, // switch to stepSizeFine after this many reversals
     initialSingleReverse: true,
     minValue: -Infinity,
     maxValue: Infinity,
-    minReversals: 3,
-    minTrials: 0,
     isResponseCorrect: () => matchProperties
   }, _options);
     
@@ -47,23 +47,30 @@ module.exports = function(_options) {
       currentIntensity = Dimension(currentIntensity);
     }
 
-    function moveUp(currentIntensity) {
+    function moveUp(currentIntensity, reversal) {
       //console.log("Moving UP");
+      let numReversals = reversalIntensities.length + (reversal ? 1 : 0);
+      let stepSize = numReversals < options.numReversalsFine ? options.stepSize : options.stepSizeFine;
+      console.log("Reversals: " + numReversals);
+      console.log("Step Size: " + (numReversals < options.numReversalsFine ? "NORMAL" : "FINE"));
       switch (options.stepType) {
-        case "db": return currentIntensity * 10.0**(options.stepSize/20.0); 
-        case "log": return currentIntensity * 10.0**options.stepSize; 
-        case "multiply": return currentIntensity * options.stepSize; 
-        case "linear": return currentIntensity + options.stepSize; 
+        case "db": return currentIntensity * 10.0**(stepSize/20.0); 
+        case "log": return currentIntensity * 10.0**stepSize; 
+        case "multiply": return currentIntensity * stepSize; 
+        case "linear": return currentIntensity + stepSize; 
       }
     }
     
     function moveDown(currentIntensity) {
       //console.log("Moving DOWN");
+      let stepSize = reversalIntensities.length < options.numReversalsFine ? options.stepSize : options.stepSizeFine;
+      console.log("Reversals: " + reversalIntensities.length);
+      console.log("Step Size: " + (reversalIntensities.length < options.numReversalsFine ? "NORMAL" : "FINE"));
       switch (options.stepType) {
-        case "db": return currentIntensity / 10.0**(options.stepSize/20.0); 
-        case "log": return currentIntensity / 10.0**options.stepSize; 
-        case "multiply": return currentIntensity / options.stepSize; 
-        case "linear": return currentIntensity - options.stepSize; 
+        case "db": return currentIntensity / 10.0**(stepSize/20.0); 
+        case "log": return currentIntensity / 10.0**stepSize; 
+        case "multiply": return currentIntensity / stepSize; 
+        case "linear": return currentIntensity - stepSize; 
       }
     }
     
@@ -105,7 +112,7 @@ module.exports = function(_options) {
           else {
             reversal = true;
             direction = "up";
-            currentIntensity = moveUp(currentIntensity);
+            currentIntensity = moveUp(currentIntensity, true);
             correctCounter = 0;
           }
         }
