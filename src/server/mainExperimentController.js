@@ -247,6 +247,7 @@ function MainExperimentController(experiment, options) {
       context: context,
       condition: currentTrial.condition
     });
+    console.log("-------------------------------------------");
     console.log("Condition:");
     console.log(JSON.stringify(currentTrial.condition, null, 2));
   }
