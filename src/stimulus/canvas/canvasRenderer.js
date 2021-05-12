@@ -22,7 +22,8 @@ function getColorValueForIntensity(intensity, options) {
   
   // don't use gamma for extremes (to avoid unneccessary warnings)
   if (intensity > 0 && intensity < 1) {
-    colorInterpolator = colorInterpolator.gamma(options.gamma || 1.0);
+    let gamma = options.useGamma ? options.gamma || 1.0 : 1.0;
+    colorInterpolator = colorInterpolator.gamma(gamma);
   }
   
   colorInterpolator = colorInterpolator(options.minimumIntensityColor || "#000000", options.maximumIntensityColor || "#ffffff");
@@ -47,7 +48,8 @@ function canvasRenderer(renderFunc, options) {
     maximumIntensityColor: "#ffffff",
     dimensions: [],
     intensities: [],  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
-    fonts: []
+    fonts: [],
+    useGamma: false,
   }, options);
   
   options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
@@ -77,7 +79,7 @@ function canvasRenderer(renderFunc, options) {
         pixelDensity: runtime.pixeldensity,
         viewingDistance: runtime.viewingdistance
       });
-      
+            
       function resize(widthpx, heightpx) {
         
         // make dimensions even, so that half transform is full pixel
@@ -180,7 +182,7 @@ function canvasRenderer(renderFunc, options) {
         if (cond !== undefined) {
           if (typeof cond == "number") {
             //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-            condition[key] = getColorValueForIntensity(condition[key], condition);
+            condition[key] = getColorValueForIntensity(condition[key], Object.assign({}, {gamma: runtime?.gamma || uiOptions?.gamma, useGamma: options.useGamma}, condition));
           }
           else {
             runtime.warn("Intensity value " + key + " not specified as number. Using specified value " + condition[key] + " unchanged.");
