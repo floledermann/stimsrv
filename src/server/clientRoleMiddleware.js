@@ -39,6 +39,10 @@ function factory(experiment) {
   
     let clientId = req.cookies[clientIdCookieName];
     let ip = req.socket.remoteAddress;
+
+    if (req.query.clientId) {
+      clientId = req.query.clientId;
+    }
     
     if (!clientId) {
 
