@@ -342,24 +342,22 @@ app.post("/selectrole", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  
-  let client = null;
-  
+    
   if (req.clientDevice && req.clientRole) {
     
-    client = clients[req.clientDevice.id + "." + req.clientRole.role];
+    // allow override through query param
+    let clientType = req.query.client || req.clientDevice.client || "browser";
+    
+    if (!clients[clientType]) {
+      clients[clientType] = {};
+    }
+    
+    let client = clients[clientType][req.clientDevice.id + "." + req.clientRole.role];
   
     // allow override through query param
-    if (!client || req.query.client) {
-      clientType = req.clientDevice.client || "browser";
-      
-      // allow override through query param
-      if (req.query.client) {
-        clientType = req.query.client
-      }
-      
+    if (!client) {      
       client = adapters[clientType](req.clientDevice, req.clientRole);
-      clients[req.clientDevice.id + "." + req.clientRole.role] = client;
+      clients[clientType][req.clientDevice.id + "." + req.clientRole.role] = client;
       controller.addClient(client);
     }
     
