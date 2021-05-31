@@ -222,7 +222,7 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
 
-stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at the [Research Unit Cartography, TU Wien, Austria](https://cartography.tuwien.ac.at/).
+stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at [TU Wien, Research Unit Cartography](https://cartography.tuwien.ac.at/).
 
 
 
