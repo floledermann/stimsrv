@@ -81,17 +81,18 @@ function canvasRenderer(renderFunc, options) {
       });
             
       function resize(widthpx, heightpx) {
-        
+                
         // make dimensions even, so that half transform is full pixel
         
-        widthpx = Math.round(widthpx/2 + 0.5) * 2;
-        heightpx = Math.round(heightpx/2 + 0.5) * 2;
+        widthpx = Math.floor(widthpx/2 + 0.5) * 2;
+        heightpx = Math.floor(heightpx/2 + 0.5) * 2;
         
         canvas.width = widthpx * dppx;      
         canvas.height = heightpx * dppx;
         
         canvas.style.width = widthpx + "px";
         canvas.style.height = heightpx + "px";
+
       }
       
       resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
