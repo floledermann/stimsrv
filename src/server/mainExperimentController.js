@@ -247,9 +247,11 @@ function MainExperimentController(experiment, options) {
       context: context,
       condition: currentTrial.condition
     });
-    console.log("-------------------------------------------");
-    console.log("Condition:");
-    console.log(JSON.stringify(currentTrial.condition, null, 2));
+    // TODO: this output is interesting to watch what the server is doing, 
+    // but should not be hardcoded here
+    //console.log("-------------------------------------------");
+    //console.log("Condition:");
+    //console.log(JSON.stringify(currentTrial.condition, null, 2));
   }
   
   function response(_response) {
