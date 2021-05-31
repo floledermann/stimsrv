@@ -3,7 +3,7 @@ try {
   puppeteer = require("puppeteer");
 }
 catch(e) {
-  throw new Error("puppeteer must be installed manually to use this browser adapter!");
+  throw new Error("The 'puppeteer' package must be installed manually to use this browser adapter!");
 }
 
 const stream = require("stream");
@@ -12,8 +12,8 @@ module.exports = function(experiment, controller) {
   
   return function(client, role) {
     
-    let imageWidth = 200;
-    let imageHeight = 200;
+    let imageWidth = 480;
+    let imageHeight = 480;
     
     if (client.imageSize) {
       let [w,h] = client.imageSize.split("x").map(n => +n);
@@ -39,21 +39,32 @@ module.exports = function(experiment, controller) {
         width: imageWidth,
         height: imageHeight
       },
+      // GPU rendering is not enabled in headless mode, which can lead to
+      // slight differences in graphical output.
+      // See https://bugs.chromium.org/p/chromium/issues/detail?id=765284
+      // Therefore, render in non-headless mode by default.
       headless: false
     });
     let pageP = null;
     let navP = null;
 
-    browserP.then(browser => {
+    navP = browserP.then(browser => {
       pageP = browser.newPage();
-      navP = pageP;
-      navP.then(page => {
-        navP = page.goto("http://localhost:8080/?clientId=" + client.id + "&role=" + role.role + "&client=browser");
-      })
+      navP = pageP.then(page => {
+        navP = page.goto("http://localhost:8080/?clientId=" + client.id + "&role=" + role.role + "&client=browser", {
+          waitUntil: "networkidle0"
+        });
+        
+        navP.then(page => {
+          console.log("###### Page loaded! ######");
+        });
+        
+        return navP;
+      });
+      
+      return navP;
     });
-    
-    navP = browserP;
-    
+        
     //await browser.close();
 
     function warn(message, data) {
@@ -83,10 +94,14 @@ module.exports = function(experiment, controller) {
     let updated = false;
     
     function update() {
-      if (updateResponse) {
+      if (!updated && updateResponse) {
         updateResponse.send("reload");
+        updateResponse = null;
+        updated = true;
       }
-      updateResponse = null;
+      else {
+        updated = false;
+      }
     }
     
     return {
@@ -116,8 +131,6 @@ module.exports = function(experiment, controller) {
       
       render: function(req, res) {
         
-        console.log("Request: " + req.path);
-        
         if (req.path == "/image/") {
           renderCurrentImage(res); 
         }
@@ -127,12 +140,9 @@ module.exports = function(experiment, controller) {
             updateResponse.send("");
           }
           updateResponse = res;
-          if (!updated) {
-            update();
-          }
+          update();
         }
         else {
-          updated = true;
           res.render("experiment-simplebrowser.html", {
             message: lastMessage,
             data: lastMessageData,
@@ -140,7 +150,8 @@ module.exports = function(experiment, controller) {
             imageSize: [imageWidth/(client.devicePixelRatio || 1), imageHeight/(client.devicePixelRatio || 1)],
             delay: experiment.settings.simpleBrowserRefresh || 5,
             backgroundColor: currentDisplay?.backgroundColor || "#000000",
-            foregroundColor: currentDisplay?.foregroundColor || "#ffffff"
+            foregroundColor: currentDisplay?.foregroundColor || "#ffffff",
+            clientType: "puppeteer"
           });
         }
       }
