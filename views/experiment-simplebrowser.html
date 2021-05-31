@@ -28,7 +28,7 @@ document.write(window.innerWidth);
 
 {% for ui in role.interfaces %}
 <section class="interface-{{ui}}">
-<img src="/image/?role={{role.role}}&client={{clientType | default('browser-simple')}}" width="{{imageSize[0]}}" height="{{imageSize[1]}}">
+<img src="/image/?role={{role.role}}&client={{clientId | default('browser-simple')}}" width="{{imageSize[0]}}" height="{{imageSize[1]}}">
 </section>
 {% endfor %}
 
@@ -60,7 +60,7 @@ xhr.onreadystatechange = function () {
   }
 };
 
-xhr.open("GET", "/update/?role={{role.role}}&client={{clientType | default('browser-simple')}}", true);
+xhr.open("GET", "/update/?role={{role.role}}&client={{clientId | default('browser-simple')}}", true);
 xhr.timeout = 60 * 1000; // 1 minute
 xhr.ontimeout = function () {
   // re-initiate connection
