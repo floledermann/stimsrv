@@ -85,6 +85,12 @@ catch (e) {
   exitError(msg, e);
 }
 
+let serverConfig = null;
+
+if (experiment.serverConfigFile) {
+  serverConfig = require(path.resolve(experiment.serverConfigFile));
+}
+
 async function bundleClientCode(inputFileName, outputFileName, globalName) {
   
   let bundle = await rollup.rollup({
@@ -162,7 +168,15 @@ app.use(session({
 
 // use current dir and stimsrv package relative as fallback path for templates
 // TODO: should locating templates be an option on the experiment object?
-nunjucks.configure([path.resolve("views"), path.join(__dirname, "../../views")], {
+let templateDirs = [path.resolve("views"), path.join(__dirname, "../../views")];
+
+for (let client of Object.values(serverConfig?.clients)) {
+  if (client.templateDir) {
+    templateDirs.push(client.templateDir);
+  }
+}
+
+nunjucks.configure(templateDirs, {
   express: app,
   autoescape: true
 });
@@ -271,8 +285,12 @@ let controller = MainExperimentController(experiment, experiment.settings);
 
 const adapters = {
   'browser': require("./clientAdapter/browser.js")(experiment, controller),
-  'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment, controller)
+  //'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment, controller)
 };
+
+for (let [type, client] of Object.entries(serverConfig?.clients)) {
+  adapters[type] = client(experiment, controller);
+}
 
 let clients = {};
 
