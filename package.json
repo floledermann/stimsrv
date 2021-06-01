@@ -36,7 +36,6 @@
     "@rollup/plugin-node-resolve": "11.2.0",
     "another-dimension": "0.4.9",
     "body-parser": "1.19.0",
-    "canvas": "2.7.0",
     "cookie-parser": "1.4.5",
     "d3-interpolate": "2.0.1",
     "express": "4.17.1",
