@@ -170,9 +170,11 @@ app.use(session({
 // TODO: should locating templates be an option on the experiment object?
 let templateDirs = [path.resolve("views"), path.join(__dirname, "../../views")];
 
-for (let client of Object.values(serverConfig?.clients)) {
-  if (client.templateDir) {
-    templateDirs.push(client.templateDir);
+if (serverConfig?.clients) {
+  for (let client of Object.values(serverConfig.clients)) {
+    if (client.templateDir) {
+      templateDirs.push(client.templateDir);
+    }
   }
 }
 
@@ -284,12 +286,13 @@ let server = app.listen(port, () => {
 let controller = MainExperimentController(experiment, experiment.settings);
 
 const adapters = {
-  'browser': require("./clientAdapter/browser.js")(experiment, controller),
-  //'browser-simple': require("./clientAdapter/simpleBrowser.js")(experiment, controller)
+  'browser': require("./clientAdapter/browser.js")(experiment, controller)
 };
 
-for (let [type, client] of Object.entries(serverConfig?.clients)) {
-  adapters[type] = client(experiment, controller);
+if (serverConfig?.clients) {
+  for (let [type, client] of Object.entries(serverConfig?.clients)) {
+    adapters[type] = client(experiment, controller);
+  }
 }
 
 let clients = {};
