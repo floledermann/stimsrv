@@ -315,6 +315,7 @@ io.on("connection", (socket) => {
   
   socket.on("broadcast", (data) => {
     io.sockets.emit("broadcast", data);
+    console.log("Received event: " + JSON.stringify(data));
   });
   
   socket.on("calibrate time", (data) => {
@@ -328,6 +329,7 @@ io.on("connection", (socket) => {
   
   socket.on("response", (data) => {
     controller.response(data.response);
+    console.log("Received response: " + JSON.stringify(data.response));
   });
   
   socket.on("warning", (data) => {
@@ -344,7 +346,7 @@ io.on("connection", (socket) => {
   });
   
   socket.onAny((messageType, data) => {
-    console.log("Received message: " + messageType);
+    //console.log("Received message: " + messageType);
     //console.log(data);
   });
   
