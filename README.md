@@ -10,9 +10,9 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-base
 Main features:
 
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
-- Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be done on a tablet connected by WiFi.
-- Central control of experiment state and unidirectional data flow for deterministic experiment behaviour even in complex, distributed settings.
-- Provides utilities that help develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering the stimulus).
+- Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
+- Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
+- Provides utilities that help to develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering the stimulus).
 - Timestamp synchronization between multiple clients accomplishes temporal precision of a few milliseconds in local WiFi networks.
 - Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution and viewing distance.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
