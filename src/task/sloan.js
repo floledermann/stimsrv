@@ -1,12 +1,12 @@
 
 const Dimension = require("another-dimension");
 
-const htmlButtons = require("../ui/htmlButtons.js");
-const parameterController = require("../controller/parameterController.js");
-const random = require("../controller/random.js");
+const htmlButtons = require("stimsrv/ui/htmlButtons");
+const parameterController = require("stimsrv/controller/parameterController");
+const random = require("stimsrv/controller/random");
 
-const canvasRenderer = require("../stimulus/canvas/canvasRenderer.js");
-const sloan = require("../stimulus/canvas/sloan.js");
+const canvasRenderer = require("stimsrv/stimulus/canvas/canvasRenderer");
+const sloan = require("stimsrv/stimulus/canvas/sloan");
 
 function renderSloan(ctx, condition) {
   sloan.fill(ctx, condition.letter, condition.size);
