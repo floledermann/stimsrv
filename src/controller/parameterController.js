@@ -59,7 +59,13 @@ module.exports = function(config) {
         
         let condition = {};
         
+        // if any parameter is exhausted, we are done
         let done = false;
+        
+        // special case: no parameters nor conditions
+        if (Object.keys(parameterIterators).length == 0 && !conditionsIterator) {
+          done = true;
+        }
         
         for (key of Object.keys(parameterIterators)) {
           let param = parameterIterators[key].next(lastCondition, lastResponse, trials);
