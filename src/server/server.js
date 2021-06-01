@@ -345,7 +345,7 @@ io.on("connection", (socket) => {
   
   socket.onAny((messageType, data) => {
     console.log("Received message: " + messageType);
-    console.log(data);
+    //console.log(data);
   });
   
   
