@@ -102,7 +102,7 @@ function clientFactory(options) {
     role: options.role.role, // TODO: this should be the whole role object, but check/test this
   };
  
-  function prepareTask(task) {
+  function prepareTask(task, context) {
     
     let uiOptions = getRendererOptions();
       
@@ -120,7 +120,7 @@ function clientFactory(options) {
            || task.interfaces["*"];
            
       if (ui) {
-        ui.initialize?.(wrapper, uiOptions);
+        ui.initialize?.(wrapper, uiOptions, context);
       }
     }
     
@@ -241,9 +241,20 @@ function clientFactory(options) {
           }
         }
         
-        if (currentTask.event) {
-          currentTask.event(broadcastType, broadcastData);
+        // forward directly to UIs
+        if (currentTask) {
+          for (let ui of options.role.interfaces) {       
+            ui = currentTask.interfaces[options.role.role + "." + ui]
+                 || currentTask.interfaces[ui]
+                 || currentTask.interfaces[options.role.role + ".*"]
+                 || currentTask.interfaces["*"];
+                 
+            if (ui) {
+              ui.event?.(broadcastType, broadcastData);
+            }
+          }
         }
+        
       });
     },
 
@@ -293,7 +304,7 @@ function clientFactory(options) {
         
           currentTask = experiment.tasks[taskIndex].ui(fullContext);
           currentTask.name = experiment.tasks[data.taskIndex].name;
-          prepareTask(currentTask);
+          prepareTask(currentTask, fullContext);
         }
         
         showCondition(currentTask, data.condition);
@@ -314,7 +325,7 @@ function clientFactory(options) {
         if (!currentTask.name) {
           currentTask.name = experiment.tasks[data.taskIndex].name;
         }
-        prepareTask(currentTask);
+        prepareTask(currentTask, fullContext);
 
         if (data.condition) {
           showCondition(currentTask, data.condition);
