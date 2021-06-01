@@ -1,6 +1,6 @@
-# stimsrv — browser-based psychological experiments and user studies
+# stimsrv — Browser-based Psychological Experiments and User Studies
 
-! | This is alpha version software - everything may still change without prior notice | !
+! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
 |&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-credits--acknowledgements)&nbsp;—&nbsp;|
@@ -170,6 +170,12 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 ## Device configuration & roles
 
 *(... coming soon ...)*
+
+### Support for old & simple web browsers
+
+By default, stimsrv client relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like older smartphones or e-book readers) can be used for stimulus display in experiments by rendering on the server and delivering the graphics to the client as an image.
+
+See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-puppeteer) for more details on how to enable and configure server-side rendering.
 
 ## Implementing tasks
 
