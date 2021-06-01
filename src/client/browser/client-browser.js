@@ -28,8 +28,8 @@ function clientFactory(options) {
   let broadcastSubscribers = {};
 
   function handleIncomingEvent(eventType, data) {
-    console.log("Received message: " + eventType);
-    console.log(data);
+    //console.log("Received message: " + eventType);
+    //console.log(data);
     if (eventSubscribers[eventType]) {
       for (let cb of eventSubscribers[eventType]) {
         cb(data);
@@ -239,6 +239,10 @@ function clientFactory(options) {
           for (let cb of broadcastSubscribers[broadcastType]) {
             cb(broadcastData);
           }
+        }
+        
+        if (currentTask.event) {
+          currentTask.event(broadcastType, broadcastData);
         }
       });
     },
