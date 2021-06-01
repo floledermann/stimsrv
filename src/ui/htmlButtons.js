@@ -144,7 +144,7 @@ function htmlButtons(buttonDefs, config) {
               }
               
               if (config.hideAfterResponse) {
-                wrapper.style.display = "none";
+                wrapper.style.visibility = "hidden";
               }
               
               if (config.broadcastEvents) {
@@ -170,13 +170,13 @@ function htmlButtons(buttonDefs, config) {
       }
       
       if (config.delay) {
-        wrapper.style.display = "none";
+        wrapper.style.visibility = "hidden";
         setTimeout(function() {
-          wrapper.style.display = "";
+          wrapper.style.visibility = "visible";
         }, config.delay);
       }
       else {
-        wrapper.style.display = "";
+        wrapper.style.visibility = "visible";
       }
     }
   }
