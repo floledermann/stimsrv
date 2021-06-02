@@ -12,7 +12,7 @@ Main features:
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
 - Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
-- Provides utilities that help to develop new experiment tasks with very little code, allowing you to focus on the core functionality (e.g. rendering the stimulus).
+- Provides utilities that help to develop new experiment tasks with very little code, allowing researchers to focus on the core functionality (e.g. rendering the stimulus).
 - Timestamp synchronization between multiple clients accomplishes temporal precision of a few milliseconds in local WiFi networks.
 - Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution and viewing distance.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
@@ -194,7 +194,7 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each task that you need to implement for your experiment. Because experiment definitions are JavaScript files, all features of the language (such as inline functions or iterators) can be used to configure an experiment. The stimsrv server takes care of packaging and delivering the experiment code for web browsers and coordinating multiple clients, among other things.
 
-The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible Science.
+The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible science.
 
 ### Terminology
 
@@ -228,7 +228,7 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
 
-stimsrv has been created by [Florian Ledermann](https://twitter.com/floledermann) at [TU Wien, Research Unit Cartography](https://cartography.tuwien.ac.at/).
+stimsrv is created by [Florian Ledermann](https://twitter.com/floledermann) at [TU Wien, Research Unit Cartography](https://cartography.tuwien.ac.at/).
 
 
 
