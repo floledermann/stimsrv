@@ -102,10 +102,10 @@ function clientFactory(options) {
     role: options.role.role, // TODO: this should be the whole role object, but check/test this
   };
  
-  function prepareTask(task, context) {
+  function prepareCurrentTask(context) {
     
     let uiOptions = getRendererOptions();
-      
+    
     for (let ui of options.role.interfaces) {
       
       // clear ui
@@ -114,17 +114,14 @@ function clientFactory(options) {
       wrapper.style.cssText = ""; // this may be set by tasks
     
       // setup new ui
-      ui = task.interfaces[options.role.role + "." + ui]
-           || task.interfaces[ui]
-           || task.interfaces[options.role.role + ".*"]
-           || task.interfaces["*"];
+      ui = getUI(ui);
            
       if (ui) {
         ui.initialize?.(wrapper, uiOptions, context);
       }
     }
     
-    document.body.classList.add("current-task-" + task.name);
+    document.body.classList.add("current-task-" + currentTask.name);
 
   }
   
@@ -132,19 +129,29 @@ function clientFactory(options) {
     document.body.classList.remove("current-task-" + task.name);
   }
   
-  function showCondition(task, condition) {
-    for (let ui of options.role.interfaces) {
-      
-      ui = task.interfaces[options.role.role + "." + ui]
-           || task.interfaces[ui]
-           || task.interfaces[options.role.role + ".*"]
-           || task.interfaces["*"];
-           
-      if (ui) {
-        ui.render?.(condition);
+  function showCondition(condition) {
+    eachUI(ui => ui.render?.(condition));
+  }
+  
+  function getUI(uiName) {
+    return currentTask.interfaces[options.role.role + "." + uiName]
+           || currentTask.interfaces[uiName]
+           || currentTask.interfaces[options.role.role + ".*"]
+           || currentTask.interfaces["*"];
+  }
+  
+  function eachUI(callback) {
+    if (currentTask) {
+      for (let ui of options.role.interfaces) {       
+        ui = getUI(ui);
+             
+        if (ui) {
+          callback(ui);
+        }
       }
     }
   }
+
   
   function getResourceURL(id, path) {
     return "/static/resources/" + id + "/" + path;
@@ -242,19 +249,8 @@ function clientFactory(options) {
         }
         
         // forward directly to UIs
-        if (currentTask) {
-          for (let ui of options.role.interfaces) {       
-            ui = currentTask.interfaces[options.role.role + "." + ui]
-                 || currentTask.interfaces[ui]
-                 || currentTask.interfaces[options.role.role + ".*"]
-                 || currentTask.interfaces["*"];
-                 
-            if (ui) {
-              ui.event?.(broadcastType, broadcastData);
-            }
-          }
-        }
-        
+        eachUI(ui => ui.event?.(broadcastType, broadcastData))
+         
       });
     },
 
@@ -304,10 +300,10 @@ function clientFactory(options) {
         
           currentTask = experiment.tasks[taskIndex].ui(fullContext);
           currentTask.name = experiment.tasks[data.taskIndex].name;
-          prepareTask(currentTask, fullContext);
+          prepareCurrentTask(currentTask, fullContext);
         }
         
-        showCondition(currentTask, data.condition);
+        showCondition(data.condition);
       });
       
       this.subscribeEvent("task init", data => {
@@ -325,10 +321,10 @@ function clientFactory(options) {
         if (!currentTask.name) {
           currentTask.name = experiment.tasks[data.taskIndex].name;
         }
-        prepareTask(currentTask, fullContext);
+        prepareCurrentTask(currentTask, fullContext);
 
         if (data.condition) {
-          showCondition(currentTask, data.condition);
+          showCondition(data.condition);
         }
       });
       
