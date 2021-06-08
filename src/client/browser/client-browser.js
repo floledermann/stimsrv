@@ -328,6 +328,14 @@ function clientFactory(options) {
         }
       });
       
+      this.subscribeEvent("client join", data => {
+        eachUI(ui => ui?.event?.("client join", data));
+      });
+      
+      this.subscribeEvent("client leave", data => {
+        eachUI(ui => ui?.event?.("client leave", data));
+      });
+      
       this.subscribeEvent("stimsrv reload", data => {
         console.log("Server restarted - reloading experiment");
         window.location.reload();

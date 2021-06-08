@@ -303,6 +303,7 @@ controller.startExperiment();
 let io = socketio(server, {serveClient: false }); // , transports: ["websocket"]
 
 io.on("connection", (socket) => {
+  
   console.log("New user connected");
   
   let client = {
@@ -381,7 +382,9 @@ app.get("*", (req, res) => {
     if (!client) {      
       client = adapters[clientType](req.clientDevice, req.clientRole);
       clients[clientType][req.clientDevice.id + "." + req.clientRole.role] = client;
-      controller.addClient(client);
+      if (!adapters[clientType].usesSocket) {
+        controller.addClient(client);
+      }
     }
     
     if (!client) {

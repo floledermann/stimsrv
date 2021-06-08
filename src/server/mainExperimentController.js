@@ -289,10 +289,13 @@ function MainExperimentController(experiment, options) {
         condition: currentTrial?.condition
       });
     }
+    // initialize task before sending join message, so that new client get to process it with task already active
+    clients.forEach((c, i) => c.message("client join", {numClients: clients.length, clientNum: i+1}));
   }
   
   function removeClient(client) {
     clients = clients.filter(c => c !== client);
+    clients.forEach((c, i) => c.message("client leave", {numClients: clients.length, clientNum: i+1}));
   }
   
   function broadcast(message, data) {

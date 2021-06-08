@@ -1,6 +1,6 @@
 module.exports = function(experiment) {
   
-  return function(client) {
+  function adapter(client) {
     
     return {
       
@@ -18,5 +18,9 @@ module.exports = function(experiment) {
     }
     
   }
+  
+  adapter.usesSocket = true;
+  
+  return adapter;
   
 }
