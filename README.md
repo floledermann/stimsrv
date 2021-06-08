@@ -232,7 +232,7 @@ If you use stimsrv in your research, please cite the following publication:
 
 ----
 
-Ledermann, F. and Gartner, G.: Towards Conducting Reproducible Distributed Experiments in the Geosciences, AGILE GIScience Ser., 2, 33, https://doi.org/10.5194/agile-giss-2-33-2021, 2021.
+**Ledermann, F. and Gartner, G.: Towards Conducting Reproducible Distributed Experiments in the Geosciences, AGILE GIScience Ser., 2, 33, https://doi.org/10.5194/agile-giss-2-33-2021, 2021.**
 
 ----
 
