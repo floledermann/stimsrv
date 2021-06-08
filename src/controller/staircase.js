@@ -51,8 +51,8 @@ module.exports = function(_options) {
       //console.log("Moving UP");
       let numReversals = reversalIntensities.length + (reversal ? 1 : 0);
       let stepSize = numReversals < options.numReversalsFine ? options.stepSize : options.stepSizeFine;
-      console.log("Reversals: " + numReversals);
-      console.log("Step Size: " + (numReversals < options.numReversalsFine ? "NORMAL" : "FINE"));
+      //console.log("Reversals: " + numReversals);
+      //console.log("Step Size: " + (numReversals < options.numReversalsFine ? "NORMAL" : "FINE"));
       switch (options.stepType) {
         case "db": return currentIntensity * 10.0**(stepSize/20.0); 
         case "log": return currentIntensity * 10.0**stepSize; 
@@ -64,8 +64,8 @@ module.exports = function(_options) {
     function moveDown(currentIntensity) {
       //console.log("Moving DOWN");
       let stepSize = reversalIntensities.length < options.numReversalsFine ? options.stepSize : options.stepSizeFine;
-      console.log("Reversals: " + reversalIntensities.length);
-      console.log("Step Size: " + (reversalIntensities.length < options.numReversalsFine ? "NORMAL" : "FINE"));
+      //console.log("Reversals: " + reversalIntensities.length);
+      //console.log("Step Size: " + (reversalIntensities.length < options.numReversalsFine ? "NORMAL" : "FINE"));
       switch (options.stepType) {
         case "db": return currentIntensity / 10.0**(stepSize/20.0); 
         case "log": return currentIntensity / 10.0**stepSize; 
