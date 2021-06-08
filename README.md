@@ -169,14 +169,55 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
+The devices in your experiment can participate in specific *roles*, determining the provided display and interaction possibilities. In your experiment configuration, **`devices`** are defined as plain JS objects, with a mandatory **`id`** entry, and optionally a human-readable **`name`** and properties of the device.
 
-*(... coming soon ...)*
+```JS
+// *devices* entry of your experiment
+devices: [
+  { 
+    id: "supervisor_tablet",
+    name: "Tablet of experimenter",
+    resolution: "1920x1080",
+    pixeldensity: 150
+  },
+  {
+    id: "participant_phone",
+    name: "Phone for participant",
+    resolution: "1080x1920",
+    pixeldensity: 441
+  }
+],
+```
+
+These devices need to be assigned to one or more roles. In your experiment configuration, **`roles`** are defined as plain JS objects, with a mandatory **`role`** entry specifying the role id, the **`devices`** for which this role is available, and the **`interfaces`** that are enabled for this role. For each task, the list of interfaces available for the device's role will be matched with that task's interfaces, and those interfaces which are available will be rendered on the device. Each interface will be represented by a `<section>` element in the client's window – therefore, multiple interfaces can be shown at the same time if the role requires it.
+
+```JS
+// *roles* entry of your experiment
+roles: [
+  {
+    role: "participant",
+    devices: ["participant_phone"],
+    interfaces: ["display", "response"]
+  },
+  { 
+    role: "supervisor",
+    devices: ["supervisor_tablet"],
+    interfaces: ["monitor", "control"]
+  }
+],
+```
+
+A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring the experment (by the supervisor), `"control"` for the supervisor's controls. But these can be changed and additional interface names can be added, according to the requirements of your experiment.
 
 ### Support for old & simple web browsers
 
 By default, stimsrv relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like older smartphones or e-book readers) can be used for stimulus display in experiments by rendering on the server and delivering the graphics to the client as an image.
 
 See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-puppeteer) for more details on how to enable and configure server-side rendering.
+
+### Modifying the frontend CSS
+
+*(... coming soon ...)*
 
 ## Implementing tasks
 
@@ -191,7 +232,7 @@ The **`name`** entry of the task is a String with the task's name, which will be
 Example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
 
 ```JS
-// tasks entry of your experiment
+// *tasks* entry of your experiment
 tasks: [
   // Let's make a custom task from scratch, without any help from library functions!
   // A stimsrv task is simply a plain JS object adhering to a simple structure.
@@ -270,7 +311,7 @@ tasks: [
       }
     })
   }
-]
+],
 ```
 
 By stimsrv only requiring this simple contract/interface from a task, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer. Provided that the simple required pattern shown above is adhered to, tasks can be implemented using plain JS objects, classes or functional-compositional approaches. 
