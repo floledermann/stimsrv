@@ -275,7 +275,7 @@ tasks: [
 
 By stimsrv only requiring this simple contract/interface from a task, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer. Provided that the simple required pattern shown above is adhered to, tasks can be implemented using plain JS objects, classes or functional-compositional approaches. 
 
-### Reusable task components
+### Reusable components for task composition
 
 *(... coming soon ...)*
 
