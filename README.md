@@ -1,6 +1,6 @@
 <div align="center">
-# stimsrv
-**Multi-device Distributed User Studies and Behavioural Experiments**
+<h1>stimsrv</h1>
+<strong>Multi-device Distributed User Studies and Behavioural Experiments</strong>
 </div>
 
 <div align="center">
@@ -14,10 +14,10 @@
 
 ----
 
+stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments across multiple devices.
+
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
-
-stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments across multiple devices.
 
 Main features:
 
