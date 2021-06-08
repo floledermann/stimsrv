@@ -169,7 +169,7 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
-The devices in your experiment participate in the experiment in a specific *role*, which determines the interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
+The devices in your experiment each participate in a specific *role*, which determines the arrangement of interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
 
 ```JS
 // *devices* entry of your experiment
