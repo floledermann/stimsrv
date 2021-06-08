@@ -6,10 +6,12 @@
 --|-----------------------------------------------------------------------------------|--
 
 <div align="center">
-[**Running&nbsp;Experiments**](#defining--running-experiments) ·
-[**Experiment&nbsp;results**](#experiment-results) ·
-[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology) ·
-[**License&nbsp;&amp;&nbsp;Credits**](#license-credits--acknowledgements)
+<a href="#defining--running-experiments">Running&nbsp;Experiments</a> ·
+<a href="#experiment-results">Experiment&nbsp;results</a> ·
+<a href="#device-configuration--roles">Device&nbsp;configuration&nbsp;&amp;&nbsp;roles</a> ·
+<a href="#implementing-tasks">Implementing&nbsp;tasks</a> ·
+<a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·
+<a href="#license-credits--acknowledgements">License&nbsp;&amp;&nbsp;Credits</a>
 </div>
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments across multiple devices.
