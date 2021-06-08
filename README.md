@@ -24,7 +24,7 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 ## Defining & running experiments
 
-Experiments in stimsrv are implemented in JavaScript. A single *experiment specification* defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
+Experiments in stimsrv are implemented in JavaScript. A single ***experiment specification*** defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
 
 To use stimsrv, install [Node.js](https://nodejs.org/) and run the following command in your project directory:
 
@@ -34,7 +34,7 @@ npm install stimsrv
 
 (The *[stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template)* provides scripts for Windows to perform such tasks without using the command line.)
 
-A minimal experiment definition file looks like this:
+A minimal experiment specification file looks like this:
 
 ```javascript
 // Load the "pause" task
