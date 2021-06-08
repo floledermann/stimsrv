@@ -169,6 +169,7 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
+
 *(... coming soon ...)*
 
 ### Support for old & simple web browsers
@@ -181,15 +182,16 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and a ***ui***, which usually runs on the client(s) and is responsible for rendering the condition to the user and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `ui`, and optionally the `controller` and other properties.
 
-The **`ui`** entry of the task must be a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task wants to show (these are matched with the `interfaces` of each client's role to determine which interface should be shown on which client). Each of these entries contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`ui`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task wants to show (these are matched with the `interfaces` of each client's role to determine which interface should be shown on which client). Each of these entries contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
-The **`controller`** entry of the task must be a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
+The **`controller`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
 
 The **`name`** entry of the task is a String with the task's name, which will be used to store result data.
 
 Example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
 
 ```JS
+// tasks entry of your experiment
 tasks: [
   // Let's make a custom task from scratch, without any help from library functions!
   // A stimsrv task is simply a plain JS object adhering to a simple structure.
@@ -210,8 +212,8 @@ tasks: [
           // defined by the client role (defined above at the experiment level).
           // By convention, the "display" interface is used for displaying the stimulus:
           "display": {
-            // Each inerfaces entry needs two functions: initialize() and render().
-            // initialize() gets passed the parent element and the stimsrv client,
+            // Each inerfaces entry contains two functions: initialize() and render().
+            // initialize() gets passed the parent element and the stimsrv client API,
             // and sets up ui elements and interaction.
             initialize: (parent, stimsrv) => {
               // Add a simple text element to the parent
@@ -271,7 +273,11 @@ tasks: [
 ]
 ```
 
-By stimsrv only requiring this simple contract/interface from a task, this opens up the possibility to implement your tasks in whichever programming paradigm you prefer. On top of the simple required pattern, tasks can be implemented using plain JS objects, classes or functional-compositional approaches. 
+By stimsrv only requiring this simple contract/interface from a task, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer. Provided that the simple required pattern shown above is adhered to, tasks can be implemented using plain JS objects, classes or functional-compositional approaches. 
+
+### Resuable task components
+
+*(... coming soon ...)*
 
 ## Context & controllers
 
@@ -301,6 +307,12 @@ The hope is that by defining experiments in a concise yet comprehensive format, 
 - ***Condition***: A set of properties that define the stimulus for a trial. In the example above, the condition specifies the specific letter to be shown, plus other aspects of the presentation (e.g. the font size to use, the contrast ratio etc.).
 - ***Response***: A set of properties that define the response of the participant. In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed).
 - ***Result***: The result of a trial. Contains information about the condition, the response, the context plus additional information, such as timing information.
+
+### System overview
+
+This graphics shows an overview of the flow of information in stimsrv.
+
+![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
 
 <!--
 ## Available tasks
