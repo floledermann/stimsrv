@@ -293,7 +293,7 @@ By stimsrv only requiring this simple contract/interface from a task, this opens
 
 The [Pong example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/pong) shows realtime event synchronization between clients in action.
 
-![3-sided Pong on stimsrv](https://img.youtube.com/vi/oe6Ff-pTMS4/0.jpg)](https://www.youtube.com/watch?v=oe6Ff-pTMS4)
+[![3-sided Pong on stimsrv](https://img.youtube.com/vi/oe6Ff-pTMS4/0.jpg)](https://www.youtube.com/watch?v=oe6Ff-pTMS4)
 
 ## Design Philosophy & Terminology
 
