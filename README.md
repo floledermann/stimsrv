@@ -1,16 +1,16 @@
-# stimsrv — Browser-based Psychological Experiments and User Studies
+# stimsrv — Multi-device Distributed User Studies and Behavioural Experiments
 
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
 |&nbsp;—&nbsp;[**Running&nbsp;Experiments**](#defining--running-experiments)&nbsp;— |&nbsp;—&nbsp;[**Experiment&nbsp;results**](#experiment-results)&nbsp;— |&nbsp;—&nbsp;[**Philosophy&nbsp;&amp;&nbsp;Terminology**](#design-philosophy--terminology)&nbsp;— |&nbsp;—&nbsp;[**License&nbsp;&amp;&nbsp;Credits**](#license-credits--acknowledgements)&nbsp;—&nbsp;|
 
-stimsrv (***stim***ulus ***s***e***rv***er) is a system for running browser-based psychological experiments and user studies.
+stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments across multiple devices.
 
 Main features:
 
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
-- Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
+- Distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
 - Provides utilities that help to develop new experiment tasks with very little code, allowing researchers to focus on the core functionality (e.g. rendering the stimulus).
 - Timestamp synchronization between multiple clients accomplishes temporal precision of a few milliseconds in local WiFi networks.
@@ -390,7 +390,7 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 (This isn't legal advice, please consider consulting a lawyer and see the [full license](https://www.gnu.org/licenses/agpl-3.0.en.html) for all details.)
 
-If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
+If you need a different license for your purposes, contact the author of stimsrv (see below for contact information). Individual licenses and support may be available upon request.
 
 If you use stimsrv in your research, please cite the following publication:
 
