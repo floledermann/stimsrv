@@ -169,7 +169,7 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
-The devices in your experiment can participate in specific *roles*, determining the provided display and interaction possibilities. In your experiment configuration, **`devices`** are defined as plain JS objects, with a mandatory **`id`** entry, and optionally a human-readable **`name`** and properties of the device.
+The devices in your experiment participate in the experiment in a specific *role*, which determines the interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
 
 ```JS
 // *devices* entry of your experiment
@@ -189,7 +189,7 @@ devices: [
 ],
 ```
 
-These devices need to be assigned to one or more roles. In your experiment configuration, **`roles`** are defined as plain JS objects, with a mandatory **`role`** entry specifying the role id, the **`devices`** for which this role is available, and the **`interfaces`** that are enabled for this role. For each task, the list of interfaces available for the device's role will be matched with that task's interfaces, and those interfaces which are available will be rendered on the device. Each interface will be represented by a `<section>` element in the client's window – therefore, multiple interfaces can be shown at the same time if the role requires it.
+Devices need to be assigned to one or more roles to participate in the experiment. In your experiment configuration, **`roles`** are defined as plain JS objects, with a mandatory **`role`** entry specifying the role id, the **`devices`** for which this role is available, and the **`interfaces`** that are enabled for this role. For each task in the experiment, the list of interfaces available for the device's role is matched with the interfaces defined by the task, and the matching interfaces are rendered on the device. Each interface will be represented by a `<section>` element in the client's HTML output – therefore, multiple interfaces can be shown simultaneously if the role requires it.
 
 ```JS
 // *roles* entry of your experiment
@@ -208,6 +208,16 @@ roles: [
 ```
 
 A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring the experment (by the supervisor), `"control"` for the supervisor's controls. But these can be changed and additional interface names can be added, according to the requirements of your experiment.
+
+When starting an experiment, stimsrv outputs the available device IDs to the console, together with information on how to connect to the stimsrv server.
+
+![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-console-output.png)
+
+Upon entering the specified URL in your web browser (or, when using the `--open` option, the web browser will launch automatically), you are shown a form in which you can enter the client ID, and get to select the roles available for the selected client.
+
+![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-experiment-start.png)
+
+Chose a role and click on "Start" to join the experiment with that browser and the selected role.
 
 ### Support for old & simple web browsers
 
