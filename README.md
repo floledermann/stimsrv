@@ -329,6 +329,8 @@ This graphics shows an overview of the flow of information in stimsrv.
 
 ## License, Credits & Acknowledgements
 
+<img align="right" src="http://www.gnu.org/graphics/agplv3-with-text-100x42.png">
+
 stimsrv is licensed under the [GNU Affero General Public License, Version 3](https://www.gnu.org/licenses/agpl-3.0.en.html). Roughly speaking, this license allows you to use and modify stimsrv free of charge, provided that you publish the modified or extended code under the same license.
 
 (This isn't legal advice, please consider consulting a lawyer and see the [full license](https://www.gnu.org/licenses/agpl-3.0.en.html) for all details.)
