@@ -228,6 +228,14 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 If you need a different license for your purposes, contact the author of stimsrv. Individual licenses and support may be available upon request.
 
+If you use stimsrv in your research, please cite the following publication:
+
+----
+
+Ledermann, F. and Gartner, G.: Towards Conducting Reproducible Distributed Experiments in the Geosciences, AGILE GIScience Ser., 2, 33, https://doi.org/10.5194/agile-giss-2-33-2021, 2021.
+
+----
+
 stimsrv is created by [Florian Ledermann](https://twitter.com/floledermann) at [TU Wien, Research Unit Cartography](https://cartography.tuwien.ac.at/).
 
 
