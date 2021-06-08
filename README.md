@@ -1,6 +1,6 @@
 <div align="center">
   <h1>stimsrv<br>Multi-device Distributed User Studies and Behavioural Experiments</h1>
- 
+</div>
 
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
