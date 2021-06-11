@@ -12,7 +12,7 @@
 
 ----
 
-stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments across multiple devices.
+stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments, potentially across multiple devices.
 
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
