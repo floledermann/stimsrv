@@ -22,4 +22,18 @@ valOrFunc.allProperties = function(arg, ...args) {
   return result;
 }
 
+// apply valOrFunc to some properties of an object, others are copied as value
+valOrFunc.properties = function(arg, propertyNames, ...args) {
+  let result = {};
+  for (let key of Object.keys(arg)) {
+    if (propertyNames.includes(key)) {
+      result[key] = valOrFunc.call(null, arg[key], ...args);
+    }
+    else {
+      result[key] = arg[key];
+    }
+  }
+  return result;
+}
+
 module.exports = valOrFunc;
