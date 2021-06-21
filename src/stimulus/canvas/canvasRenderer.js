@@ -110,7 +110,6 @@ function canvasRenderer(renderFunc, options) {
       
       ctx = canvas.getContext('2d');
       
-      // TODO: dynamically resize if parent resizes, but how to re-render?
       let observer = new ResizeObserver((entries) => {
         //let entry = entries.find((entry) => entry.target === parent);
         resize(options.width || parent.clientWidth, options.height || parent.clientHeight)
