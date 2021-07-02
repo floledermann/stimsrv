@@ -6,7 +6,7 @@ let sequence = function(choices, options) {
     loopCount: undefined, // stop after loopCount loops
   }, options);
   
-  return function*() {
+  let g = function*() {
   
     let i=0;
     let index=0;
@@ -28,6 +28,10 @@ let sequence = function(choices, options) {
       }
     }
   }
+  
+  g.choices = choices;
+  
+  return g;
 }
 
 sequence.loop = function(choices, options) {

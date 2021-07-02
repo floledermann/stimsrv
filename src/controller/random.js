@@ -1,11 +1,15 @@
 const deepEqual = require("fast-deep-equal");
 
 function randomPick(choices, options) {
-  return function*() {
+  let g = function*() {
     while (true) {
       yield choices[Math.floor(choices.length * Math.random())];
     }
   }
+  
+  g.choices = choices;
+  
+  return g;
 }
 
 function randomRange(from, to, options) {
@@ -14,7 +18,7 @@ function randomRange(from, to, options) {
     round: false    // 100, 10, 1/true, 0.1, 0.01, ...
   }, options);
   
-  return function*() {
+  let g = function*() {
     while (true) {
       let num = from + Math.random() * (to-from);
       if (options.round) {
@@ -24,6 +28,11 @@ function randomRange(from, to, options) {
       yield num;
     }
   }
+  
+  g.from = from;
+  g.to = to;
+  
+  return g;
 }
 
 function randomShuffle(choices, options) {
@@ -50,7 +59,7 @@ function randomShuffle(choices, options) {
     choices = multipledChoices;
   }
     
-  return function*() {
+  let g = function*() {
     
     let shuffledChoices = shuffled(choices);
     let index = 0;
@@ -64,7 +73,7 @@ function randomShuffle(choices, options) {
         if (!options.loop) return;
         let lastItem = choices[choices.length-1];
         shuffledChoices = shuffled(choices);
-        if (options.preventContinuation) {
+        if (options.preventContinuation && choices.length > 1) {
           while (deepEqual(shuffledChoices[0], lastItem)) {
             shuffledChoices = shuffled(choices);
           }
@@ -73,11 +82,25 @@ function randomShuffle(choices, options) {
       }
     }
   }
+  
+  g.choices = choices;
+  
+  return g;
+}
+
+function randomLoop(choices, options) {
+  
+  options = Object.assign({
+    loop: true
+  }, options);
+  
+  return randomShuffle(choices, options);
 }
 
 randomPick.pick = randomPick;
 randomPick.range = randomRange;
 randomPick.shuffle = randomShuffle;
 randomPick.sequence = randomShuffle;
+randomPick.loop = randomLoop;
 
 module.exports = randomPick;
