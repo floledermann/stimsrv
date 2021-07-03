@@ -1,5 +1,10 @@
 
 function pickProperties(obj, keys) {
+  
+  if (! (typeof obj == "object")) {
+    return obj;
+  }
+  
   let result = {};
   for (let key of keys) {
     if (obj.hasOwnProperty(key)) {
@@ -10,6 +15,11 @@ function pickProperties(obj, keys) {
 }
 
 pickProperties.without = function(obj, omitKeys) {
+  
+  if (! (typeof obj == "object")) {
+    return obj;
+  }
+  
   let result = {};
   for (let key of Object.keys(obj)) {
     if (!omitKeys.includes(key)) {
