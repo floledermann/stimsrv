@@ -113,7 +113,7 @@ function MainExperimentController(experiment, options) {
     
     // store results of previous experiment
     if (currentTask && valOrFunc(currentTask?.store, context) !== false) {
-      // separate constant parameters form changing parameters
+      // separate constant parameters from changing parameters
       let constantParameters = currentController.constantParameters?.() || {};
       results.push({
         name: currentTask?.name,
