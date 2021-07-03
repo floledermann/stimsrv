@@ -86,19 +86,24 @@ module.exports = function(config) {
           
           if (typeof spec == "function") {
             // property is function
-            let param = spec(condition, lastCondition, lastResponse, trials);
-            if (param === null) {
+            spec = spec(condition, lastCondition, lastResponse, trials);
+            if (spec === null) {
               done = true;
+              return condition;
             }
-            return handleParameter(condition, key, param);
+            // recurse dynamic spec
+            //return handleParameter(condition, key, spec);
           }
           if (spec.next && typeof spec.next == "function") {
             // property is generator
-            let param = spec.next(lastCondition, lastResponse, trials);
-            if (param.done) {
+            spec = spec.next(lastCondition, lastResponse, trials);
+            if (spec.done) {
               done = true;
+              return condition;
             }
-            return handleParameter(condition, key, param.value);
+            spec = spec.value;
+            // recurse dynamic spec
+            //return handleParameter(condition, key, spec);
           }
           
           // primitive value - copy to output
