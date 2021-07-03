@@ -61,6 +61,7 @@ function canvasRenderer(renderFunc, options) {
   let lastCondition = null;
   
   let dppx = 1;
+  let width = 0, height = 0;
   
   let resourcesPromise = null;
   
@@ -81,6 +82,9 @@ function canvasRenderer(renderFunc, options) {
       });
             
       function resize(widthpx, heightpx) {
+        
+        width = widthpx;
+        height = heightpx;
                 
         // make dimensions even, so that half transform is full pixel
         
@@ -96,6 +100,8 @@ function canvasRenderer(renderFunc, options) {
       }
       
       resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
+      
+      //console.log("INIT", parent.clientWidth, parent.clientHeight);
          
       if (options.fonts) {
         resourcesPromise = Promise.all(options.fonts.map(font => {
@@ -112,9 +118,13 @@ function canvasRenderer(renderFunc, options) {
       
       let observer = new ResizeObserver((entries) => {
         //let entry = entries.find((entry) => entry.target === parent);
-        resize(options.width || parent.clientWidth, options.height || parent.clientHeight)
-        if (lastCondition) {
-          this.render(lastCondition);
+        //console.log("RESIZE", parent.clientWidth, parent.clientHeight);
+        // check if parent was actually resized to avoid this triggering on initialization
+        if (parent.clientWidth != width || parent.clientHeight != height) {
+          resize(options.width || parent.clientWidth, options.height || parent.clientHeight)
+          if (lastCondition) {
+            this.render(lastCondition);
+          }
         }
       });
       observer.observe(parent);
