@@ -1,7 +1,16 @@
 const deepEqual = require("fast-deep-equal");
 
 function randomPick(choices, options) {
-  let g = function*() {
+  let g = function*(context) {
+    
+    // initialize any dynamic values
+    choices = choices.map(c => {
+      if (typeof c == "function") {
+        c = c(context);
+      }
+      return c;
+    });
+  
     while (true) {
       yield choices[Math.floor(choices.length * Math.random())];
     }
@@ -18,7 +27,7 @@ function randomRange(from, to, options) {
     round: false    // 100, 10, 1/true, 0.1, 0.01, ...
   }, options);
   
-  let g = function*() {
+  let g = function*(context) {
     while (true) {
       let num = from + Math.random() * (to-from);
       if (options.round) {
@@ -59,9 +68,18 @@ function randomShuffle(choices, options) {
     choices = multipledChoices;
   }
     
-  let g = function*() {
+  let g = function*(context) {
     
-    let shuffledChoices = shuffled(choices);
+    // initialize any dynamic values
+    let _choices = choices.map(c => {
+      if (typeof c == "function") {
+        c = c(context);
+      }
+      return c;
+    });
+ 
+    let shuffledChoices = shuffled(_choices);
+    
     let index = 0;
     
     while (true) {
@@ -71,11 +89,11 @@ function randomShuffle(choices, options) {
       
       if (index == shuffledChoices.length) {
         if (!options.loop) return;
-        let lastItem = choices[choices.length-1];
-        shuffledChoices = shuffled(choices);
-        if (options.preventContinuation && choices.length > 1) {
+        let lastItem = _choices[_choices.length-1];
+        shuffledChoices = shuffled(_choices);
+        if (options.preventContinuation && _choices.length > 1) {
           while (deepEqual(shuffledChoices[0], lastItem)) {
-            shuffledChoices = shuffled(choices);
+            shuffledChoices = shuffled(_choices);
           }
         }
         index = 0;

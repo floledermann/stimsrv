@@ -131,6 +131,47 @@ describe("Iterators", () => {
       assert.strictEqual(next.value, undefined);   
       
     });
+    
+    it("Function items are initialized with context object once at start", () => {
+      
+      let iter = sequence([c => c.val1, c => c.val2, c => Math.random()],{loop:true})({
+        val1: "a",
+        val2: "b"
+      });
+      
+      let next = iter.next();
+      assert.equal(next.value, "a");
+      assert(!next.done);
+      
+      next = iter.next();
+      assert.equal(next.value, "b");
+      assert(!next.done);
+      
+      next = iter.next();
+      let rnd = next.value;
+      assert.equal(typeof next.value, "number");
+      assert(!next.done);
+
+      next = iter.next();
+      assert.equal(next.value, "a");
+      assert(!next.done);
+
+      next = iter.next();
+      assert.equal(next.value, "b");
+      assert(!next.done);
+      
+      // thrid item must return same (random) value as on first call
+      next = iter.next();
+      assert.equal(next.value, rnd);
+      assert(!next.done);
+      
+      next = iter.next();
+      assert.equal(next.value, "a");
+      assert(!next.done);
+
+      // ...
+
+    });  
 
   });
 

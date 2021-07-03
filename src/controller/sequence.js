@@ -6,7 +6,15 @@ let sequence = function(choices, options) {
     loopCount: undefined, // stop after loopCount loops
   }, options);
   
-  let g = function*() {
+  let g = function*(context) {
+    
+    // initialize any dynamic values
+    choices = choices.map(c => {
+      if (typeof c == "function") {
+        c = c(context);
+      }
+      return c;
+    });
   
     let i=0;
     let index=0;
