@@ -37,6 +37,15 @@ describe("Iterators", () => {
     });
 
 
+    it("Exposes choices", () => {
+      
+      let iter = sequence([1,2,3])();
+      
+      assert.deepEqual(iter.choices, [1,2,3]);
+      
+    });
+
+
     it("Repeat each item options.stepCount times", () => {
       
       let iter = sequence([1,2,3],{stepCount: 2})();

@@ -12,7 +12,9 @@ describe("ParameterController", () => {
     
     let c = parameterController({
       // config
-    })({/* context */});
+    })({
+      // context
+    });
     
     // we got a working controller
     assert.equal(typeof c.nextCondition, "function");
@@ -33,7 +35,9 @@ describe("ParameterController", () => {
       parameters: {
         param1: "value1"
       }
-    })({/* context */});
+    })({
+      // context
+    });
     
     let p = c.nextCondition();
     assert(p);
@@ -108,7 +112,9 @@ describe("ParameterController", () => {
       parameters: {
         param1: sequence(["value1","value2"])
       }
-    })({/* context */});
+    })({
+      // context
+    });
     
     let p = c.nextCondition();
     assert(p);
@@ -155,7 +161,9 @@ describe("ParameterController", () => {
           param3: "value2"
         }
       ]
-    })({/* context */});
+    })({
+      // context
+    });
     
     let p = c.nextCondition();
     assert(p);
@@ -209,6 +217,8 @@ describe("ParameterController", () => {
         
   });
   
+  // Automated expansion of recursive generators gives too little control, so is omitted for now
+  /*
   it("Nested generators", () => {
     
     let c = parameterController({
@@ -220,7 +230,9 @@ describe("ParameterController", () => {
           ])
         }
       ]
-    })({/* context */});
+    })({
+      // context
+    });
     
     let p = c.nextCondition();
     assert(p);
@@ -257,6 +269,72 @@ describe("ParameterController", () => {
     // ...
         
   });
+  
+  it("Nested generators - 3 levels", () => {
+    
+    let c = parameterController({
+      parameters: [
+        {
+          param1: sequence.loop([
+            sequence.loop([
+              sequence.loop(["a","b"]),
+              sequence.loop(["c","d"])
+            ]),
+            sequence.loop([
+              sequence.loop(["e","f"]),
+              sequence.loop(["g","h"])
+            ])
+          ])
+        }
+      ]
+    })({
+      // context
+    });
+    
+    let p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "a");
+    
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "e");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "c");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "g");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "b");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "f");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "d");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "h");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "a");
+
+    p = c.nextCondition();
+    assert(p);
+    assert.equal(p.param1, "e");
+
+    // ...
+        
+  });
+  */
   
   it(".constantParameters() returns parameters constant for given context", () => {
     

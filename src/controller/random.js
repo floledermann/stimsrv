@@ -1,7 +1,8 @@
 const deepEqual = require("fast-deep-equal");
 
 function randomPick(choices, options) {
-  let g = function*(context) {
+  
+  return function(context) {
     
     // initialize any dynamic values
     choices = choices.map(c => {
@@ -10,15 +11,14 @@ function randomPick(choices, options) {
       }
       return c;
     });
-  
-    while (true) {
-      yield choices[Math.floor(choices.length * Math.random())];
+    
+    return {
+      next: () => choices[Math.floor(choices.length * Math.random())],
+      choices: choices
     }
+  
   }
-  
-  g.choices = choices;
-  
-  return g;
+ 
 }
 
 function randomRange(from, to, options) {
@@ -68,7 +68,7 @@ function randomShuffle(choices, options) {
     choices = multipledChoices;
   }
     
-  let g = function*(context) {
+  return function(context) {
     
     // initialize any dynamic values
     let _choices = choices.map(c => {
@@ -81,29 +81,37 @@ function randomShuffle(choices, options) {
     let shuffledChoices = shuffled(_choices);
     
     let index = 0;
+    let done = false;
     
-    while (true) {
-      
-      yield shuffledChoices[index];
-      index++;
-      
-      if (index == shuffledChoices.length) {
-        if (!options.loop) return;
-        let lastItem = _choices[_choices.length-1];
-        shuffledChoices = shuffled(_choices);
-        if (options.preventContinuation && _choices.length > 1) {
-          while (deepEqual(shuffledChoices[0], lastItem)) {
+    return {
+      next: () => {
+        
+        if (done) return {done: true};
+        
+        let val = shuffledChoices[index];
+        index++;
+        
+        if (index == shuffledChoices.length) {
+          if (!options.loop) done = true;
+          else {
+            let lastItem = _choices[_choices.length-1];
             shuffledChoices = shuffled(_choices);
+            if (options.preventContinuation && _choices.length > 1) {
+              while (deepEqual(shuffledChoices[0], lastItem)) {
+                shuffledChoices = shuffled(_choices);
+              }
+            }
+            index = 0;
           }
-        }
-        index = 0;
-      }
+        }       
+          
+        return {value: val};
+        
+      },
+      choices: choices
     }
+    
   }
-  
-  g.choices = choices;
-  
-  return g;
 }
 
 function randomLoop(choices, options) {
