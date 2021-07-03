@@ -13,8 +13,10 @@ module.exports = function(config) {
     nextContext: null
   }, config);
   
-  Object.freeze(config.parameters);
-
+  if (!Array.isArray(config.parameters)) {
+    config.parameters = [config.parameters];
+  }
+  
   return function(context) {
     
     // all parameters should be generators, so convert primitive values into infinite generators
@@ -29,30 +31,39 @@ module.exports = function(config) {
     }
     
     // make a copy of the parameters
-    let parameterIterators = Object.assign({}, config.parameters);
-    
-    //console.log(parameterIterators);
-    
-    for (let key of Object.keys(parameterIterators)) {
-      // if its already an iterator, we don't have to do anything
-      if (!(parameterIterators[key].next && typeof parameterIterators[key].next == "function")) {
-        // function -> initialize with context
-        if (typeof parameterIterators[key] == "function") {
-          parameterIterators[key] = parameterIterators[key](context);
-        }
-        // primitive values -> copy to output
-        if (!(parameterIterators[key].next && typeof parameterIterators[key].next == "function")) {
-          parameterIterators[key] = yieldForever(parameterIterators[key]);
+    let parameterIterators = config.parameters.map(p => {
+      
+      if (typeof p == "function") {
+        p = p(context);
+      }
+      
+      if (!(typeof p == "function" || (p.next && typeof p.next == "function"))) {
+        // object case
+        // make copy     
+        p = Object.assign({}, p);
+        
+        // initialize property iterators / callbacks
+        for (let key of Object.keys(p)) {
+          // if its already an iterator, we don't have to do anything
+          if (!(p[key].next && typeof p[key].next == "function")) {
+            // function -> initialize with context
+            if (typeof p[key] == "function") {
+              p[key] = p[key](context);
+            }
+            // primitive values -> copy to output
+            // this is not needed anymore, since primitive values are handled by handleParameter() below
+            /*
+            if ( (!(p[key].next && typeof p[key].next == "function")) && !(typeof p[key] == "function")) {
+              p[key] = yieldForever(p[key]);
+            }
+            */
+          }
         }
       }
-    }
+      
+      return p;
+    });
     
-    let conditionsIterator = null;
-    
-    if (config.conditions) {
-      conditionsIterator = config.conditions(context);
-    }
-
     // return next condition, or null for end of experiment
     return {
       nextCondition: function(lastCondition=null, lastResponse=null, trials=[]) {
@@ -62,25 +73,69 @@ module.exports = function(config) {
         // if any parameter is exhausted, we are done
         let done = false;
         
-        // special case: no parameters nor conditions
-        if (Object.keys(parameterIterators).length == 0 && !conditionsIterator) {
+        // special case: no parameters in any spec
+        /*
+        if (parameterIterators.every(p => (! typeof p == "function") && Object.keys(p).length == 0)) {
           done = true;
         }
+        */
         
-        for (key of Object.keys(parameterIterators)) {
-          let param = parameterIterators[key].next(lastCondition, lastResponse, trials);
-          if (param.done) {
-            done = true;
+        function handleParameter(condition, key, spec) {
+          
+          if (spec === undefined) return;
+          
+          if (typeof spec == "function") {
+            // property is function
+            let param = spec(condition, lastCondition, lastResponse, trials);
+            if (param === null) {
+              done = true;
+            }
+            return handleParameter(condition, key, param);
           }
-          condition[key] = param.value;
+          if (spec.next && typeof spec.next == "function") {
+            // property is generator
+            let param = spec.next(lastCondition, lastResponse, trials);
+            if (param.done) {
+              done = true;
+            }
+            return handleParameter(condition, key, param.value);
+          }
+          
+          // primitive value - copy to output
+          condition[key] = spec;
+          return condition;
         }
         
-        if (conditionsIterator) {
-          let cond = conditionsIterator.next(lastCondition, lastResponse, trials);
-        
-          Object.assign(condition, cond.value);
+        function handleParameters(condition, spec) {
+          if (typeof spec == "function") {
+            // overall function
+            let cond = spec(condition, lastCondition, lastResponse, trials);
+            if (cond === null) {
+              done = true;
+              return condition;
+            }
+            return handleParameters(condition, cond);
+          }
+          if (spec.next && typeof spec.next == "function") {
+            // overall generator
+            let cond = spec.next(lastCondition, lastResponse, trials);
+            if (cond.done) {
+              done = true;
+              return condition;
+            }
+            return handleParameters(condition, cond.value); 
+          }
+          
+          // object with individual properties
+          for (key of Object.keys(spec)) {
+            handleParameter(condition, key, spec[key]);
+          }
+          
+          return condition;
         }
-        
+                
+        condition = parameterIterators.reduce(handleParameters, {});
+                
         if (!done) {
           return condition;
         }
@@ -90,15 +145,30 @@ module.exports = function(config) {
       
       constantParameters: function() {
         
-        let p = {};
-        
-        for (key of Object.keys(config.parameters)) {
-          if (isConstantParameter(config.parameters[key])) {
-            p[key] = config.parameters[key];
+        let parameters = parameterIterators.reduce((parameters, spec) => {
+          if (isConstantParameter(spec)) {
+            for (key of Object.keys(spec)) {
+              if (isConstantParameter(spec[key])) {
+                parameters[key] = spec[key];
+              }
+              else {
+                // potentially static param is overwritten by dynamic param
+                delete parameters[key];
+              }
+            }  
           }
-        }
+          else {
+            // if the overall parameters object is dynamic, we have to be conservative
+            // as it may override any parameter!
+            // so discard any constant parameters colleted to this point!
+            return {};
+          }
+          
+          return parameters;
+        }, {});
         
-        return p;
+        
+        return parameters;
         
       },
       
