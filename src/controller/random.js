@@ -1,11 +1,11 @@
 const deepEqual = require("fast-deep-equal");
 
-function randomPick(choices, options) {
+function randomPick(items, options) {
   
   return function(context) {
     
     // initialize any dynamic values
-    choices = choices.map(c => {
+    items = items.map(c => {
       if (typeof c == "function") {
         c = c(context);
       }
@@ -13,8 +13,8 @@ function randomPick(choices, options) {
     });
     
     return {
-      next: () => choices[Math.floor(choices.length * Math.random())],
-      choices: choices
+      next: () => items[Math.floor(items.length * Math.random())],
+      items: items
     }
   
   }
@@ -44,7 +44,7 @@ function randomRange(from, to, options) {
   return g;
 }
 
-function randomShuffle(choices, options) {
+function randomShuffle(items, options) {
   options = Object.assign({
     loop: false,
     multiple: 1,
@@ -61,24 +61,24 @@ function randomShuffle(choices, options) {
   }
   
   if (options.multiple > 1) {
-    let multipledChoices = [];
+    let multipledItems = [];
     for (let i=0; i<options.multiple; i++) {
-      multipledChoices = multipledChoices.concat(choices);
+      multipledItems = multipledItems.concat(items);
     }
-    choices = multipledChoices;
+    items = multipledItems;
   }
     
   return function(context) {
     
     // initialize any dynamic values
-    let _choices = choices.map(c => {
+    items = items.map(c => {
       if (typeof c == "function") {
         c = c(context);
       }
       return c;
     });
  
-    let shuffledChoices = shuffled(_choices);
+    let shuffledItems = shuffled(items);
     
     let index = 0;
     let done = false;
@@ -88,17 +88,17 @@ function randomShuffle(choices, options) {
         
         if (done) return {done: true};
         
-        let val = shuffledChoices[index];
+        let val = shuffledItems[index];
         index++;
         
-        if (index == shuffledChoices.length) {
+        if (index == shuffledItems.length) {
           if (!options.loop) done = true;
           else {
-            let lastItem = _choices[_choices.length-1];
-            shuffledChoices = shuffled(_choices);
-            if (options.preventContinuation && _choices.length > 1) {
-              while (deepEqual(shuffledChoices[0], lastItem)) {
-                shuffledChoices = shuffled(_choices);
+            let lastItem = shuffledItems[shuffledItems.length-1];
+            shuffledItems = shuffled(items);
+            if (options.preventContinuation && items.length > 1) {
+              while (deepEqual(shuffledItems[0], lastItem)) {
+                shuffledItems = shuffled(items);
               }
             }
             index = 0;
@@ -108,19 +108,19 @@ function randomShuffle(choices, options) {
         return {value: val};
         
       },
-      choices: choices
+      items: items
     }
     
   }
 }
 
-function randomLoop(choices, options) {
+function randomLoop(items, options) {
   
   options = Object.assign({
     loop: true
   }, options);
   
-  return randomShuffle(choices, options);
+  return randomShuffle(items, options);
 }
 
 randomPick.pick = randomPick;

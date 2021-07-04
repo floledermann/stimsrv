@@ -1,4 +1,4 @@
-let sequence = function(choices, options) {
+let sequence = function(items, options) {
   
   options = Object.assign({
     stepCount: 1,         // repeat each item stepCount times
@@ -9,7 +9,7 @@ let sequence = function(choices, options) {
   return function(context) {
     
     // initialize any dynamic values
-    choices = choices.map(c => {
+    items = items.map(c => {
       if (typeof c == "function") {
         c = c(context);
       }
@@ -26,13 +26,13 @@ let sequence = function(choices, options) {
         
         if (done) return {done: true};
         
-        let val = choices[index];
+        let val = items[index];
         i++;
         if (i == options.stepCount) {
           i=0;
           index++;
         }
-        if (index == choices.length) {
+        if (index == items.length) {
           loopCounter++;
           if (!options.loop || (options.loopCount && loopCounter == options.loopCount)) {
             done = true;
@@ -41,19 +41,19 @@ let sequence = function(choices, options) {
         }
         return {value: val};
       },
-      choices: choices
+      items: items
     }
   }
 
 }
 
-sequence.loop = function(choices, options) {
+sequence.loop = function(items, options) {
 
   options = Object.assign({
     loop: true
   }, options);
   
-  return sequence(choices, options);
+  return sequence(items, options);
 }
 
 module.exports = sequence;

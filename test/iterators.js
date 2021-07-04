@@ -37,11 +37,11 @@ describe("Iterators", () => {
     });
 
 
-    it("Exposes choices", () => {
+    it("Exposes items", () => {
       
       let iter = sequence([1,2,3])();
       
-      assert.deepEqual(iter.choices, [1,2,3]);
+      assert.deepEqual(iter.items, [1,2,3]);
       
     });
 
