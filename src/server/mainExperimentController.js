@@ -109,12 +109,13 @@ function MainExperimentController(experiment, options) {
     }
   }
   
-  function nextTask() {
-    
-    // store results of previous experiment
+  function storeCurrentTaskResults() {
     if (currentTask && valOrFunc(currentTask?.store, context) !== false) {
+      
       // separate constant parameters from changing parameters
+      // constant parameters are stored once for the task, changing parameters are stored for each trial
       let constantParameters = currentController.constantParameters?.() || {};
+      
       results.push({
         name: currentTask?.name,
         description: currentTask?.description,
@@ -129,6 +130,11 @@ function MainExperimentController(experiment, options) {
         }))
       });
     }
+  }
+  
+  function nextTask() {
+    
+    storeCurrentTaskResults();
     
     currentTaskTimeOffset = null;
     

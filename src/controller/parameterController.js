@@ -150,15 +150,15 @@ module.exports = function(config) {
       
       constantParameters: function() {
         
-        let parameters = parameterIterators.reduce((parameters, spec) => {
+        let parameters = parameterIterators.reduce((parametersAccumulator, spec) => {
           if (isConstantParameter(spec)) {
             for (key of Object.keys(spec)) {
               if (isConstantParameter(spec[key])) {
-                parameters[key] = spec[key];
+                parametersAccumulator[key] = spec[key];
               }
               else {
                 // potentially static param is overwritten by dynamic param
-                delete parameters[key];
+                delete parametersAccumulator[key];
               }
             }  
           }
@@ -169,7 +169,7 @@ module.exports = function(config) {
             return {};
           }
           
-          return parameters;
+          return parametersAccumulator;
         }, {});
         
         
