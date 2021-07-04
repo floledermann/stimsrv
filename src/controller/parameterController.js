@@ -9,7 +9,6 @@ module.exports = function(config) {
   
   config = Object.assign({
     parameters: {},
-    conditions: null,
     nextContext: null
   }, config);
   
