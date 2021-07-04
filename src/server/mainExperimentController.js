@@ -125,7 +125,7 @@ function MainExperimentController(experiment, options) {
         trials: trials.map(t => Object.assign(t, {
           // include only parameters which are not constant
           condition: Object.fromEntries(
-            Object.entries(t.condition || {}).filter(([key, value]) => !(key in constantParameters))
+            Object.entries(t.condition || {}).filter(([key, value]) => !(key in constantParameters) || (constantParameters[key] !== value))
           )
         }))
       });

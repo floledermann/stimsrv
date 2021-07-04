@@ -375,7 +375,7 @@ describe("ParameterController", () => {
         
   });
   
-  it(".constantParameters() does not contain parameters which are potnatially overriden dynmaically", () => {
+  it(".constantParameters() also contains parameters which are potentially overriden dynamically", () => {
     
     let c = parameterController({
       parameters: [
@@ -416,10 +416,13 @@ describe("ParameterController", () => {
     
     let cps = c.constantParameters();
     
-    assert.deepEqual(Object.keys(cps), ["param1","param2","param5"]);
+    assert.deepEqual(Object.keys(cps).sort(), ["param1","param2","param3","param4","param5","param7"]);
     assert.equal(cps.param1, "value1.2");
     assert.equal(cps.param2, "value2.2");
+    assert.equal(cps.param3, "value3");
+    assert.equal(cps.param4, "context1");
     assert.equal(cps.param5, "value5.2");
+    assert.equal(cps.param7, "value7");
 
     // ...
         

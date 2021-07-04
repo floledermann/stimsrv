@@ -150,6 +150,7 @@ module.exports = function(config) {
       constantParameters: function() {
         
         let parameters = parameterIterators.reduce((parametersAccumulator, spec) => {
+          // can be applied only to parameter objects
           if (isConstantParameter(spec)) {
             for (key of Object.keys(spec)) {
               if (isConstantParameter(spec[key])) {
@@ -160,12 +161,6 @@ module.exports = function(config) {
                 delete parametersAccumulator[key];
               }
             }  
-          }
-          else {
-            // if the overall parameters object is dynamic, we have to be conservative
-            // as it may override any parameter!
-            // so discard any constant parameters colleted to this point!
-            return {};
           }
           
           return parametersAccumulator;
