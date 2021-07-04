@@ -66,8 +66,8 @@ module.exports = function(config) {
         nextCondition: function(lastCondition, lastResponse, conditions, responses) {
           return currentController.nextCondition?.(lastCondition, lastResponse, conditions, responses);
         },
-        constantParamters: function() {
-          return currentController.constantParamters();
+        constantParameters: function() {
+          return currentController.constantParameters();
         },
         initialContext: context => {
 
