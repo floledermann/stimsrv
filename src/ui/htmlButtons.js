@@ -16,7 +16,8 @@ let defaults = {
     alwaysRerender: false,
     delay: 500,
     clickSound: false,
-    hideAfterResponse: true
+    hideAfterResponse: true,
+    css: null
 };
 
 function htmlButtons(config) {
@@ -53,6 +54,12 @@ function htmlButtons(config) {
       runtime = _runtime;
       document = parent.ownerDocument;
       lastButtonDefs = null;
+      
+      if (config.css) {
+        let styleEl = document.createElement("style");
+        styleEl.textContent = config.css;
+        parent.appendChild(styleEl);
+      }
       
       wrapper = document.createElement(config.wrapperTag);
       if (config.wrapperClass) {
