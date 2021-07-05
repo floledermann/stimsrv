@@ -35,7 +35,7 @@ function sloanTask(config) {
   return {
     name: "sloan",
     description: "Sloan letters visual acuity test", 
-    ui: function(context) {
+    frontend: function(context) {
       return {
         interfaces: {
           display: renderer,

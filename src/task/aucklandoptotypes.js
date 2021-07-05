@@ -73,7 +73,7 @@ module.exports = function(config) {
   return {
     name: "tao",
     description: "Auckland Optotypes visual acuity test", 
-    ui: function(context) {
+    frontend: function(context) {
 
       let interfaces = {};
       

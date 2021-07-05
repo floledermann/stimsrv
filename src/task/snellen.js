@@ -35,7 +35,7 @@ module.exports = function(config) {
     
     description: "Snellen-E visual acuity test", 
     
-    ui: function(context) {
+    frontend: function(context) {
       
       let interfaces = {};
       

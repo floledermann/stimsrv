@@ -33,14 +33,14 @@ module.exports = function(config) {
     },
     resources: taskResources,
     // this is called on client - it cannot return a (changed) context, but only set up internal configuration
-    ui: function(context) {   
+    frontend: function(context) {   
     
-      if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex]?.ui) {
+      if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex]?.frontend) {
         // pass merged context to subtask, excluding taskIndex if not defined in sub-context
         let subContext = Object.assign({}, context);
         delete subContext.taskIndex;
         Object.assign(subContext, context.context);
-        currentTask = config.tasks[context.taskIndex]?.ui(subContext);
+        currentTask = config.tasks[context.taskIndex]?.frontend(subContext);
       }
       else {
         config.error("No task found for taskIndex " + context.taskIndex + ".");

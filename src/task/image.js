@@ -25,7 +25,7 @@ module.exports = function(config) {
   return {
     name: "image",
     description: "Image stimulus",
-    ui: context => {
+    frontend: context => {
       let uis = {};
       for (let ui of config.imageUIs) {
         uis[ui] = imageStimulus({baseURL: valOrFunc(config.baseURL, context)});

@@ -32,7 +32,7 @@ function pause(config) {
   return {
     name: config.name,
     store: config.store,
-    ui: function(context) {
+    frontend: function(context) {
     
       // construct interfaces from config info
       

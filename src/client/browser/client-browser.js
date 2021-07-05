@@ -28,8 +28,7 @@ function clientFactory(options) {
   let broadcastSubscribers = {};
 
   function handleIncomingEvent(eventType, data) {
-    //console.log("Received message: " + eventType);
-    //console.log(data);
+    //console.log("Received message: " + eventType, data);
     if (eventSubscribers[eventType]) {
       for (let cb of eventSubscribers[eventType]) {
         cb(data);
@@ -298,7 +297,7 @@ function clientFactory(options) {
             endTask(currentTask);
           }
         
-          currentTask = experiment.tasks[taskIndex].ui(fullContext);
+          currentTask = experiment.tasks[taskIndex].frontend(fullContext);
           currentTask.name = experiment.tasks[data.taskIndex].name;
           prepareCurrentTask(currentTask, fullContext);
         }
@@ -316,7 +315,7 @@ function clientFactory(options) {
           endTask(currentTask);
         }
         
-        currentTask = experiment.tasks[data.taskIndex].ui(fullContext);
+        currentTask = experiment.tasks[data.taskIndex].frontend(fullContext);
         // hack: add name to ui part of task
         if (!currentTask.name) {
           currentTask.name = experiment.tasks[data.taskIndex].name;
