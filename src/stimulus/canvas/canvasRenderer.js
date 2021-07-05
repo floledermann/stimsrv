@@ -251,7 +251,7 @@ function canvasRenderer(renderFunc, options) {
     },
     
     fonts: options.fonts,
-    resources: options.fonts.map(f => f.resource),
+    resources: options.fonts?.map(f => f.resource),
   }
 }
 
