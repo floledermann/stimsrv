@@ -7,6 +7,7 @@ const valOrFunc = require("../util/valOrFunc.js");
 const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
 
 let defaults = {
+    buttons: ["Default Button"],
     wrapperTag: "div",
     wrapperClass: "buttons",
     buttonTag: "button",
@@ -18,13 +19,22 @@ let defaults = {
     hideAfterResponse: true
 };
 
-function htmlButtons(buttonDefs, config) {
+function htmlButtons(config) {
+  
+  if (typeof config == "function" || typeof config == "string" || Array.isArray(config)) {
+    // old, deprectated call with (buttonDefs, config) => convert
+    console.warn("Deprecation warning: htmlButtons(buttonDefs, options) is deprecated, use htmlButtons(config) with config.buttons entry instead!");
+    let _config = arguments[1];
+    if (!_config) _config = {};
+    _config.buttons = config;
+    config = _config;
+  }
   
   config = Object.assign({}, defaults, config);
   
   // single string -> convert to array
-  if (typeof buttonDefs != 'function' && !Array.isArray(buttonDefs)) {
-    buttonDefs = [buttonDefs];
+  if (typeof config.buttons != 'function' && !Array.isArray(config.buttons)) {
+    config.buttons = [config.buttons];
   }
   
   let runtime = null;
@@ -63,7 +73,7 @@ function htmlButtons(buttonDefs, config) {
       
       respondedToCurrentCondition = false;
       
-      let _buttonDefs = valOrFunc.array(buttonDefs, condition);
+      let _buttonDefs = valOrFunc.array(config.buttons, condition);
       
       // check if change/rerender is needed
       if (config.alwaysRerender || !deepEqual(_buttonDefs, lastButtonDefs)) {
