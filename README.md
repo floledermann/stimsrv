@@ -241,9 +241,9 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 ## Implementing tasks
 
-A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and a ***ui***, which usually runs on the client(s) and is responsible for rendering the condition to the user and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `ui`, and optionally the `controller` and other properties.
+A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and a ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition to the user and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `frontend`, and optionally the `controller` and other properties.
 
-The **`ui`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task wants to show (these are matched with the `interfaces` of each client's role to determine which interface should be shown on which client). Each of these entries contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`frontend`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task wants to show (these are matched with the `interfaces` of each client's role to determine which interface should be shown on which client). Each of these entries contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
 The **`controller`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
 
@@ -256,17 +256,17 @@ Example code for a custom task implementation (taken from the [custom task examp
 tasks: [
   // Let's make a custom task from scratch, without any help from library functions!
   // A stimsrv task is simply a plain JS object adhering to a simple structure.
-  // On the top level, there are 3 entries: name, ui, controller
+  // On the top level, there are 3 entries: name, frontend, controller
   {
     // *name* is simply the name/id of the task (will be used in saved data, for example)
     name: "task1",
-    // *ui* is a function that receives the task's context and 
-    // returns information on the task's ui components.
-    // The task's ui will be rendered on each participating client.
-    ui: context => {
+    // *frontend* is a function that receives the task's context and 
+    // returns information on the task's frontend components.
+    // The task's frontend will be rendered on each participating client.
+    frontend: context => {
       let textEl = null;
       let buttonEl = null;
-      // The object returned by task.ui() has to have an "interfaces" entry
+      // The object returned by task.frontend() has to have an "interfaces" entry
       return {
         interfaces: {
           // The entries in the interfaces object are matched up with the interfaces 
