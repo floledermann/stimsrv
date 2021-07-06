@@ -256,6 +256,8 @@ A stimsrv task is simply a plain JS object with entries for `frontend`, and (opt
 ```JS
 // Basic structure of a custom task
 {
+  // Name of the task
+  name: "task1",
   // Task frontend - this will be run on the client(s)
   frontend: context => {
     return {
@@ -279,11 +281,25 @@ A stimsrv task is simply a plain JS object with entries for `frontend`, and (opt
 }
 ```
 
-The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client. Each interface entry contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`name`** entry of the task is a String with the task's name, which will be used to identify the task in the stored result data.
+
+#### Task *frontend* options
+
+The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which user interfaces should be shown on each client. For each interface entry, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+
+Option |  | type | Description
+-------|--|------|------------
+**`interfaces`** | mandatory | Object | Plain JS object with an entry for each interface (e.g. `display`, `response` etc.)
+`transformCondition` | optional | Function | Function `context => condition => conditionMixin`, returning an object with entries to extend / alter the condition on the client. The properties of the returned object will be applied to the current condition object before passing it to each interface's `render()` function.
+
+#### Task *controller* options
 
 The **`controller`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end and the experiment should continue with the next task.
 
-The **`name`** entry of the task is a String with the task's name, which will be used to identify the task in the stored result data.
+Option |  | type | Description
+-------|--|------|------------
+**`nextCondition`** | mandatory | Function | Function `(lastCondition, lastResponse, trials) => condition` generating a new condition object from previous results. `trials` is an Array of task results, each containing a `condition` and `response` entry.
+`nextContext` | optional | Function | Function `(context, trials) => context`, returning an object with entries to add / alter the context passed to the next task. `trials` is an Array of task results, each containing a `condition` and `response` entry. The properties of the returned object will be applied to the current context object before initializing the next task.
 
 Full example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
 
