@@ -241,18 +241,22 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 ## Implementing tasks
 
+A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.)
+
+Generally, most concepts in stimsrv are represented either by *plain JS objects* (for data and objects) or by *functions* (for dynamic behaviour).
+
 ### Using the provided utility functions
 
 *(... coming soon ...)*
 
-
 ### Implementing tasks from scratch
 
-A stimsrv task is a simple JS object composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend`, and `controller` are functions which recieve a context parameter and return the necessary information. So the basic structure of a task looks like this:
+A stimsrv task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend`, and `controller` are functions which recieve a context object and return a plain JS object specifying the behaviour. So the basic structure of a task looks like this:
 
 ```JS
 // Basic structure of a custom task
 {
+  // Task frontend - this will be run on the client(s)
   frontend: context => {
     return {
       interfaces: {
@@ -262,17 +266,20 @@ A stimsrv task is a simple JS object composed of two parts: the ***controller***
       }
     }
   },
+  // Task controller - this will be run on the server
   controller: context => {
     return {
-      // ...
-      // information about the progression from one condition to the next for the task
-      // ...
+      nextCondition: (lastCondition, lastResponse, conditions, responses) => {
+        // ...
+        // progression from one condition to the next for the task
+        // ...
+      }
     }
   }
 }
 ```
 
-The **`frontend`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show (these are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client). Each of the entries in the `interfaces` object is a plain JS object with two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`frontend`** entry of a task is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show (these are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client). Each of these entries in turn has two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
 The **`controller`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
 
