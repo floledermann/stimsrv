@@ -22,9 +22,9 @@ Main features:
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transition from server to client code.
 - Distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
-- Provides utilities that help to develop new experiment tasks with very little code, allowing researchers to focus on the core functionality (e.g. rendering the stimulus).
+- Provides utilities that help to develop new experiment tasks with very little code, allowing researchers to focus on the core functionality (e.g. rendering the stimulus, order of stimuli etc.).
 - Timestamp synchronization between multiple clients accomplishes temporal precision of a few milliseconds in local WiFi networks.
-- Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on display resolution and viewing distance.
+- Adaption of experiments to the device context, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the [stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template).
@@ -34,7 +34,7 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 ## Defining & running experiments
 
-Experiments in stimsrv are implemented in JavaScript. A single ***experiment specification*** defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) and the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
+Experiments in stimsrv are implemented in JavaScript. A single ***experiment specification*** file defines both the user-facing side of the experiment (which runs in a *client*, usually a web browser) as well as the flow of the experiment (which is coordinated by the stimsrv *server*, which potentially controls and coordinates multiple clients). Stimsrv experiments can encompass multiple computers and laptops, mobile devices, uncommon devices such a e-book readers, and even printed media, all controlled from a single experiment specification.
 
 To use stimsrv, install [Node.js](https://nodejs.org/) and run the following command in your project directory:
 
@@ -179,7 +179,7 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
-The devices in your experiment each participate in a specific *role*, which determines the arrangement of interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
+The *devices* in your experiment each participate in a specific *role*, which determines the arrangement of interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
 
 ```JS
 // *devices* entry of your experiment
@@ -199,7 +199,7 @@ devices: [
 ],
 ```
 
-Devices need to be assigned to one or more roles to participate in the experiment. In your experiment configuration, **`roles`** are defined as plain JS objects, with a mandatory **`role`** entry specifying the role id, the **`devices`** for which this role is available, and the **`interfaces`** that are enabled for this role. For each task in the experiment, the list of interfaces available for the device's role is matched with the interfaces defined by the task, and the matching interfaces are rendered on the device. Each interface will be represented by a `<section>` element in the client's HTML output – therefore, multiple interfaces can be shown simultaneously if the role requires it.
+Devices need to be assigned to one or more roles to participate in the experiment. In your experiment configuration, **`roles`** are defined as plain JS objects, with a mandatory **`role`** entry specifying the role id, the **`devices`** for which this role is available, and the **`interfaces`** that are enabled for this role. For each task in the experiment, the list of interfaces available for the device's role is matched with the interfaces defined by the task, and the matching interfaces are rendered on the device. Each interface will usually be represented by a `<section>` element in the client's HTML output – therefore, multiple interfaces can be shown simultaneously if the role requires it.
 
 ```JS
 // *roles* entry of your experiment
@@ -217,13 +217,13 @@ roles: [
 ],
 ```
 
-A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring the experment (by the supervisor), `"control"` for the supervisor's controls. But these can be changed and additional interface names can be added, according to the requirements of your experiment.
+A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring the experment (by the supervisor), `"control"` for the supervisor's controls. But these names are only conventions and can be changed according to the requirements of your particular experiment.
 
 When starting an experiment, stimsrv outputs the available device IDs to the console, together with information on how to connect to the stimsrv server.
 
 ![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-console-output.png)
 
-Upon entering the specified URL in your web browser (or, when using the `--open` option, the web browser will launch automatically), you are shown a form in which you can enter the client ID, and get to select the roles available for the selected client.
+Upon entering the specified URL in your web browser (or, when using the `--open` option, the web browser will be launched automatically), you are shown a form in which you can enter the client ID, and get to select the roles available for the selected client.
 
 ![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-experiment-start.png)
 
@@ -231,7 +231,7 @@ Chose a role and click on "Start" to join the experiment with that browser and t
 
 ### Support for old & simple web browsers
 
-By default, stimsrv relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like older smartphones or e-book readers) can be used for stimulus display in experiments by rendering on the server and delivering the graphics to the client as an image.
+By default, stimsrv relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like older smartphones or e-book readers) can be used for stimulus display by rendering on the server and delivering the graphics to the client as an image.
 
 See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-puppeteer) for more details on how to enable and configure server-side rendering.
 
@@ -241,15 +241,44 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 ## Implementing tasks
 
-A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and a ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition to the user and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `frontend`, and optionally the `controller` and other properties.
+### Using the provided utility functions
 
-The **`frontend`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task wants to show (these are matched with the `interfaces` of each client's role to determine which interface should be shown on which client). Each of these entries contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+*(... coming soon ...)*
+
+
+### Implementing tasks from scratch
+
+A stimsrv task is a simple JS object composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.) A task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend`, and `controller` are functions which recieve a context parameter and return the necessary information. So the basic structure of a task looks like this:
+
+```JS
+// Basic structure of a custom task
+{
+  frontend: context => {
+    return {
+      interfaces: {
+        // ...
+        // information about the user interfaces to show for the task
+        // ...
+      }
+    }
+  },
+  controller: context => {
+    return {
+      // ...
+      // information about the progression from one condition to the next for the task
+      // ...
+    }
+  }
+}
+```
+
+The **`frontend`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show (these are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client). Each of the entries in the `interfaces` object is a plain JS object with two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
 The **`controller`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
 
 The **`name`** entry of the task is a String with the task's name, which will be used to store result data.
 
-Example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
+Full example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
 
 ```JS
 // *tasks* entry of your experiment
@@ -334,11 +363,7 @@ tasks: [
 ],
 ```
 
-By stimsrv only requiring this simple contract/interface from a task, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer. Provided that the simple required pattern shown above is adhered to, tasks can be implemented using plain JS objects, classes or functional-compositional approaches. 
-
-### Reusable components for task composition
-
-*(... coming soon ...)*
+By stimsrv requiring tasks to only adhere to this simple interface, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer - using plain JS objects, classes or functional-compositional approaches. 
 
 ## Context & controllers
 
