@@ -279,11 +279,11 @@ A stimsrv task is simply a plain JS object with entries for `frontend`, and (opt
 }
 ```
 
-The **`frontend`** entry of a task is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show (these are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client). Each of these entries in turn has two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which interfaces should be shown on each client. Each interface entry contains two methods: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
-The **`controller`** entry of a task is a function that recieves a context object (see below) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end.
+The **`controller`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with entries for `nextCondition()` and (optionally) `nextContext()`. `nextCondition()` returns the next condition to render on the client(s), or `null` if the task should end and the experiment should continue with the next task.
 
-The **`name`** entry of the task is a String with the task's name, which will be used to store result data.
+The **`name`** entry of the task is a String with the task's name, which will be used to identify the task in the stored result data.
 
 Full example code for a custom task implementation (taken from the [custom task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-task)):
 
