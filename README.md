@@ -285,12 +285,12 @@ The **`name`** entry of the task is a String with the task's name, which will be
 
 #### Task *frontend* options
 
-The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object with an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which user interfaces should be shown on each client. For each interface entry, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object defining the task's user interfaces. The returned object needs to have an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which user interfaces should be shown on each client. For each interface entry, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
 Option |  | type | Description
 -------|--|------|------------
-**`interfaces`** | mandatory | Object | Plain JS object with an entry for each interface (e.g. `display`, `response` etc.)
-`transformCondition` | optional | Function | Function `context => condition => conditionMixin`, returning an object with entries to extend / alter the condition on the client. The properties of the returned object will be applied to the current condition object before passing it to each interface's `render()` function.
+**`interfaces`** | mandatory | Object | Plain JS object with an entry for each interface (e.g. `display`, `response` etc.).
+`transformCondition` | optional | Function | Function `context => condition => condition`, returning an object with entries to extend / alter the condition on the client. The passed in `context` contains the device's and role's specific properties. The properties of the returned object will be added to the current condition object before passing it to each interface's `render()` function.
 
 #### Task *controller* options
 
@@ -324,7 +324,7 @@ tasks: [
           // The entries in the interfaces object are matched up with the interfaces 
           // defined by the client role (defined above at the experiment level).
           // By convention, the "display" interface is used for displaying the stimulus:
-          "display": {
+          display: {
             // Each inerfaces entry contains two functions: initialize() and render().
             // initialize() gets passed the parent element and the stimsrv client API,
             // and sets up ui elements and interaction.
@@ -341,7 +341,7 @@ tasks: [
           },
           // Second user interface component.
           // By convention, the "response" interface is used for entering user responses:
-          "response": {
+          response: {
             initialize: (parent, stimsrv) => {
               // Add a button
               buttonEl = parent.ownerDocument.createElement("button");
