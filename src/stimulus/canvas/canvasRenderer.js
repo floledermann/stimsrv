@@ -46,13 +46,14 @@ function canvasRenderer(renderFunc, options) {
     height: null,  // height in layout pixels, default: use parent height
     minimumIntensityColor: "#000000",
     maximumIntensityColor: "#ffffff",
-    dimensions: [],
+    dimensions: [],   // "translate" is always added
     intensities: [],  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
     fonts: [],
     useGamma: false,
   }, options);
   
   options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
+  options.dimensions = options.dimensions.concat(["translate"]);
   
   let ctx = null;
   
@@ -218,15 +219,15 @@ function canvasRenderer(renderFunc, options) {
       ctx.translate(Math.round(width / 2), Math.round(height / 2));
       
       // affine transform
-      if (condition.rotate) {
-        ctx.rotate(condition.rotate/180*Math.PI);
-      }
       if (condition.translate) {
         let trans = condition.translate;
         if (!Array.isArray(condition.translate)) {
           trans = [trans, trans];
         }
         ctx.translate(trans[0], trans[1]);
+      }  
+      if (condition.rotate) {
+        ctx.rotate(condition.rotate/180*Math.PI);
       }
       
       // wait for resources to be loaded
