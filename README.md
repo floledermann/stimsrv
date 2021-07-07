@@ -245,10 +245,6 @@ A stimsrv task is composed of two parts: the ***controller***, which usually run
 
 Generally, most concepts in stimsrv are represented either by *plain JS objects* (for data and objects) or by *functions* (for dynamic behaviour).
 
-### Using the provided utility functions
-
-*(... coming soon ...)*
-
 ### Implementing tasks from scratch
 
 A stimsrv task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend`, and `controller` are functions which recieve a context object and return a plain JS object specifying the behaviour. So the basic structure of a task looks like this:
@@ -387,6 +383,11 @@ tasks: [
 ```
 
 By stimsrv requiring tasks to only adhere to this simple interface, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer - using plain JS objects, classes or functional-compositional approaches. 
+
+### Implementing tasks using the provided utility functions
+
+*(... coming soon ...)*
+
 
 ## Context & controllers
 
