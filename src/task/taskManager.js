@@ -54,8 +54,16 @@ function taskManager(config) {
   return {
     resolve: resolve,
     resolveArray: resolveArray,
-    resolveResources: function(name, context) {
-      return resolveArray(name, context).map(res => res.resource ? res.resource : res).filter(r => r);
+    resolveResources: function(spec, context) {
+      let arr = [];
+      if (typeof spec == "function") {
+        arr = toArray(spec(resolveConfig(context)));
+      }
+      else {
+        // string -> get parameter by name
+        arr = resolveArray(spec, context);
+      }
+      return arr.map(res => res.resource ? res.resource : res).filter(r => r);
     },
     resolveConfig: resolveConfig,
     transformCondition: context => condition => {

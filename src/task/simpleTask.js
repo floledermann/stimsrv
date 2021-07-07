@@ -41,7 +41,7 @@ function simpleTask(config) {
       },
       controller: manager.controller,
       resources: toArray(config.resources).map(res => {
-        if (typeof res == "string") {
+        if (typeof res == "string" || typeof res == "function") {
           return manager.resolveResources(res);
         }
         return res;
