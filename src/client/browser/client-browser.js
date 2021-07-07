@@ -129,6 +129,7 @@ function clientFactory(options) {
   }
   
   function showCondition(condition) {
+    console.log("Condition: ", condition);
     eachUI(ui => ui.render?.(condition));
   }
   
