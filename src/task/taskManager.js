@@ -1,13 +1,7 @@
 
 const parameterController = require("stimsrv/controller/parameterController");
 
-
-function array(val) {
-  if (val === undefined || val === null) return [];
-  if (!Array.isArray(val)) return [val];
-  return val;
-}
-
+const toArray = require("stimsrv/util/toArray");
 
 function taskManager(config) {
   
@@ -19,8 +13,8 @@ function taskManager(config) {
     staticOptions: []
   }, config);
   
-  config.controllerConfig = [config.defaults, ...array(config.controllerConfig)];
-  config.transformCondition = array(config.transformCondition);
+  config.controllerConfig = [config.defaults, ...toArray(config.controllerConfig)];
+  config.transformCondition = toArray(config.transformCondition);
   
   let params = parameterController({
     parameters: config.controllerConfig, //Array.prototype.map.call(arguments, p => pickProperties.without(p, staticOptions))
@@ -43,8 +37,19 @@ function taskManager(config) {
   }
   
   function resolveArray(name, context, defaultValue) {
-    return array(resolve(name, context, defaultValue));
-  };
+    return toArray(resolve(name, context, defaultValue));
+  }
+  
+  function resolveConfig(context) {
+    return config.controllerConfig.reduce((config, current) => {
+      if (typeof current == "function") {
+        current = current(context);
+      }
+      current = Object.fromEntries(Object.entries(current).map(([key, spec]) => [key, typeof spec == "function" ? spec(context) : spec]));
+      Object.assign(config, current);
+      return config;
+    }, {});
+  }
   
   return {
     resolve: resolve,
@@ -52,6 +57,7 @@ function taskManager(config) {
     resolveResources: function(name, context) {
       return resolveArray(name, context).map(res => res.resource ? res.resource : res).filter(r => r);
     },
+    resolveConfig: resolveConfig,
     transformCondition: context => condition => {
       return config.frontendTransformCondition.reduce((condition, transform) => {
         if (typeof transform == "function") {
@@ -73,9 +79,11 @@ function taskManager(config) {
       
       let interfaces = {};
       
+      let config = resolveConfig(context);
+      
       Object.keys(spec).forEach(key => {
         resolveArray(key + "Interface", context, key).forEach(ui => {
-          interfaces[ui] = spec[key];
+          interfaces[ui] = spec[key](config);
         })
       });
       

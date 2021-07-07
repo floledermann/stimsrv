@@ -1,4 +1,7 @@
 
+const taskManager = require("stimsrv/task/taskManager");
+const toArray = require("stimsrv/util/toArray");
+
 function simpleTask(config) {
   config = Object.assign({
     name: "Unnamed Task",
@@ -7,8 +10,8 @@ function simpleTask(config) {
     interfaces: {},
     transformCondition: null,
     nextContext: null,
-    resources: //?
-    css: //?
+    //resources: null, //?
+    //css: null //?
   }, config);
   
   let task = function(controllerConfig, transformCondition) {
@@ -16,7 +19,7 @@ function simpleTask(config) {
     let interfaceOptions = Object.keys(config.interfaces).map(i => i + "Interface");
     let staticOptions = interfaceOptions.concat(["css"]);
     
-    let interfaceOptions = Object.fromEntries(Object.entries(config.interfaces).map().
+    //let interfaceConstructors = Object.fromEntries(Object.entries(config.interfaces).map([key, spec] => [key, spec(config)]));
     
     let manager = taskManager({
       defaults: config.defaults,
@@ -37,12 +40,12 @@ function simpleTask(config) {
         };
       },
       controller: manager.controller,
-      resources: config.resources.map(res => {
+      resources: toArray(config.resources).map(res => {
         if (typeof res == "string") {
           return manager.resolveResources(res);
         }
         return res;
-      }
+      })
     }
   }
   
