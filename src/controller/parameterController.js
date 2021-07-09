@@ -44,7 +44,7 @@ module.exports = function(config) {
         // initialize property iterators / callbacks
         for (let key of Object.keys(p)) {
           // if its already an iterator, we don't have to do anything
-          if (!(p[key].next && typeof p[key].next == "function")) {
+          if (!(p[key]?.next && typeof p[key].next == "function")) {
             // function -> initialize with context
             if (typeof p[key] == "function") {
               p[key] = p[key](context);
@@ -93,7 +93,7 @@ module.exports = function(config) {
             // recurse dynamic spec
             //return handleParameter(condition, key, spec);
           }
-          if (spec.next && typeof spec.next == "function") {
+          if (spec?.next && typeof spec.next == "function") {
             // property is generator
             spec = spec.next(lastCondition, lastResponse, trials);
             if (spec.done) {
