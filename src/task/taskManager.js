@@ -17,7 +17,7 @@ function taskManager(config) {
   config.transformCondition = toArray(config.transformCondition);
   
   let params = parameterController({
-    parameters: config.controllerConfig, //Array.prototype.map.call(arguments, p => pickProperties.without(p, staticOptions))
+    parameters: config.controllerConfig,
     // first use config.nextContext, then user-supplied nextContext() (both optional)
     nextContext: context => (context = config.nextContext?.(context) || context, resolve("nextContext", context, context))
   });
@@ -41,12 +41,19 @@ function taskManager(config) {
   }
   
   function resolveConfig(context) {
-    return config.controllerConfig.reduce((config, current) => {
-      if (typeof current == "function") {
-        current = current(context);
+    return config.controllerConfig.reduce((config, spec) => {
+      // resolve function with context
+      if (typeof spec == "function") {
+        spec = spec(context);
       }
-      current = Object.fromEntries(Object.entries(current).map(([key, spec]) => [key, typeof spec == "function" ? spec(context) : spec]));
-      Object.assign(config, current);
+      // for each entry in spec object, resolve with context if it is a function
+      spec = Object.fromEntries(
+        Object.entries(spec).map(
+          ([key, spec]) => [key, typeof spec == "function" ? spec(context) : spec]
+        )
+      );
+      // add to overall result
+      Object.assign(config, spec);
       return config;
     }, {});
   }
@@ -56,18 +63,17 @@ function taskManager(config) {
     resolveArray: resolveArray,
     resolveResources: function(spec, context) {
       let arr = [];
+      // if spec is a function, resolve with config object
       if (typeof spec == "function") {
         arr = toArray(spec(resolveConfig(context)));
       }
-      else {
-        // string -> get parameter by name
-        arr = resolveArray(spec, context);
-      }
+      // each item may have a .resource entry, or it is already a resource
+      // (this is nedded to support resources that have other information attached to them, e.g. fonts)
       return arr.map(res => res.resource ? res.resource : res).filter(r => r);
     },
     resolveConfig: resolveConfig,
     transformCondition: context => condition => {
-      return config.frontendTransformCondition.reduce((condition, transform) => {
+      return config.transformCondition.reduce((condition, transform) => {
         if (typeof transform == "function") {
           transform = transform(context);
         }
@@ -79,9 +85,7 @@ function taskManager(config) {
       }, condition);
     },
     
-    controller: function(context) {
-      return params(context);
-    },
+    controller: context => params(context),
     
     interfaces: function(spec, context) {
       
