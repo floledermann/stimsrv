@@ -19,6 +19,7 @@ function clientFactory(options) {
           
   for (let ui of options.role.interfaces) {
     let el = document.createElement("section");
+    el.className = "interface";
     el.id = "interface-" + ui;
     options.root.appendChild(el);
     options.root.classList.add("has-ui-" + ui);
