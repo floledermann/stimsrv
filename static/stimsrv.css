@@ -28,40 +28,41 @@ body {
   height: 100%;
 }
 
-#interface-display,
-#interface-monitor {
-  /* flex child */
-  flex: 0 1 100vh; /* use full height initially, but shrink */
+section.interface {
   
-  /* flex parent (for text child elements etc.) */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  position: relative; /* make offset parent */
-  overflow: hidden;
-
-  background-color: #000000;
-  color: #ffffff;
-  font-size: 1.2em;
-}
-
-#interface-display canvas,
-#interface-monitor canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#interface-response,
-#interface-control {
   /* flex child */
-  flex: 1 0 0; /* use no height initially, but grow fully with content */
+  flex: 1 0 auto; /* use auto height initially, do not shrink but grow as needed */
 
   /* flex parent */
   display: flex;
   align-items: center;
   justify-content: center;
+
+  position: relative; /* make offset parent */
+  overflow: hidden;
+
+  background-color: #000000;
+  color: #ffffff;
+}
+
+section#interface-display,
+section#interface-monitor {
+  /* flex child */
+  flex: 0 1 100vh; /* use full height initially, but shrink - needed for absolute positioned canvas */
+  
+  font-size: 1.2em;
+}
+
+section#interface-response {
+  background-color: #ffffff;
+  color: #000000;  
+}
+
+
+section.interface canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .content {
