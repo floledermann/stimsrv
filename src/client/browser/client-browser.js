@@ -131,6 +131,16 @@ function clientFactory(options) {
   
   function showCondition(condition) {
     console.log("Condition: ", condition);
+    if (currentTask.transformCondition && typeof currentTask.transformCondition == "function") {
+      Object.assign(condition, currentTask.transformCondition(condition));
+      // remove undefined properties
+      Object.keys(condition).forEach(key => {
+        if (condition[key] === undefined) {
+          delete condition[key];
+        }
+      });
+      console.log("Transformed condition: ", condition);
+    }
     eachUI(ui => ui.render?.(condition));
   }
   
