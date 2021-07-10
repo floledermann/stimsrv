@@ -9,12 +9,7 @@ let sequence = function(items, options) {
   return function(context) {
     
     // initialize any dynamic values
-    items = items.map(c => {
-      if (typeof c == "function") {
-        c = c(context);
-      }
-      return c;
-    });
+    items = items.map(item => typeof item == "function" ? item(context) : item);
   
     let i=0;
     let index=0;
@@ -54,6 +49,33 @@ sequence.loop = function(items, options) {
   }, options);
   
   return sequence(items, options);
+}
+
+sequence.array = function(items, options) {
+  
+  return function(context) {
+  
+    items = items.map(item => typeof item == "function" ? item(context) : item);
+    
+    return {
+      next: function() {
+        let done = false;
+        let val = [];
+        for (let item of items) {
+          let next = item;
+          if (item.next && typeof item.next == "function") {
+            next = item.next();
+            if (item.done) return {done: true};
+            next = next.value;
+          }
+          val.push(next);
+        }
+        return {value: val};
+      },
+      items: items
+    }
+  
+  }
 }
 
 module.exports = sequence;
