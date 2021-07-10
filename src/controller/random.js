@@ -24,8 +24,12 @@ function randomPick(items, options) {
 function randomRange(from, to, options) {
   
   options = Object.assign({
-    round: false    // 100, 10, 1/true, 0.1, 0.01, ...
+    round: false,    // 100, 10, 1/true, 0.1, 0.01, ...
+    suffix: null,
   }, options);
+  
+  // force suffix to be a string
+  if (options.suffix) options.suffix = options.suffix + "";
   
   let g = function*(context) {
     while (true) {
@@ -34,7 +38,7 @@ function randomRange(from, to, options) {
         let round = +options.round;
         num = Math.round(num / round) * round;
       }
-      yield num;
+      yield num + (options.suffix || 0);
     }
   }
   
