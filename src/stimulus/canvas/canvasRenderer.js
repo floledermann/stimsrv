@@ -2,7 +2,8 @@
 const Dimension = require("another-dimension");
 const d3 = require("d3-interpolate");
 
-const resource = require("../../util/resource.js");
+const resource = require("stimsrv/util/resource");
+const valOrFunc = require("stimsrv/util/valOrFunc");
 
 function clamp(value, min=0, max=1) {
   if (value < min) {
@@ -39,23 +40,27 @@ function getColorValueForIntensity(intensity, options) {
   return colorValue;
 }
     
-function canvasRenderer(renderFunc, options) {
+function canvasRenderer(renderFunc, options, context) {
   
   options = Object.assign({
     width: null,  // width in layout pixels, default: use parent width
     height: null,  // height in layout pixels, default: use parent height
-    minimumIntensityColor: "#000000",
-    maximumIntensityColor: "#ffffff",
     dimensions: [],   // "translate" is always added
+    defaultDimensions: ["translate"],
     intensities: [],  // "foregroundIntensity", "backgroundIntensity" are always added (see below)
+    defaultIntensities: ["foregroundIntensity","backgroundIntensity"],
+
     fonts: [],
-    useGamma: false,
   }, options);
   
-  options.intensities = options.intensities.concat(["foregroundIntensity","backgroundIntensity"]);
-  options.dimensions = options.dimensions.concat(["translate"]);
+  display = displayConfig(Object.assign({}, options, {
+    warnDefaults: options.warn
+  })(context);
   
-  let ctx = null;
+  options.intensities = options.intensities.concat(options.defaultIntensities);
+  options.dimensions = options.dimensions.concat(options.defaultDimensions);
+  
+  let ctx2d = null;
   
   let runtime = null;
   
@@ -67,7 +72,7 @@ function canvasRenderer(renderFunc, options) {
   let resourcesPromise = null;
   
   return {
-    initialize: function(parent, _runtime) {
+    initialize: function(parent, _runtime, context) {
       
       runtime = _runtime;
       lastCondition = null;
@@ -78,8 +83,8 @@ function canvasRenderer(renderFunc, options) {
       dppx = document.defaultView.devicePixelRatio || 1; // defaultView = window
       
       Dimension.configure({
-        pixelDensity: runtime.pixeldensity,
-        viewingDistance: runtime.viewingdistance
+        pixelDensity: propOrFunc.ignoreCase(config.pixelDensity, context),
+        viewingDistance: propOrFunc.ignoreCase(config.viewingDistance, context)
       });
             
       function resize(widthpx, heightpx) {
@@ -115,7 +120,7 @@ function canvasRenderer(renderFunc, options) {
       
       parent.appendChild(canvas);
       
-      ctx = canvas.getContext('2d');
+      ctx2d = canvas.getContext('2d');
       
       let observer = new ResizeObserver((entries) => {
         //let entry = entries.find((entry) => entry.target === parent);
@@ -131,10 +136,14 @@ function canvasRenderer(renderFunc, options) {
       observer.observe(parent);
     },
     
-    renderToCanvas: function(ctx, condition, uiOptions) {
+    // contract: if render() returns a string or element, then replace the parent content
+    render: function(condition) {
       
-      let width = ctx.canvas.width;
-      let height = ctx.canvas.height;
+      // remember for redrawing on resize
+      lastCondition = condition;
+      
+      let width = ctx2d.canvas.width;
+      let height = ctx2d.canvas.height;
         
       condition = Object.assign({
         lowIntensity: 0,
@@ -145,23 +154,14 @@ function canvasRenderer(renderFunc, options) {
         rotate: 0
       }, condition);
       
-      if (uiOptions) {
-        //console.log(uiOptions.pixeldensity);
-        //console.log(uiOptions.viewingdistance);
-        Dimension.configure({
-          pixelDensity: uiOptions.pixeldensity,
-          viewingDistance: uiOptions.viewingdistance
-        });
-      }
-      
       // convert dimensions to pixels
       for (let key of options.dimensions) {
         let cond = condition[key];
         if (Array.isArray(cond)) {
-          condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
+          condition[key] = cond.map(c => display.dimensionToScreenPixels(c, condition));
         }
         else {
-          condition[key] = Dimension(cond, "px").toNumber("px");  
+          condition[key] = display.dimensionToScreenPixels(cond, condition)  
           //console.log("Converting " + cond + " to " + condition[key]);
         }
       }
@@ -189,34 +189,25 @@ function canvasRenderer(renderFunc, options) {
 
       // convert intensities to color values
       for (let key of options.intensities) {
-        let cond = condition[key];
-        if (cond !== undefined) {
-          if (typeof cond == "number") {
-            //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-            condition[key] = getColorValueForIntensity(condition[key], Object.assign({}, {gamma: runtime?.gamma || uiOptions?.gamma, useGamma: options.useGamma}, condition));
-          }
-          else {
-            runtime.warn("Intensity value " + key + " not specified as number. Using specified value " + condition[key] + " unchanged.");
-          }
-        }
+        condition[key] = display.intensityToColorValue(condition[key], condition);
       }
       
-      ctx.resetTransform();
+      ctx2d.resetTransform();
       
       if (condition.backgroundIntensity) {
-        ctx.fillStyle = condition.backgroundIntensity;
-        ctx.fillRect(0,0,width,height);
+        ctx2d.fillStyle = condition.backgroundIntensity;
+        ctx2d.fillRect(0,0,width,height);
         if (!this.backgroundColor) this.backgroundColor = condition.backgroundIntensity; // HACK for browser-simple, refactor
       }
       
       if (condition.foregroundIntensity) {
-        ctx.fillStyle = condition.foregroundIntensity;
-        ctx.strokeStyle = condition.foregroundIntensity;
+        ctx2d.fillStyle = condition.foregroundIntensity;
+        ctx2d.strokeStyle = condition.foregroundIntensity;
         if (!this.foregroundColor) this.foregroundColor = condition.foregroundIntensity; // HACK for browser-simple, refactor
       }
       
       // move origin to center
-      ctx.translate(Math.round(width / 2), Math.round(height / 2));
+      ctx2d.translate(Math.round(width / 2), Math.round(height / 2));
       
       // affine transform
       if (condition.translate) {
@@ -224,38 +215,26 @@ function canvasRenderer(renderFunc, options) {
         if (!Array.isArray(condition.translate)) {
           trans = [trans, trans];
         }
-        ctx.translate(trans[0], trans[1]);
+        ctx2d.translate(trans[0], trans[1]);
       }  
       if (condition.rotate) {
-        ctx.rotate(condition.rotate/180*Math.PI);
+        ctx2d.rotate(condition.rotate/180*Math.PI);
       }
       
       // wait for resources to be loaded
       if (resourcesPromise) {
         resourcesPromise.then(() => {
-          renderFunc(ctx, condition);
+          renderFunc(ctx2d, condition);
         });
       }
       else {
-        renderFunc(ctx, condition);
+        renderFunc(ctx2d, condition);
       }
-    },
-    
-    // contract: if render() returns a string or element, then replace the parent content
-    render: function(condition) {
-      
-      // remember for redrawing on resize
-      lastCondition = condition;
-      
-      this.renderToCanvas(ctx, condition);
-      
     },
     
     fonts: options.fonts,
     resources: options.fonts?.map(f => f.resource),
   }
 }
-
-canvasRenderer.getColorValueForIntensity = getColorValueForIntensity;
 
 module.exports = canvasRenderer;
