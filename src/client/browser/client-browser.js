@@ -91,7 +91,7 @@ function clientFactory(options) {
   }
   
   let experiment = null;  
-  let currentTask = null;
+  let currentTaskFrontend = null;
   
   let taskIndex = null;
   let context = {};
@@ -106,22 +106,22 @@ function clientFactory(options) {
     
     let uiOptions = getRendererOptions();
     
-    for (let ui of options.role.interfaces) {
+    for (let uiName of options.role.interfaces) {
       
       // clear ui
-      let wrapper = document.getElementById("interface-" + ui);
+      let wrapper = document.getElementById("interface-" + uiName);
       wrapper.innerHTML = "";
       wrapper.style.cssText = ""; // this may be set by tasks
-    
+      
       // setup new ui
-      ui = getUI(ui);
-           
+      let ui = getUI(uiName);
+      
       if (ui) {
         ui.initialize?.(wrapper, uiOptions, context);
       }
     }
     
-    document.body.classList.add("current-task-" + currentTask.name);
+    document.body.classList.add("current-task-" + currentTaskFrontend.name);
 
   }
   
@@ -131,8 +131,8 @@ function clientFactory(options) {
   
   function showCondition(condition) {
     console.log("Condition: ", condition);
-    if (currentTask.transformCondition && typeof currentTask.transformCondition == "function") {
-      Object.assign(condition, currentTask.transformCondition(condition));
+    if (currentTaskFrontend.transformCondition && typeof currentTaskFrontend.transformCondition == "function") {
+      Object.assign(condition, currentTaskFrontend.transformCondition(condition));
       // remove undefined properties
       Object.keys(condition).forEach(key => {
         if (condition[key] === undefined) {
@@ -145,14 +145,14 @@ function clientFactory(options) {
   }
   
   function getUI(uiName) {
-    return currentTask.interfaces[options.role.role + "." + uiName]
-           || currentTask.interfaces[uiName]
-           || currentTask.interfaces[options.role.role + ".*"]
-           || currentTask.interfaces["*"];
+    return currentTaskFrontend.interfaces[options.role.role + "." + uiName]
+           || currentTaskFrontend.interfaces[uiName]
+           || currentTaskFrontend.interfaces[options.role.role + ".*"]
+           || currentTaskFrontend.interfaces["*"];
   }
   
   function eachUI(callback) {
-    if (currentTask) {
+    if (currentTaskFrontend) {
       for (let ui of options.role.interfaces) {       
         ui = getUI(ui);
              
@@ -219,7 +219,7 @@ function clientFactory(options) {
       event: event,
       response: response,
       getResourceURL: getResourceURL
-    })
+    });
     
     return config;
     
@@ -296,7 +296,7 @@ function clientFactory(options) {
       
       this.subscribeEvent("condition", data => {
         
-        if (currentTask === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
+        if (currentTaskFrontend === null || data.taskIndex != taskIndex || !deepEqual(context, data.context)) {
           
           this.error("Task specification changed without initialization.", data);
           
@@ -305,13 +305,13 @@ function clientFactory(options) {
           context = data.context;
           let fullContext = Object.assign({}, context, localContext);
           
-          if (currentTask) {
-            endTask(currentTask);
+          if (currentTaskFrontend) {
+            endTask(currentTaskFrontend);
           }
         
-          currentTask = experiment.tasks[taskIndex].frontend(fullContext);
-          currentTask.name = experiment.tasks[data.taskIndex].name;
-          prepareCurrentTask(currentTask, fullContext);
+          currentTaskFrontend = experiment.tasks[taskIndex].frontend(fullContext);
+          currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
+          prepareCurrentTask(currentTaskFrontend, fullContext);
         }
         
         showCondition(data.condition);
@@ -323,16 +323,16 @@ function clientFactory(options) {
         context = data.context;
         let fullContext = Object.assign({}, context, localContext);
         
-        if (currentTask) {
-          endTask(currentTask);
+        if (currentTaskFrontend) {
+          endTask(currentTaskFrontend);
         }
         
-        currentTask = experiment.tasks[data.taskIndex].frontend(fullContext);
+        currentTaskFrontend = experiment.tasks[data.taskIndex].frontend(fullContext);
         // hack: add name to ui part of task
-        if (!currentTask.name) {
-          currentTask.name = experiment.tasks[data.taskIndex].name;
+        if (!currentTaskFrontend.name) {
+          currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
         }
-        prepareCurrentTask(currentTask, fullContext);
+        prepareCurrentTask(currentTaskFrontend, fullContext);
 
         if (data.condition) {
           showCondition(data.condition);
