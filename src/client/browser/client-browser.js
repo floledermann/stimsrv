@@ -118,7 +118,7 @@ function clientFactory(options) {
       wrapper.style.cssText = ""; // this may be set by tasks
       
       // setup new ui
-      let ui = getUI(uiName);
+      let ui = getUI(uiName, context);
       
       if (ui) {
         ui.initialize?.(wrapper, uiOptions, context);
@@ -148,11 +148,25 @@ function clientFactory(options) {
     eachUI(ui => ui.render?.(condition));
   }
   
-  function getUI(uiName) {
-    return currentTaskFrontend.interfaces[options.role.role + "." + uiName]
-           || currentTaskFrontend.interfaces[uiName]
-           || currentTaskFrontend.interfaces[options.role.role + ".*"]
-           || currentTaskFrontend.interfaces["*"];
+  function getUI(uiName, context) {
+    
+    // test available UIs in decreasing specificity
+    let fullName = options.role.role + "." + uiName;
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = uiName;
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = options.role.role + ".*";
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = "*";
+    
+    let ui = currentTaskFrontend.interfaces[fullName];
+    
+    if (ui) {
+      if (typeof ui == "function") {
+        ui = ui(context);
+        currentTaskFrontend.interfaces[fullName] = ui;
+      }
+    }
+    
+    return ui;
+
   }
   
   function eachUI(callback) {
@@ -315,7 +329,7 @@ function clientFactory(options) {
         
           currentTaskFrontend = experiment.tasks[taskIndex].frontend(fullContext);
           currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
-          prepareCurrentTask(currentTaskFrontend, fullContext);
+          prepareCurrentTask(fullContext);
         }
         
         showCondition(data.condition);
@@ -336,7 +350,7 @@ function clientFactory(options) {
         if (!currentTaskFrontend.name) {
           currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
         }
-        prepareCurrentTask(currentTaskFrontend, fullContext);
+        prepareCurrentTask(fullContext);
 
         if (data.condition) {
           showCondition(data.condition);

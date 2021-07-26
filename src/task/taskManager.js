@@ -96,9 +96,6 @@ function taskManager(config) {
       Object.keys(spec).forEach(key => {
         resolveArray(key + "Interface", context, key).forEach(ui => {
           interfaces[ui] = spec[key](config);
-          if (typeof interfaces[ui] == "function") {
-            interfaces[ui] = interfaces[ui](context);
-          }
         })
       });
       
