@@ -1,3 +1,8 @@
+
+const Dimension = require("another-dimension");
+const d3 = require("d3-interpolate");
+
+
 function clamp(value, min=0, max=1) {
   if (value < min) {
     client.warn("Clamping intensity value " + value.toFixed(3) + " to 1.");
@@ -24,7 +29,7 @@ function displayConfig(spec) {
     defaultViewingDistance: 600,
     defaultGamma: 2.2,
     defautAmbientIntensity: 1/100,
-    warnDefaults: null
+    warnDefaults: msg => console.warn("No warning handler configured: " + msg)
   }, spec);
   
   function warn(val, message) {
@@ -58,25 +63,28 @@ function displayConfig(spec) {
         
         if (v !== undefined) return v;
         
-        let defaultValue = config[defaultName] || spec[defaultName];
+        let defaultValue = config?.[defaultName] || spec?.[defaultName];
         
         return warn(defaultValue, "No value for " + name + " specified, using default of " + defaultValue + ".");
       }
     }
     
+    // helper to retrieve a key from the provided options object, or the config or spec objects if not defined
     function val(name, options) {
-      return options[name] || config[name] || spec[name];
+      return options?.[name] || config?.[name] || spec?.[name];
     }
     
     let pixelDensity = valFunc("pixelDensity");
     let viewingDistance = valFunc("viewingDistance");
     let _gamma = valFunc("gamma");
+    
     let gamma = function(options) {
       if (val("useGamma", options)) {
         return _gamma(options);
       }
       return val("defaultGamma");
     }
+    
     let ambientIntensity = valFunc("ambientIntensity");
     
     function intensityToColorValue(intensity, options) {

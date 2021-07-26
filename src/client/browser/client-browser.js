@@ -3,6 +3,7 @@ const socketio = require("socket.io-client");
 const deepEqual = require("fast-deep-equal");
 
 const warnDefaults = require("../../util/warnDefaults.js");
+const pickProperties = require("../../util/pickProperties.js");
 
 const timing = require("./timing.js");
 
@@ -96,11 +97,14 @@ function clientFactory(options) {
   let taskIndex = null;
   let context = {};
 
-  let localContext = {
-    clientid: options.clientid,
-    device: options.device,
-    role: options.role.role, // TODO: this should be the whole role object, but check/test this
-  };
+  let localContext = Object.assign(
+    {},
+    pickProperties.without(options.role, ["devices"]),
+    pickProperties.without(options.device, ["id"]),
+    {
+      clientid: options.clientid
+    }
+  );
  
   function prepareCurrentTask(context) {
     
