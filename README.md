@@ -1,7 +1,7 @@
 <div align="center">
 
-<h1>stimsrv</h1>
-<h2>A System for Distributed User Studies and Behavioural Experiments</h2>
+<h1 style="border: none;">stimsrv</h1>
+<h2 style="border: none;">A System for Distributed User Studies and Behavioural Experiments</h2>
 
 <a href="#defining--running-experiments">Running&nbsp;Experiments</a> ·
 <a href="#experiment-results">Experiment&nbsp;results</a> ·
