@@ -1,6 +1,7 @@
 <div align="center">
 
-<h1>stimsrv – Multi-device Distributed User Studies and Behavioural Experiments</h1>
+<h1>stimsrv</h1>
+<h2>A System for Distributed User Studies and Behavioural Experiments</h2>
 
 <a href="#defining--running-experiments">Running&nbsp;Experiments</a> ·
 <a href="#experiment-results">Experiment&nbsp;results</a> ·
