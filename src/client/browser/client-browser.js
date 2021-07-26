@@ -158,6 +158,7 @@ function clientFactory(options) {
     
     let ui = currentTaskFrontend.interfaces[fullName];
     
+    // ui may be object of function(context) - in latter case, initialize
     if (ui) {
       if (typeof ui == "function") {
         ui = ui(context);
@@ -187,59 +188,14 @@ function clientFactory(options) {
   }
 
 
-  function getRendererOptions() {
+  function getRendererOptions() {    
     
-    let screenConfig = options.device.screens?.[0];
-    
-    if (options.role.screen) {
-      if (options.device.screens?.length) {
-        let candidates = options.device.screens.filter(d => d.id == options.role.screen);
-        if (candidates.length >= 1) {
-          if (candidates.length > 1) {
-            warn("Multiple screens with same id '" + options.role.screen + "' found - using first match.");
-          }
-          screenConfig = candidates[0];
-        }
-        else {
-          warn("No screen with id '" + options.role.screen + "' found - using first screen.");
-          screenConfig = options.device.screens[0];
-        }
-      }
-      else {
-        warn("Screen id '" + options.role.screen + "' is configured for role '" + options.role.role + "', but no screen definitions found for device '" + options.device.name + "'.");
-      }
-    }
-    else {
-      if (options.device.screens?.length > 1) {
-        warn("Screen is not specified for role '" + options.role.role + "', but more than one screen is defined for device '" + options.device.id + "' - using first screen.");
-      }
-    }    
-    
-    // provide defaults, but warn when used
-    let config = Object.assign({
-      pixeldensity: warnDefaults.value(warn, "pixeldensity", 96),
-      gamma: warnDefaults.value(warn, "gamma", 2.2),
-      viewingdistance: warnDefaults.value(warn, "viewingdistance", 600),
-      ambientIntensity: warnDefaults.value(warn, "ambientIntensity", 1/100)
-    }, options.device, screenConfig);
-    
-    config.id = options.device.id;
-    
-    if (screenConfig) {
-      config.screenId = screenConfig.id;
-    }
-    delete config.screens;
-    
-    // set callback functions
-    Object.assign(config, {
+    return {
       warn: warn,
-      error: error,
       event: event,
       response: response,
       getResourceURL: getResourceURL
-    });
-    
-    return config;
+    };
     
   }
     
