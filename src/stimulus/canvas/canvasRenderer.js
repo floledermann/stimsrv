@@ -20,7 +20,7 @@ function canvasRenderer(renderFunc, options) {
   options.intensities = options.intensities.concat(options.defaultIntensities);
   options.dimensions = options.dimensions.concat(options.defaultDimensions);
   
-  return function(context) {
+  let renderer = function(context) {
     
     let display = displayConfig(Object.assign({}, options, {
       warnDefaults: options.warn
@@ -209,10 +209,13 @@ function canvasRenderer(renderFunc, options) {
 
       },
       
-      fonts: options.fonts,
-      resources: options.fonts?.map(f => f.resource),
     }
-  }
+  };
+
+  renderer.fonts = options.fonts;
+  renderer.resources = options.fonts?.map(f => f.resource);
+  
+  return renderer;
 }
 
 module.exports = canvasRenderer;
