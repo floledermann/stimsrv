@@ -108,7 +108,12 @@ function clientFactory(options) {
  
   function prepareCurrentTask(context) {
     
-    let uiOptions = getRendererOptions();
+    let stimsrvClientAPI = {
+      warn: warn,
+      event: event,
+      response: response,
+      getResourceURL: getResourceURL
+    };
     
     for (let uiName of options.role.interfaces) {
       
@@ -121,7 +126,7 @@ function clientFactory(options) {
       let ui = getUI(uiName, context);
       
       if (ui) {
-        ui.initialize?.(wrapper, uiOptions, context);
+        ui.initialize?.(wrapper, stimsrvClientAPI, context);
       }
     }
     
@@ -188,17 +193,6 @@ function clientFactory(options) {
   }
 
 
-  function getRendererOptions() {    
-    
-    return {
-      warn: warn,
-      event: event,
-      response: response,
-      getResourceURL: getResourceURL
-    };
-    
-  }
-    
   let socket = null;
   let clientTimestampAdjust = null;
   let clientAverageDelay = null;
