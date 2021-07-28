@@ -2,13 +2,15 @@
 
 {% block title %}{{ experiment.name }}{% endblock %}
 
-{% block bodyclass %}is-device-{{device.id}} has-role-{{role.role}}{% endblock %}
-
-{% block body %}
+{% block head %}
 <style>
 {{ experiment.css | safe }}
 </style>
+{% endblock %}
 
+{% block bodyclass %}is-device-{{device.id}} has-role-{{role.role}}{% endblock %}
+
+{% block body %}
 {# UI sections are rendered by client #}
 
 <script src="/static/client-browser.js"></script>
