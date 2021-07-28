@@ -274,18 +274,22 @@ module.exports = {
   
   name: "CSS Override Example",
   
-  // css property at the experiment level - applied on all frontends
+  // CSS applied on all frontends
   css: `
     /* CSS applied to the overall experiment. */
     body {
       font-size: 12px;
+    }
+    /* The classes set on the body can be used to apply styles only for specific roles, devices or tasks */
+    .has-ui-response button {
+      font-size: 14px;
     }
   `,
 
   devices: [
     {
       id: "mobile",
-      // CSS to use for this device
+      // CSS applied only on this device
       css: `
         #interface-response {
           font-size: 2em;  /* double font size for "response" UI */
@@ -299,9 +303,9 @@ module.exports = {
     pause({
       name: "task1",
       message: "This is task 1.",
-      // css property of task - is only present as long as the task is active
+      // CSS applied only as long as the task is active
       css: `
-        /* The oder property can be used to reorder UI elements in the flexbox layout. */
+        /* The order property can be used to reorder UI elements in the flexbox layout. */
         #interface-display {
           order: 2;
         }
@@ -311,10 +315,10 @@ module.exports = {
       `,
     })
   ]
-}
-  
-See the [CSS override example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-css) for the full code and more possibilities for customizing an experiment's CSS.
+}  
 ```
+
+See the [CSS override example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-css) for the full code and more possibilities for customizing an experiment's CSS.
 
 ## Implementing tasks
 
