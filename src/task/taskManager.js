@@ -22,6 +22,7 @@ function taskManager(config) {
     nextContext: context => (context = config.nextContext?.(context) || context, resolve("nextContext", context, context))
   });
   
+  
   function resolve(name, context, defaultValue) {
     let val = config.controllerConfig.reduce((val, current) => {
       if (typeof current == "function") current = current(context);

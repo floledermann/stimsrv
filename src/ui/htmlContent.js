@@ -5,7 +5,8 @@ module.exports = function(htmlString, options) {
     wrapperTag: "div",
     wrapperClass: "content",
     parentStyle: null,
-    style: null
+    style: null,
+    css: null
   }, options);
   
   let parent = null;
@@ -36,6 +37,13 @@ module.exports = function(htmlString, options) {
       wrapper.innerHTML = htmlString;
       
       parent.innerHTML = "";
+      
+      if (options.css) {
+        let styleEl = document.createElement("style");
+        styleEl.innerHTML = options.css;
+        parent.appendChild(styleEl);
+      }
+      
       parent.appendChild(wrapper);
     }
   }
