@@ -336,6 +336,19 @@ function clientFactory(options) {
         document.body.appendChild(fsButton);
       }
       
+      // add styles for device and role
+      if (options.role.css) {
+        let styleEl = document.createElement("style");
+        styleEl.innerHTML = options.role.css;
+        document.head.appendChild(styleEl);
+      }
+      
+      if (options.device.css) {
+        let styleEl = document.createElement("style");
+        styleEl.innerHTML = options.device.css;
+        document.head.appendChild(styleEl);
+      }
+      
     },
     
     
