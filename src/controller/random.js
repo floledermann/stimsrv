@@ -13,7 +13,7 @@ function randomPick(items, options) {
     });
     
     return {
-      next: () => items[Math.floor(items.length * Math.random())],
+      next: () => ({ value: items[Math.floor(items.length * Math.random())] }),
       items: items
     }
   

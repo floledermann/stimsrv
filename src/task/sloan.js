@@ -15,7 +15,7 @@ function renderSloan(ctx, condition) {
 function sloanTask(config) {
   
   config = Object.assign({
-    letter: random.pick(config?.shapes || sloan.letters),
+    letter: random.pick(config?.letters || sloan.letters),
     letters: sloan.letters,
     size: "10mm"
   }, config);
@@ -35,24 +35,22 @@ function sloanTask(config) {
   return {
     name: "sloan",
     description: "Sloan letters visual acuity test", 
-    frontend: function(context) {
-      return {
-        interfaces: {
-          display: renderer,
-          response: htmlButtons(c => c.letters.map(l => ({
-            label: l,
-            response: {letter: l}
-          }))),
-          monitor: renderer,
-          control: null
-        }
+    frontend: context => ({
+      interfaces: {
+        display: renderer,
+        response: htmlButtons(c => c.letters.map(l => ({
+          label: l,
+          response: {letter: l}
+        }))),
+        monitor: renderer,
+        control: null
       }
-    },
+    }),
     controller: parameterController({
       parameters: config, 
       nextContext: (context, trials) => {
         return nextContext ? {
-          context: Object.assign(context, nextContext(context, trials))
+          context: Object.assign(context, nextContext?.(context, trials))
         } : null;
       }
     })

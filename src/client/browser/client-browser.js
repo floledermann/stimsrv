@@ -3,6 +3,7 @@ const socketio = require("socket.io-client");
 const deepEqual = require("fast-deep-equal");
 
 const warnDefaults = require("../../util/warnDefaults.js");
+const pickProperties = require("../../util/pickProperties.js");
 
 const timing = require("./timing.js");
 
@@ -96,15 +97,23 @@ function clientFactory(options) {
   let taskIndex = null;
   let context = {};
 
-  let localContext = {
-    clientid: options.clientid,
-    device: options.device,
-    role: options.role.role, // TODO: this should be the whole role object, but check/test this
-  };
+  let localContext = Object.assign(
+    {},
+    pickProperties.without(options.role, ["devices"]),
+    pickProperties.without(options.device, ["id"]),
+    {
+      clientid: options.clientid
+    }
+  );
  
   function prepareCurrentTask(context) {
     
-    let uiOptions = getRendererOptions();
+    let stimsrvClientAPI = {
+      warn: warn,
+      event: event,
+      response: response,
+      getResourceURL: getResourceURL
+    };
     
     for (let uiName of options.role.interfaces) {
       
@@ -114,10 +123,10 @@ function clientFactory(options) {
       wrapper.style.cssText = ""; // this may be set by tasks
       
       // setup new ui
-      let ui = getUI(uiName);
+      let ui = getUI(uiName, context);
       
       if (ui) {
-        ui.initialize?.(wrapper, uiOptions, context);
+        ui.initialize?.(wrapper, stimsrvClientAPI, context);
       }
     }
     
@@ -144,11 +153,26 @@ function clientFactory(options) {
     eachUI(ui => ui.render?.(condition));
   }
   
-  function getUI(uiName) {
-    return currentTaskFrontend.interfaces[options.role.role + "." + uiName]
-           || currentTaskFrontend.interfaces[uiName]
-           || currentTaskFrontend.interfaces[options.role.role + ".*"]
-           || currentTaskFrontend.interfaces["*"];
+  function getUI(uiName, context) {
+    
+    // test available UIs in decreasing specificity
+    let fullName = options.role.role + "." + uiName;
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = uiName;
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = options.role.role + ".*";
+    if (!currentTaskFrontend.interfaces[fullName]) fullName = "*";
+    
+    let ui = currentTaskFrontend.interfaces[fullName];
+    
+    // ui may be object of function(context) - in latter case, initialize
+    if (ui) {
+      if (typeof ui == "function") {
+        ui = ui(context);
+        currentTaskFrontend.interfaces[fullName] = ui;
+      }
+    }
+    
+    return ui;
+
   }
   
   function eachUI(callback) {
@@ -169,62 +193,6 @@ function clientFactory(options) {
   }
 
 
-  function getRendererOptions() {
-    
-    let screenConfig = options.device.screens?.[0];
-    
-    if (options.role.screen) {
-      if (options.device.screens?.length) {
-        let candidates = options.device.screens.filter(d => d.id == options.role.screen);
-        if (candidates.length >= 1) {
-          if (candidates.length > 1) {
-            warn("Multiple screens with same id '" + options.role.screen + "' found - using first match.");
-          }
-          screenConfig = candidates[0];
-        }
-        else {
-          warn("No screen with id '" + options.role.screen + "' found - using first screen.");
-          screenConfig = options.device.screens[0];
-        }
-      }
-      else {
-        warn("Screen id '" + options.role.screen + "' is configured for role '" + options.role.role + "', but no screen definitions found for device '" + options.device.name + "'.");
-      }
-    }
-    else {
-      if (options.device.screens?.length > 1) {
-        warn("Screen is not specified for role '" + options.role.role + "', but more than one screen is defined for device '" + options.device.id + "' - using first screen.");
-      }
-    }    
-    
-    // provide defaults, but warn when used
-    let config = Object.assign({
-      pixeldensity: warnDefaults.value(warn, "pixeldensity", 96),
-      gamma: warnDefaults.value(warn, "gamma", 2.2),
-      viewingdistance: warnDefaults.value(warn, "viewingdistance", 600),
-      ambientIntensity: warnDefaults.value(warn, "ambientIntensity", 1/100)
-    }, options.device, screenConfig);
-    
-    config.id = options.device.id;
-    
-    if (screenConfig) {
-      config.screenId = screenConfig.id;
-    }
-    delete config.screens;
-    
-    // set callback functions
-    Object.assign(config, {
-      warn: warn,
-      error: error,
-      event: event,
-      response: response,
-      getResourceURL: getResourceURL
-    });
-    
-    return config;
-    
-  }
-    
   let socket = null;
   let clientTimestampAdjust = null;
   let clientAverageDelay = null;
@@ -311,7 +279,7 @@ function clientFactory(options) {
         
           currentTaskFrontend = experiment.tasks[taskIndex].frontend(fullContext);
           currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
-          prepareCurrentTask(currentTaskFrontend, fullContext);
+          prepareCurrentTask(fullContext);
         }
         
         showCondition(data.condition);
@@ -332,7 +300,7 @@ function clientFactory(options) {
         if (!currentTaskFrontend.name) {
           currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
         }
-        prepareCurrentTask(currentTaskFrontend, fullContext);
+        prepareCurrentTask(fullContext);
 
         if (data.condition) {
           showCondition(data.condition);
@@ -366,6 +334,19 @@ function clientFactory(options) {
           }
         });
         document.body.appendChild(fsButton);
+      }
+      
+      // add styles for device and role
+      if (options.role.css) {
+        let styleEl = document.createElement("style");
+        styleEl.innerHTML = options.role.css;
+        document.head.appendChild(styleEl);
+      }
+      
+      if (options.device.css) {
+        let styleEl = document.createElement("style");
+        styleEl.innerHTML = options.device.css;
+        document.head.appendChild(styleEl);
       }
       
     },

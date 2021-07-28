@@ -215,7 +215,8 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
       highIntensity: 1.0,
       foregroundIntensity: 1.0,  // high intensity (bright) stimulus on low intensity background.
       backgroundIntensity: 0.0,
-      rotate: 0
+      rotate: 0,
+      translate: 0
    }, buttonCondition, conditionOverride);
     
     // convert dimensions to pixels
