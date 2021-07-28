@@ -82,7 +82,7 @@ function pause(config) {
       
       if (!interfaces["*"] && fallback) {
         let msg = valOrFunc(fallback, context);
-        interfaces["*"] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle });
+        interfaces["*"] = htmlContent(msg, { parentStyle: parentStyle, style: config.messageStyle, css: config.css });
         // the following is needed for browser-simple - integrate
         interfaces["*"].renderToCanvas = canvasMessage(msg, bgColor, fgColor);
         interfaces["*"].backgroundColor = bgColor;
