@@ -238,7 +238,7 @@ See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-pu
 
 ### Modifying the frontend with CSS
 
-The HTML structure established by stimsrv is quite simple. Inside the `body`, a `section` with `id=interface‑<interfaceName>` is created for each UI component of the current task which is available for the given role. Within those `sections`, each UI component may create the required HTML.
+On each client, stimsrv establishes a simple HTML stucture containing a `section` with id `interface‑<interfaceName>` for each UI component available for the given role. Within those sections, each UI component of a task may create the required HTML content.
 
 Furthermore, a few classes are set on the `body` to indicate the state of the frontend: `is‑device‑<deviceId>`, `has‑role‑<roleName>`, `has‑ui‑<uiName>` and `current‑task‑<taskName>` are set according to the current device, role, UIs and tasks. These can be used in CSS selectors for fine-grained and context-dependent customization of the user interface.
 
