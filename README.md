@@ -18,7 +18,7 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
-### Main features:
+### Main features
 
 - Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
@@ -28,7 +28,9 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 - Implemented in JavaScript, leveraging a modern, function-based programming style and supporting seamless transitions from server to client code.
 - Follows the design principle of “Simple things should be simple, complex things should be possible.” (Alan Kay)
 
-To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To implement your own experiment, you can start with the [stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template).
+### Try it out
+
+To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To start with implementing your own experiment, you can use the [stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template).
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting publicly accessible online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
