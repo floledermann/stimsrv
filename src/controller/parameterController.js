@@ -1,10 +1,14 @@
 
 /*
-parameterController
+parameterController(config)
 
 A helper to dynamically generate parameter objects, which are simple key-value pairs.
 
 This can be used to generate the parameters of a task from a parameter specification which may include dynamic elements such as iterators and callback functions, which will be resolved into actual static parameters for subsequent trials by this helper.
+
+Parameters:
+
+config: Object { parameters, nextContext } containing the configuration of the parameterController.
 
 config.parameters is the specification for how to generate parameter objects. Must be a single Spec or an Array of Specs.
 If it is an Array, each entry in the array is reduce'd with previous result to produce the overall result.
@@ -16,7 +20,9 @@ controller.constantParameters() collects all parameters which are (potentially!)
 
 config.nextContext is simply passed through to the returned controller object.
 
-returns: context => controller { nextCondition(), constantParameters(), nextContext() }
+Returns:
+
+context => controller { nextCondition(), constantParameters(), nextContext() }
 
 See \test\parameterController.js for example usage.
 
