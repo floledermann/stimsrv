@@ -1,10 +1,39 @@
 
+/*
+parameterController
 
-function isConstantParameter(param) {
-  return !(typeof param == "function" || (param?.next && typeof param.next == "function"))
+A helper to dynamically generate parameter objects, which are simple key-value pairs of primitive values.
+
+config.parameters is the specification for how to generate parameter objects. Must be a single Spec or an Array of Specs.
+If it is an Array, each entry in the array is reduce'd with previous result to produce the overall result.
+Each Spec may be an Object, an Iterator or a Function.
+Functions are intitialized with the context and return the actual spec: an Object, an Iterator or a Function(condition, lastCondition, lastResponse, trials). These define the actual key-value entries of the generated parameters.
+Each key of the object derived in this way may again be a Function(context), an Iterator or a primitive value. Primitive values are copied to the output, Generators and Functions are invoked to produce an output value.
+controller.nextCondition(lastCondition, lastResponse, trials) collects all such generated values as an Object. It generates new value objects as long as none of the generators are exhausted or functions return null.
+controller.constantParameters() collects all parameters which are (potentially!) static values - may still be overridden by generators or functions
+
+config.nextContext is simply passed through to the returned controller object.
+
+returns: context => controller { nextCondition(), constantParameters(), nextContext() }
+
+See \test\parameterController.js for example usage.
+
+Attempt at formal TypeScript specification:
+
+parameterController(ParameterControllerConfig) => Context => ControllerObject { nextCondition(), constantParameters(), nextContext() }
+
+ParameterControllerConfig {
+  parameters: Array<Spec> | Spec,
+  nextContext?: (Context, TrialsResults) => Context
 }
 
-// outer factory is called at experiment initialization time
+Spec: (context => InitializedSpec) | Iterator<SpecObject> | SpecObject
+InitializedSpec: ((condition, lastCondition, lastResponse, trials) => Iterator<SpecObject> | SpecObject) | Iterator<SpecObject> | SpecObject
+SpecObject { [key: string]: ValueSpec }
+ValueSpec: ((condition, lastCondition, lastResponse, trials) => Iterator<ParameterValue> | ParameterValue) | Iterator<ParameterValue> | ParameterValue
+
+*/
+
 module.exports = function(config) {
   
   config = Object.assign({
@@ -33,6 +62,7 @@ module.exports = function(config) {
     let parameterIterators = config.parameters.map(p => {
       
       if (typeof p == "function") {
+        // function case -> initialize with context
         p = p(context);
       }
       
@@ -49,13 +79,6 @@ module.exports = function(config) {
             if (typeof p[key] == "function") {
               p[key] = p[key](context);
             }
-            // primitive values -> copy to output
-            // this is not needed anymore, since primitive values are handled by handleParameter() below
-            /*
-            if ( (!(p[key].next && typeof p[key].next == "function")) && !(typeof p[key] == "function")) {
-              p[key] = yieldForever(p[key]);
-            }
-            */
           }
         }
       }
@@ -63,21 +86,15 @@ module.exports = function(config) {
       return p;
     });
     
-    // return next condition, or null for end of experiment
+    
     return {
+      // return next condition, or null for end of experiment
       nextCondition: function(lastCondition=null, lastResponse=null, trials=[]) {
         
         let condition = {};
         
         // if any parameter is exhausted, we are done
         let done = false;
-        
-        // special case: no parameters in any spec
-        /*
-        if (parameterIterators.every(p => (! typeof p == "function") && Object.keys(p).length == 0)) {
-          done = true;
-        }
-        */
         
         function handleParameter(condition, key, spec) {
           
@@ -149,6 +166,10 @@ module.exports = function(config) {
       
       constantParameters: function() {
         
+        function isConstantParameter(param) {
+          return !(typeof param == "function" || (param?.next && typeof param.next == "function"))
+        }
+
         let parameters = parameterIterators.reduce((parametersAccumulator, spec) => {
           // can be applied only to parameter objects
           if (isConstantParameter(spec)) {
