@@ -2,7 +2,9 @@
 /*
 parameterController
 
-A helper to dynamically generate parameter objects, which are simple key-value pairs of primitive values.
+A helper to dynamically generate parameter objects, which are simple key-value pairs.
+
+This can be used to generate the parameters of a task from a parameter specification which may include dynamic elements such as iterators and callback functions, which will be resolved into actual static parameters for subsequent trials by this helper.
 
 config.parameters is the specification for how to generate parameter objects. Must be a single Spec or an Array of Specs.
 If it is an Array, each entry in the array is reduce'd with previous result to produce the overall result.
