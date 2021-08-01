@@ -18,7 +18,7 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 ! | This is alpha version software – everything may still change without prior notice | !
 --|-----------------------------------------------------------------------------------|--
 
-Main features:
+### Main features:
 
 - Run distributed experiments with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - Central control of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
@@ -532,7 +532,7 @@ stimsrv is licensed under the [GNU Affero General Public License, Version 3](htt
 
 If you need a different license for your purposes, contact the author of stimsrv (see below for contact information). Individual licenses and support may be available upon request.
 
-If you use stimsrv in your research, please cite the following publication:
+**If you use stimsrv in research, please cite the following publication:**
 
 ----
 
