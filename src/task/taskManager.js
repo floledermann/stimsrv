@@ -3,6 +3,20 @@ const parameterController = require("stimsrv/controller/parameterController");
 
 const toArray = require("stimsrv/util/toArray");
 
+/**
+taskManager
+
+Helper for managing the dynamic aspects of a task configuration and translate them into
+actual (static) values given a specific context.
+
+The main functionality is resolving entries against a controllerConfig specification
+(passed to the parameterController, see documentation there). Such specification can be an Array
+of individual specifications, including callbacks, iterators for objects or individual fields.
+
+The provided methods resolve, resolveArray, resolveResources, resolveConfig allow to resolve
+parameters to actual values, given a specific context.
+*/
+
 function taskManager(config) {
   
   config = Object.assign({
