@@ -20,13 +20,13 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 
 ### Main features
 
-- Run *distributed experiments* with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
-- *Central control* of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
-- Utilities that help to develop new experiment components with *very little code*, allowing researchers to focus on the core functionality of their experiments.
-- *Timestamp synchronization* between multiple clients for temporal precision down to a few milliseconds in local WiFi networks.
-- Adaption of experiments to the *device contexts*, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
-- Implemented in *JavaScript*, leveraging a modern, function-based programming style, supporting seamless transitions from server to client code and making use of the web browser as a modern and versatile runtime environment.
-- Follows the design principle of *“Simple things should be simple, complex things should be possible.”* (Alan Kay)
+- Run ***distributed experiments*** with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
+- ***Central control*** of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
+- Utilities that help to develop new experiment components with ***very little code***, allowing researchers to focus on the core functionality of their experiments.
+- ***Timestamp synchronization*** between multiple clients for temporal precision down to a few milliseconds in local WiFi networks.
+- Adaption of experiments to the ***device contexts***, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
+- Implemented in ***JavaScript***, leveraging a modern, function-based programming style, supporting seamless transitions from server to client code and making use of the web browser as a modern and versatile runtime environment.
+- Follows the design principle of ***“Simple things should be simple, complex things should be possible.”*** (Alan Kay)
 
 ### Try it out
 
