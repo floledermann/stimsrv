@@ -6,8 +6,7 @@ const toArray = require("stimsrv/util/toArray");
 simpleTask
 
 Helper to implement tasks with the following features:
-
-- Sequence of conditions can be specified for each instance including callbacks and iterators (by way of stimsrv/util/parameterController)
+- Sequence of conditions can be specified for each instance including callbacks and iterators (by way of stimsrv/util/parameterController - see docuemtnation there)
 - Task parameters are split into static and dynamic paramters
 - Default values can be specified and changed globally
 - Interfaces can be remapped using "<interfaceName>Interface" properties, e.g. displayInterface: "display"
