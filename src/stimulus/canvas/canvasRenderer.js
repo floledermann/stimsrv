@@ -203,7 +203,7 @@ function canvasRenderer(renderFunc, options) {
             ctx2d.rotate(condition.rotate/180*Math.PI);
           }
           
-          renderFunc(ctx2d, condition, stimsrvAPI);
+          renderFunc(ctx2d, condition, context, stimsrvAPI);
           
         });
 
