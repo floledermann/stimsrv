@@ -28,7 +28,7 @@ function canvasRenderer(renderFunc, options) {
     
     let ctx2d = null;
     
-    let runtime = null;
+    let stimsrvAPI = null;
     
     let lastCondition = null;
     
@@ -38,9 +38,9 @@ function canvasRenderer(renderFunc, options) {
     let resourcesPromise = Promise.resolve(true);
     
     return {
-      initialize: function(parentOrCanvas, _runtime) {
+      initialize: function(parentOrCanvas, _stimsrvAPI) {
         
-        runtime = _runtime;
+        stimsrvAPI = _stimsrvAPI;
         lastCondition = null;
 
         let document = parentOrCanvas.ownerDocument;
@@ -155,17 +155,17 @@ function canvasRenderer(renderFunc, options) {
           
           if (condition.contrastRatio) {
             if (condition.highIntensity) {
-              runtime.warn("Both highIntensity and contrastRatio specified - omitting contrastRatio.");
+              stimsrvAPI.warn("Both highIntensity and contrastRatio specified - omitting contrastRatio.");
             }
             else {
-              let realLowIntensity = condition.lowIntensity + runtime.ambientIntensity * (1-condition.lowIntensity);
+              let realLowIntensity = condition.lowIntensity + context.ambientIntensity * (1-condition.lowIntensity);
               let realHighIntensity = realLowIntensity * condition.contrastRatio;
-              condition.highIntensity = (realHighIntensity - runtime.ambientIntensity) / (1 - runtime.ambientIntensity);
+              condition.highIntensity = (realHighIntensity - context.ambientIntensity) / (1 - context.ambientIntensity);
             }
           }
           /*
           if (condition.contrastRatio / 2 > condition.centerIntensity) {
-            runtime.warn("Contrast ratio " + condition.contrastRatio + " exceeds valid range for center intensity " + condition.centerIntensity + " - clipping will occur!");
+            stimsrvAPI.warn("Contrast ratio " + condition.contrastRatio + " exceeds valid range for center intensity " + condition.centerIntensity + " - clipping will occur!");
           }
           */
 
@@ -203,7 +203,7 @@ function canvasRenderer(renderFunc, options) {
             ctx2d.rotate(condition.rotate/180*Math.PI);
           }
           
-          renderFunc(ctx2d, condition);
+          renderFunc(ctx2d, condition, stimsrvAPI);
           
         });
 
