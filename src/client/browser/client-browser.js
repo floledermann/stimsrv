@@ -189,7 +189,7 @@ function clientFactory(options) {
 
   
   function getResourceURL(id, path) {
-    return "/static/resources/" + id + "/" + path;
+    return "/static/resources/" + id + (path ? "/" + path : "");
   }
 
 

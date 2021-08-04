@@ -364,12 +364,32 @@ The **`name`** entry of the task is a String with the task's name, which will be
 
 #### Task *frontend* options
 
-The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object defining the task's user interfaces. The returned object needs to have an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show These entries are matched with the `interfaces` of each client's role to determine which user interfaces should be shown on each client. For each interface entry, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+The **`frontend`** entry of the task definition is a function that recieves a context object (see below, you can ignore this for simple tasks) and returns a plain JS object defining the task's user interfaces. The returned object needs to have an entry **`interfaces`**, which is another plain JS object containing an entry for each of the interfaces the task needs to show. These entries are matched with the `interfaces` of each client's role to determine which user interfaces should be shown on each client. 
 
 Option |  | type | Description
 -------|--|------|------------
 **`interfaces`** | mandatory | Object | Plain JS object with an entry for each interface (e.g. `display`, `response` etc.).
 `transformCondition` | optional | Function | Function `context => condition => condition`, returning an object with entries to extend / alter the condition on the client. The passed in `context` contains the device's and role's specific properties. The properties of the returned object will be added to the current condition object before passing it to each interface's `render()` function.
+
+#### Entries for frontend.interfaces.*
+
+For each entry of `interfaces`, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
+
+Entry | Description
+------|------------
+**`initialize(parent,stimsrvAPI)`** | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server (see next section).
+**`render(condition)`** | This function is called once for each new condition, and should update the interface accordingly.
+
+#### stimsrv client API available to tasks
+
+Each interface gets passed a stimsrv client instance in its `initialize()` method. This object provides methods for communicating with the stimsrv server.
+
+Method | Description
+-------|------------
+**`response(responseData)`** | Send a response to the experiment controller. This will in turn generate a new condition, which will be sent out to all clients, or will advance to the next task (dependgin on the result of `nextCondition()` of the task controller, see below).
+**`event(eventData)`** | Send an event to the experiment controller. Events will be broadcast to all clients, but will not change the state of the experiment.
+**`warn(warningMessage,data)`** | Send an warning to the experiment controller. Warnings will be recorded in the experiment results. (Note: in case of a severe error, throw an exception instead)
+**`getResourceURL(id,path)`** | Get the download URL for the resource with given id and (optional) path. Resources need to be registered at the experiment or task level, upon which they will be available at the URL returned by this method.
 
 #### Task *controller* options
 
