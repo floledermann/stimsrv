@@ -375,17 +375,17 @@ Option |  | type | Description
 
 For each entry of `interfaces`, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
-Entry |  | type | Description
-------|--|------|------------
-**`initialize(parent, stimsrvAPI)`** | mandatory | Function | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server.
-**`render(condition)`** | mandatory | Function | This function is called once for each new condition, and should update the interface accordingly.
+Entry | Description
+------|------------
+**`initialize(parent, stimsrvAPI)`** | Function | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server.
+**`render(condition)`** | Function | This function is called once for each new condition, and should update the interface accordingly.
 
 #### stimsrv client API available to tasks
 
 Each interface gets passed a stimsrv client instance in its `initialize()` method. This object provides methods for communicating with the stimsrv server.
 
-Method | type | Description
--------|------|------------
+Method | Description
+-------|------------
 **`response(responseData)`** | Send a response to the experiment controller. This will in turn generate a new condition, which will be sent out to all clients, or will advance to the next task (dependgin on the result of `nextCondition()` of the task controller, see below).
 **`event(eventData)`** | Send an event to the experiment controller. Events will be broadcast to all clients, but will not change the state of the experiment.
 **`warn(warningMessage, data)`** | Send an warning to the experiment controller. Warnings will be recorded in the experiment results. (Note: in case of a severe error, throw an exception instead)
