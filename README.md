@@ -377,7 +377,7 @@ For each entry of `interfaces`, you can either use ready made components such as
 
 Entry | Description
 ------|------------
-**`initialize(parent, stimsrvAPI)`** | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server (see next section).
+**`initialize(parent,stimsrvAPI)`** | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server (see next section).
 **`render(condition)`** | This function is called once for each new condition, and should update the interface accordingly.
 
 #### stimsrv client API available to tasks
@@ -388,8 +388,8 @@ Method | Description
 -------|------------
 **`response(responseData)`** | Send a response to the experiment controller. This will in turn generate a new condition, which will be sent out to all clients, or will advance to the next task (dependgin on the result of `nextCondition()` of the task controller, see below).
 **`event(eventData)`** | Send an event to the experiment controller. Events will be broadcast to all clients, but will not change the state of the experiment.
-**`warn(warningMessage, data)`** | Send an warning to the experiment controller. Warnings will be recorded in the experiment results. (Note: in case of a severe error, throw an exception instead)
-**`getResourceURL(id, path)`** | Get the download URL for the resource with given id and (optional) path. Resources need to be registered at the experiment or task level, upon which they will be available at the URL returned by this method.
+**`warn(warningMessage,data)`** | Send an warning to the experiment controller. Warnings will be recorded in the experiment results. (Note: in case of a severe error, throw an exception instead)
+**`getResourceURL(id,path)`** | Get the download URL for the resource with given id and (optional) path. Resources need to be registered at the experiment or task level, upon which they will be available at the URL returned by this method.
 
 #### Task *controller* options
 
