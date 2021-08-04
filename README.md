@@ -377,8 +377,8 @@ For each entry of `interfaces`, you can either use ready made components such as
 
 Entry | Description
 ------|------------
-**`initialize(parent, stimsrvAPI)`** | Function | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server.
-**`render(condition)`** | Function | This function is called once for each new condition, and should update the interface accordingly.
+**`initialize(parent, stimsrvAPI)`** | This function is called once when the task becomes active, and gets passed the parent DOM element (the `<section>` element representing the interface area) and the stimsrv client API, which can be used to send responses, events or warnings to the server.
+**`render(condition)`** | This function is called once for each new condition, and should update the interface accordingly.
 
 #### stimsrv client API available to tasks
 
