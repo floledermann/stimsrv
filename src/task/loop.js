@@ -53,6 +53,12 @@ module.exports = function(config) {
         },
         get name() {
           return currentTask?.name || config.tasks[context.taskIndex]?.name || "loop";
+        },
+        get css() {
+          return currentTask.css;
+        },
+        get transformCondition() {
+          return currentTask.transformCondition;
         }
       }
     },

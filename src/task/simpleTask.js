@@ -52,7 +52,8 @@ function simpleTask(taskSpec) {
       frontend: context => {
         return {
           interfaces: manager.interfaces(taskSpec.interfaces, context),
-          transformCondition: manager.transformCondition(context)
+          transformCondition: manager.transformCondition(context),
+          css: manager.resolve("css", context)
         };
       },
       controller: manager.controller,

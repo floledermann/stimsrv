@@ -113,7 +113,7 @@ function taskManager(config) {
       
       Object.keys(spec).forEach(key => {
         resolveArray(key + "Interface", context, key).forEach(ui => {
-          interfaces[ui] = spec[key](config);
+          interfaces[ui] = typeof spec[key] == "function" ? spec[key](config) : spec[key];
         })
       });
       
