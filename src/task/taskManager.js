@@ -77,14 +77,17 @@ function taskManager(config) {
     resolve: resolve,
     resolveArray: resolveArray,
     resolveResources: function(spec, context) {
-      let arr = [];
-      // if spec is a function, resolve with config object
+       // if spec is a function, resolve with config object
       if (typeof spec == "function") {
-        arr = toArray(spec(resolveConfig(context)));
+        spec = toArray(spec(resolveConfig(context)));
       }
+      // otherwise reolve property name as array of resources
+      else {
+        spec = resolveArray(spec, context);
+      }        
       // each item may have a .resource entry, or it is already a resource
       // (this is nedded to support resources that have other information attached to them, e.g. fonts)
-      return arr.map(res => res.resource ? res.resource : res).filter(r => r);
+      return spec.map(res => res.resource ? res.resource : res).filter(r => r);
     },
     resolveConfig: resolveConfig,
     transformCondition: context => condition => {
