@@ -4,7 +4,7 @@ const deepEqual = require("fast-deep-equal");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
-const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
+const displayConfig = require("stimsrv/stimulus/displayConfig");
 
 let defaults = {
     buttons: ["Default Button"],
@@ -206,7 +206,11 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
     intensities: []
   }, config);
   
-  config.intensities = config.intensities.concat(["foregroundIntensity","backgroundIntensity"]);  
+  config.intensities = config.intensities.concat(["foregroundIntensity","backgroundIntensity"]); 
+
+  let display = displayConfig(Object.assign({}, config, {
+    warnDefaults: config.warn
+  }))({/*context*/});   // TODO: where to get the context from?
   
   return function(ctx, buttonCondition) {   
   
@@ -235,7 +239,7 @@ htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
       let cond = condition[key];
       if (typeof cond == "number") {
         //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-        condition[key] = getColorValueForIntensity(condition[key], condition);
+        condition[key] = display.intensityToColorValue(condition[key], condition);
       }
     }
 
