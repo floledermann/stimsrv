@@ -59,7 +59,7 @@ section#interface-response {
 }
 
 
-section.interface canvas {
+section.interface > canvas {
   position: absolute;
   top: 0;
   left: 0;

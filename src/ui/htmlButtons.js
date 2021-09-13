@@ -11,6 +11,10 @@ let defaults = {
     wrapperTag: "div",
     wrapperClass: "buttons",
     buttonTag: "button",
+    labelTag: "span",
+    labelClass: "label",
+    subUiTag: "span",
+    subUiClass: "sub-ui",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null,
     alwaysRerender: false,
@@ -48,7 +52,7 @@ function htmlButtons(config) {
   
   let clickSound = null;
   
-  return {
+  return context => ({
     initialize: function(parent, _runtime) {
       
       runtime = _runtime;
@@ -99,16 +103,44 @@ function htmlButtons(config) {
           let buttonCondition = Object.assign({}, condition, buttonDef.response);
           
           let el = document.createElement(config.buttonTag);
-          el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
+          
+          let labelWrapper = el;      
+          if (config.labelTag) {
+            labelWrapper = document.createElement(config.labelTag);
+            labelWrapper.className = config.labelClass;
+            el.appendChild(labelWrapper);
+          }
+      
+          labelWrapper.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
           if (buttonDef.className) {
             el.className = buttonDef.className;
           }
           
+          // can this be deprecated? This can be accompished by assigning a style to the task
           if (buttonDef.style) {
             el.style.cssText = buttonDef.style;
           }
           
+          let subUiWrapper = el;
+          if (config.subUiTag) {
+            subUiWrapper = document.createElement(config.subUiTag);
+            subUiWrapper.className = config.subUiClass;
+            
+            // act as offset parent for content
+            subUiWrapper.style.position = "relative";
+
+            el.appendChild(subUiWrapper);
+          }
+          
+          let subUI = buttonDef.subUI;
+          if (subUI) {
+            if (typeof subUI == "function") subUI = subUI(context);
+            subUI.initialize(subUiWrapper, runtime);
+            subUI.render(buttonCondition);
+          }
+          
+          // deprecated - use subUI instead
           if (buttonDef.canvas) {
             
             // TODO: reuse canvasRenderer - this requires some refactoring there
@@ -127,7 +159,7 @@ function htmlButtons(config) {
               viewingDistance: runtime.viewingdistance
             });
             
-            el.appendChild(canvas);
+            subUiWrapper.appendChild(canvas);
                       
             let ctx = canvas.getContext("2d");
             
@@ -196,7 +228,7 @@ function htmlButtons(config) {
         wrapper.style.visibility = "visible";
       }
     }
-  }
+  });
 }
 
 htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
