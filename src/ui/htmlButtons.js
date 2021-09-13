@@ -140,32 +140,6 @@ function htmlButtons(config) {
             subUI.render(buttonCondition);
           }
           
-          // deprecated - use subUI instead
-          if (buttonDef.canvas) {
-            
-            // TODO: reuse canvasRenderer - this requires some refactoring there
-            // to get rid of fixed binding to specific canvas
-            
-            let canvas = document.createElement("canvas");
-            
-            canvas.width = Math.round(60 * (devicePixelRatio || 1));
-            canvas.height = Math.round(40 * (devicePixelRatio || 1));
-            
-            canvas.style.width = "60px";
-            canvas.style.height = "40px";
-            
-            Dimension.configure({
-              pixelDensity: runtime.pixeldensity,
-              viewingDistance: runtime.viewingdistance
-            });
-            
-            subUiWrapper.appendChild(canvas);
-                      
-            let ctx = canvas.getContext("2d");
-            
-            buttonDef.canvas(ctx, buttonCondition);
-          }
-          
           let evt = config.buttonEvent;
           
           if (!Array.isArray(evt)) {
@@ -229,82 +203,6 @@ function htmlButtons(config) {
       }
     }
   });
-}
-
-htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
-
-  config = Object.assign({
-    dimensions: [],
-    intensities: []
-  }, config);
-  
-  config.intensities = config.intensities.concat(["foregroundIntensity","backgroundIntensity"]); 
-
-  let display = displayConfig(Object.assign({}, config, {
-    warnDefaults: config.warn
-  }))({/*context*/});   // TODO: where to get the context from?
-  
-  return function(ctx, buttonCondition) {   
-  
-    let condition = Object.assign({
-      lowIntensity: 0,
-      highIntensity: 1.0,
-      foregroundIntensity: 1.0,  // high intensity (bright) stimulus on low intensity background.
-      backgroundIntensity: 0.0,
-      rotate: 0,
-      translate: 0
-   }, buttonCondition, conditionOverride);
-    
-    // convert dimensions to pixels
-    for (let key of config?.dimensions) {
-      let cond = condition[key];
-      if (Array.isArray(cond)) {
-        condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
-      }
-      else {
-        condition[key] = Dimension(cond, "px").toNumber("px");  
-      }
-    }
-    
-    // convert intensities to color values
-    for (let key of config.intensities) {
-      let cond = condition[key];
-      if (typeof cond == "number") {
-        //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-        condition[key] = display.intensityToColorValue(condition[key], condition);
-      }
-    }
-
-    ctx.resetTransform();
-    
-    if (condition.backgroundIntensity) {
-      ctx.fillStyle = condition.backgroundIntensity;
-      ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
-    }
-    
-    if (condition.foregroundIntensity) {
-      ctx.fillStyle = condition.foregroundIntensity;
-      ctx.strokeStyle = condition.foregroundIntensity;
-    }
-    
-    // move origin to center
-    ctx.translate(Math.round(ctx.canvas.width / 2), Math.round(ctx.canvas.height / 2));
-    
-    // affine transform
-    if (condition.rotate) {
-      ctx.rotate(condition.rotate/180*Math.PI);
-    }
-    if (condition.translate) {
-      let trans = condition.translate;
-      if (!Array.isArray(condition.translate)) {
-        trans = [trans, trans];
-      }
-      ctx.translate(trans[0], trans[1]);
-    }
-          
-    
-    renderFunc(ctx, condition);
-  }
 }
 
 htmlButtons.defaults = function(_defaults) {
