@@ -52,12 +52,11 @@ module.exports = function(config) {
     });
   }
   
-  let buttonCanvas = canvasRenderer(renderTAO, {
-    dimensions: ["size"],
+  let buttonCanvas = canvasRenderer(renderTAO, Object.assign({}, options, {
     width: 40,
     height: 40,
     overrideCondition: buttonOverrides
-  });
+  }));
 
   function firstCap(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
