@@ -30,18 +30,18 @@ function sloanTask(config) {
     
   let renderer = canvasRenderer(renderSloan, options);
   
-  let buttonOverrides = {size: "27arcmin"};
-  
   return {
     name: "sloan",
     description: "Sloan letters visual acuity test", 
     frontend: context => ({
       interfaces: {
         display: renderer,
-        response: htmlButtons(c => c.letters.map(l => ({
-          label: l,
-          response: {letter: l}
-        }))),
+        response: htmlButtons({
+          buttons: condition => condition.letters.map(l => ({
+            label: l,
+            response: {letter: l}
+          }))
+        }),
         monitor: renderer,
         control: null
       }

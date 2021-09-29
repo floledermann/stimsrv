@@ -4,13 +4,17 @@ const deepEqual = require("fast-deep-equal");
 
 const valOrFunc = require("../util/valOrFunc.js");
 
-const getColorValueForIntensity = require("../stimulus/canvas/canvasRenderer.js").getColorValueForIntensity;
+const displayConfig = require("stimsrv/stimulus/displayConfig");
 
 let defaults = {
     buttons: ["Default Button"],
     wrapperTag: "div",
     wrapperClass: "buttons",
     buttonTag: "button",
+    labelTag: "span",
+    labelClass: "label",
+    subUiTag: "span",
+    subUiClass: "sub-ui",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null,
     alwaysRerender: false,
@@ -48,7 +52,7 @@ function htmlButtons(config) {
   
   let clickSound = null;
   
-  return {
+  return context => ({
     initialize: function(parent, _runtime) {
       
       runtime = _runtime;
@@ -99,39 +103,41 @@ function htmlButtons(config) {
           let buttonCondition = Object.assign({}, condition, buttonDef.response);
           
           let el = document.createElement(config.buttonTag);
-          el.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
+          
+          let labelWrapper = el;      
+          if (config.labelTag) {
+            labelWrapper = document.createElement(config.labelTag);
+            labelWrapper.className = config.labelClass;
+            el.appendChild(labelWrapper);
+          }
+      
+          labelWrapper.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
           if (buttonDef.className) {
             el.className = buttonDef.className;
           }
           
+          // can this be deprecated? This can be accompished by assigning a style to the task
           if (buttonDef.style) {
             el.style.cssText = buttonDef.style;
           }
           
-          if (buttonDef.canvas) {
+          let subUiWrapper = el;
+          if (config.subUiTag) {
+            subUiWrapper = document.createElement(config.subUiTag);
+            subUiWrapper.className = config.subUiClass;
             
-            // TODO: reuse canvasRenderer - this requires some refactoring there
-            // to get rid of fixed binding to specific canvas
-            
-            let canvas = document.createElement("canvas");
-            
-            canvas.width = Math.round(60 * (devicePixelRatio || 1));
-            canvas.height = Math.round(40 * (devicePixelRatio || 1));
-            
-            canvas.style.width = "60px";
-            canvas.style.height = "40px";
-            
-            Dimension.configure({
-              pixelDensity: runtime.pixeldensity,
-              viewingDistance: runtime.viewingdistance
-            });
-            
-            el.appendChild(canvas);
-                      
-            let ctx = canvas.getContext("2d");
-            
-            buttonDef.canvas(ctx, buttonCondition);
+            // act as offset parent for content
+            subUiWrapper.style.position = "relative";
+
+            el.appendChild(subUiWrapper);
+          }
+          
+          let subUI = buttonDef.subUI;
+          if (subUI) {
+            if (typeof subUI == "function") subUI = subUI(context);
+            subUI.initialize(subUiWrapper, runtime);
+            subUI.render(buttonCondition);
           }
           
           let evt = config.buttonEvent;
@@ -196,79 +202,7 @@ function htmlButtons(config) {
         wrapper.style.visibility = "visible";
       }
     }
-  }
-}
-
-htmlButtons.buttonCanvas = function(renderFunc, conditionOverride, config) {
-
-  config = Object.assign({
-    dimensions: [],
-    intensities: []
-  }, config);
-  
-  config.intensities = config.intensities.concat(["foregroundIntensity","backgroundIntensity"]);  
-  
-  return function(ctx, buttonCondition) {   
-  
-    let condition = Object.assign({
-      lowIntensity: 0,
-      highIntensity: 1.0,
-      foregroundIntensity: 1.0,  // high intensity (bright) stimulus on low intensity background.
-      backgroundIntensity: 0.0,
-      rotate: 0,
-      translate: 0
-   }, buttonCondition, conditionOverride);
-    
-    // convert dimensions to pixels
-    for (let key of config?.dimensions) {
-      let cond = condition[key];
-      if (Array.isArray(cond)) {
-        condition[key] = cond.map(c => Dimension(c, "px").toNumber("px"));
-      }
-      else {
-        condition[key] = Dimension(cond, "px").toNumber("px");  
-      }
-    }
-    
-    // convert intensities to color values
-    for (let key of config.intensities) {
-      let cond = condition[key];
-      if (typeof cond == "number") {
-        //console.log("Intensity " + key + ": " + condition[key] + " => " + getColorValueForIntensity(condition[key], condition));
-        condition[key] = getColorValueForIntensity(condition[key], condition);
-      }
-    }
-
-    ctx.resetTransform();
-    
-    if (condition.backgroundIntensity) {
-      ctx.fillStyle = condition.backgroundIntensity;
-      ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
-    }
-    
-    if (condition.foregroundIntensity) {
-      ctx.fillStyle = condition.foregroundIntensity;
-      ctx.strokeStyle = condition.foregroundIntensity;
-    }
-    
-    // move origin to center
-    ctx.translate(Math.round(ctx.canvas.width / 2), Math.round(ctx.canvas.height / 2));
-    
-    // affine transform
-    if (condition.rotate) {
-      ctx.rotate(condition.rotate/180*Math.PI);
-    }
-    if (condition.translate) {
-      let trans = condition.translate;
-      if (!Array.isArray(condition.translate)) {
-        trans = [trans, trans];
-      }
-      ctx.translate(trans[0], trans[1]);
-    }
-          
-    
-    renderFunc(ctx, condition);
-  }
+  });
 }
 
 htmlButtons.defaults = function(_defaults) {

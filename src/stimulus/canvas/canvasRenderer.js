@@ -13,6 +13,9 @@ function canvasRenderer(renderFunc, options) {
     defaultDimensions: ["translate"],
     intensities: [],  // "foregroundIntensity", "backgroundIntensity" are added by default (see below)
     defaultIntensities: ["foregroundIntensity","backgroundIntensity"],
+    
+    overrideContext: null,
+    overrideCondition: null,
 
     fonts: [],
   }, options);
@@ -21,6 +24,8 @@ function canvasRenderer(renderFunc, options) {
   options.dimensions = options.dimensions.concat(options.defaultDimensions);
   
   let renderer = function(context) {
+    
+    context = Object.assign({}, context, options.overrideContext);
     
     let display = displayConfig(Object.assign({}, options, {
       warnDefaults: options.warn
@@ -75,26 +80,27 @@ function canvasRenderer(renderFunc, options) {
             });
           }));
         }
+        
+        function resize(widthpx, heightpx) {
+        
+          width = widthpx;
+          height = heightpx;
+                  
+          // make dimensions even, so that half transform is full pixel
+          
+          widthpx = Math.floor(widthpx/2 + 0.5) * 2;
+          heightpx = Math.floor(heightpx/2 + 0.5) * 2;
+          
+          canvas.width = widthpx * dppx;      
+          canvas.height = heightpx * dppx;
+          
+          canvas.style.width = widthpx + "px";
+          canvas.style.height = heightpx + "px";
+
+        }
               
         if (manageSize) {
-          function resize(widthpx, heightpx) {
-          
-            width = widthpx;
-            height = heightpx;
-                    
-            // make dimensions even, so that half transform is full pixel
-            
-            widthpx = Math.floor(widthpx/2 + 0.5) * 2;
-            heightpx = Math.floor(heightpx/2 + 0.5) * 2;
-            
-            canvas.width = widthpx * dppx;      
-            canvas.height = heightpx * dppx;
-            
-            canvas.style.width = widthpx + "px";
-            canvas.style.height = heightpx + "px";
-
-          }
-          
+           
           resize(options.width || parent.clientWidth, options.height || parent.clientHeight);
 
           let observer = new ResizeObserver((entries) => {
@@ -117,6 +123,8 @@ function canvasRenderer(renderFunc, options) {
       
       // contract: if render() returns a string or element, then replace the parent content
       render: function(condition) {
+        
+        condition = Object.assign({}, condition, options.overrideCondition);
         
         // remember for redrawing on resize
         lastCondition = condition;

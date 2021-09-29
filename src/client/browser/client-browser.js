@@ -94,6 +94,8 @@ function clientFactory(options) {
   let experiment = null;  
   let currentTaskFrontend = null;
   
+  let taskStyleEl = null;
+  
   let taskIndex = null;
   let context = {};
 
@@ -129,6 +131,8 @@ function clientFactory(options) {
         ui.initialize?.(wrapper, stimsrvClientAPI, context);
       }
     }
+    
+    taskStyleEl.textContent = currentTaskFrontend.css;
     
     document.body.classList.add("current-task-" + currentTaskFrontend.name);
 
@@ -348,6 +352,9 @@ function clientFactory(options) {
         styleEl.innerHTML = options.device.css;
         document.head.appendChild(styleEl);
       }
+      
+      taskStyleEl = document.createElement("style");
+      document.head.appendChild(taskStyleEl);
       
     },
     
