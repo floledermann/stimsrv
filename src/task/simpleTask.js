@@ -28,6 +28,8 @@ function simpleTask(taskSpec) {
     //css: null //?
   }, taskSpec);
   
+  // not sure if transformCondition should be a parameter, but by having it as a second parameter
+  // the client & controller code stays more clearly separated
   let task = function(controllerConfig, transformCondition) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
