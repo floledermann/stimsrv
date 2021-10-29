@@ -3,20 +3,49 @@ const taskManager = require("stimsrv/task/taskManager");
 const htmlButtons = require("stimsrv/ui/htmlButtons");
 const canvasRenderer = require("stimsrv/stimulus/canvas/canvasRenderer");
 
+
+const RENDER_DEFAULTS = {
+  text: "<no text defined>",
+  fontFamily: "Arial",
+  fontStyle: "normal",
+  fontVariant: "normal",
+  fontWeight: "normal",
+  fontSize: 12,
+  // not supported by node-canvas
+  //lineHeight: 1.5,
+  //fontStretch: "normal",
+  angle: 0,
+  outline: false,
+  outlineWidth: 0.25, // relative to fontSize
+  outline2: false,
+  outline2Width: 0.02, // relative to fontSize
+};
+
+const DEFAULTS = Object.assign({}, 
+    RENDER_DEFAULTS, 
+  {
+    // condition
+    fontSize: "4mm",
+    backgroundIntensity: 1.0,
+    foregroundIntensity: 0.0,
+    outlineIntensity: 0.5,
+    outline2Intensity: 0.0,
+    
+    // config 
+    displayInterface: "display", 
+    responseInterface: "response",
+    monitorInterface: "monitor",
+    
+    interfaces: {}
+    // fonts
+    // css
+  }
+);
+
+  
 function renderText(ctx, condition) {
   
-  condition = Object.assign({
-    text: "<no text defined>",
-    fontStyle: "normal",
-    fontVariant: "normal",
-    fontWeight: "normal",
-    fontSize: 4,
-    // not supported by node-canvas
-    //lineHeight: 1.5,
-    //fontStretch: "normal",
-    fontFamily: "Arial",
-    angle: 0
-  }, condition);
+  condition = Object.assign({}, RENDER_DEFAULTS, condition);
   
   console.log("Rendering: ", condition);
   //console.trace();
@@ -61,37 +90,6 @@ function renderText(ctx, condition) {
  
 }
 
-const DEFAULTS = {
-  // condition
-  text: "<no text defined>",
-  fontStyle: "normal",
-  fontVariant: "normal",
-  fontWeight: "normal",
-  fontSize: "4mm",
-  // not supported by node-canvas
-  //lineHeight: 1.5,
-  //fontStretch: "normal",
-  fontFamily: "Arial",
-  angle: 0,
-  outline: false,
-  outlineWidth: 0.25, // relative to fontSize
-  outlineIntensity: 0.5,
-  outline2: false,
-  outline2Width: 0.02, // relative to fontSize
-  outline2Intensity: 0.0,
-  backgroundIntensity: 1.0,
-  foregroundIntensity: 0.0,
-  
-  // config
-  
-  displayInterface: "display", 
-  responseInterface: "response",
-  monitorInterface: "monitor",
-  
-  interfaces: {}
-  // fonts
-  // css
-}
 
 let defaults = DEFAULTS;
 
