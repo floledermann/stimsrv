@@ -18,6 +18,10 @@ Each key of the object derived in this way may again be a Function(context), an 
 controller.nextCondition(lastCondition, lastResponse, trials) collects all such generated values as an Object. It generates new value objects as long as none of the generators are exhausted or functions return null.
 controller.constantParameters() collects all parameters which are (potentially!) static values - may still be overridden by generators or functions
 
+config.generateCondition context => function(currentCondition, lastCondition, lastResponse, trials). This function
+will be called with the generated paramters before emitting the condition. It can be used to override condition object.
+Properties set to undefined will be removed from the condition object. 
+
 config.nextContext is simply passed through to the returned controller object.
 
 Returns:
@@ -46,6 +50,7 @@ module.exports = function(config) {
   
   config = Object.assign({
     parameters: {},
+    generateCondition: null,
     nextContext: null
   }, config);
   
@@ -93,6 +98,8 @@ module.exports = function(config) {
       
       return p;
     });
+    
+    let generateCondition = config.generateCondition?.(context);
     
     
     return {
@@ -166,6 +173,25 @@ module.exports = function(config) {
         condition = parameterIterators.reduce(handleParameters, {});
                 
         if (!done) {
+          if (generateCondition) {
+            // support both iterators and callback functions
+            if (generateCondition.next && typeof generateCondition.next == "function") {
+              let val = generateCondition.next();
+              if (val.done) return null;
+              condition = Object.assign(condition, val.value);
+            }
+            else {
+              let val = generateCondition(condition, lastCondition, lastResponse, trials);
+              if (val === null) return null;
+              condition = Object.assign(condition, val);
+            }
+            // remove undefined properties
+            Object.keys(condition).forEach(key => {
+              if (condition[key] === undefined) {
+                delete condition[key];
+              }
+            });   
+          }
           return condition;
         }
             

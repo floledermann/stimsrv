@@ -428,6 +428,34 @@ describe("ParameterController", () => {
         
   });
   
+    it(".generateCondition()", () => {
+    
+    let c = parameterController({
+      parameters: {
+        param1: sequence([1,2,3])
+      },
+      generateCondition: context => cond => ({param2: cond.param1 + 1})
+    })();
+    
+    let p = c.nextCondition();
+    assert.equal(p.param1, 1);
+    assert.equal(p.param2, 2);
+    
+    p = c.nextCondition();
+    assert.equal(p.param1, 2);
+    assert.equal(p.param2, 3);
+    
+    p = c.nextCondition();
+    assert.equal(p.param1, 3);
+    assert.equal(p.param2, 4);
+    
+    p = c.nextCondition();
+    assert.strictEqual(p, null);
+    
+    
+        
+  });
+  
   
 });
 

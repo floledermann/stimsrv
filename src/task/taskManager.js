@@ -33,6 +33,7 @@ function taskManager(config) {
   
   let params = parameterController({
     parameters: config.controllerConfig,
+    generateCondition: config.generateCondition,
     // first apply config.nextContext, then user-supplied nextContext() (both optional)
     nextContext: context => (context = config.nextContext?.(context) || context, resolve("nextContext", context, context))
   });

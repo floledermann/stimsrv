@@ -1,6 +1,7 @@
 
 const taskManager = require("stimsrv/task/taskManager");
 const toArray = require("stimsrv/util/toArray");
+const pickProperties = require("stimsrv/util/pickProperties");
 
 /**
 simpleTask
@@ -31,19 +32,21 @@ function simpleTask(taskSpec) {
   let task = function(controllerConfig) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
-    let staticOptions = interfaceOptions.concat(["css"]);
+    let staticOptions = interfaceOptions.concat(["css","generateCondition","transformConditionOnClient"]);
     
     //let interfaceConstructors = Object.fromEntries(Object.entries(taskSpec.interfaces).map([key, spec] => [key, spec(taskSpec)]));
     
     let manager = taskManager({
       defaults: taskSpec.defaults,
-      controllerConfig: controllerConfig,
+      controllerConfig: pickProperties.without(controllerConfig, ["generateCondition","transformConditionOnClient"]),
+      generateCondition: controllerConfig.generateCondition,
       transformConditionOnClient: controllerConfig.transformConditionOnClient,
       nextContext: taskSpec.nextContext,
       // do we need this? may simply throw an error if it does not resolve to a static value
       staticOptions: staticOptions
     });
     
+    // resolve without context for name and description
     let config = manager.resolveConfig();
     
     return {
