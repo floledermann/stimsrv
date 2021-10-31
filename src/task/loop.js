@@ -57,8 +57,8 @@ module.exports = function(config) {
         get css() {
           return currentTask.css;
         },
-        get transformCondition() {
-          return currentTask.transformCondition;
+        get transformConditionOnClient() {
+          return currentTask.transformConditionOnClient;
         }
       }
     },

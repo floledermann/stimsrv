@@ -93,12 +93,12 @@ function renderText(ctx, condition) {
 
 let defaults = DEFAULTS;
 
-let task = function(controllerConfig, transformCondition) {
+let task = function(controllerConfig, transformConditionOnClient) {
   
   let manager = taskManager({
     defaults: defaults,
     controllerConfig: controllerConfig,
-    transformCondition: transformCondition,
+    transformConditionOnClient: transformConditionOnClient,
     // do we need this? may simply throw an error if it does not resolve to a static value
     staticOptions: ["stimulusInterface", "responseInterface", "monitorInterface", "fonts", "css"]
   });
@@ -139,7 +139,7 @@ let task = function(controllerConfig, transformCondition) {
         
       return {
         interfaces: manager.interfaces(interfaces, context),
-        transformCondition: manager.transformCondition(context),
+        transformConditionOnClient: manager.transformConditionOnClient(context),
         css: manager.resolve("css", context)       
       };
 

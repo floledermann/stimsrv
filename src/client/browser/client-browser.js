@@ -144,8 +144,8 @@ function clientFactory(options) {
   
   function showCondition(condition) {
     console.log("Condition: ", condition);
-    if (currentTaskFrontend.transformCondition && typeof currentTaskFrontend.transformCondition == "function") {
-      Object.assign(condition, currentTaskFrontend.transformCondition(condition));
+    if (currentTaskFrontend.transformConditionOnClient && typeof currentTaskFrontend.transformConditionOnClient == "function") {
+      Object.assign(condition, currentTaskFrontend.transformConditionOnClient(condition));
       // remove undefined properties
       Object.keys(condition).forEach(key => {
         if (condition[key] === undefined) {

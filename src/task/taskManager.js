@@ -22,13 +22,14 @@ function taskManager(config) {
   config = Object.assign({
     defaults: {},
     controllerConfig: [],
-    transformCondition: [],
+    generateCondition: null,
+    transformConditionOnClient: [],
     // do we need this? may simply throw an error if it does not resolve to a static value
     staticOptions: []
   }, config);
   
   config.controllerConfig = [config.defaults, ...toArray(config.controllerConfig)];
-  config.transformCondition = toArray(config.transformCondition);
+  config.transformConditionOnClient = toArray(config.transformConditionOnClient);
   
   let params = parameterController({
     parameters: config.controllerConfig,
@@ -90,8 +91,8 @@ function taskManager(config) {
       return spec.map(res => res.resource ? res.resource : res).filter(r => r);
     },
     resolveConfig: resolveConfig,
-    transformCondition: context => condition => {
-      return config.transformCondition.reduce((condition, transform) => {
+    transformConditionOnClient: context => condition => {
+      return config.transformConditionOnClient.reduce((condition, transform) => {
         if (typeof transform == "function") {
           transform = transform(context);
         }

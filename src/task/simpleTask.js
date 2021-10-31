@@ -11,7 +11,7 @@ Helper to implement tasks with the following features:
 - Default values can be specified and changed globally with the .defaults() method
 - Interfaces can be remapped using "<interfaceName>Interface" properties, e.g.: displayInterface: "specialDisplay"
 - TODO: additional interfaces can be added for each instance
-- nextContext and transformCondition can be specified for task instance
+- nextContext and transformConditionOnClient can be specified for task instance
 - resources and css can be specified (static or TODO dynamic)
 */
 
@@ -22,15 +22,13 @@ function simpleTask(taskSpec) {
     description: "",
     defaults: {},
     interfaces: {},
-    transformCondition: null,
     nextContext: null,
     //resources: null, //?
     //css: null //?
   }, taskSpec);
   
-  // not sure if transformCondition should be a parameter, but by having it as a second parameter
-  // the client & controller code stays more clearly separated
-  let task = function(controllerConfig, transformCondition) {
+  // controllerConfig needs to be an object conttaining the entries for each property of the condition
+  let task = function(controllerConfig) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
     let staticOptions = interfaceOptions.concat(["css"]);
@@ -40,7 +38,7 @@ function simpleTask(taskSpec) {
     let manager = taskManager({
       defaults: taskSpec.defaults,
       controllerConfig: controllerConfig,
-      transformCondition: transformCondition,
+      transformConditionOnClient: controllerConfig.transformConditionOnClient,
       nextContext: taskSpec.nextContext,
       // do we need this? may simply throw an error if it does not resolve to a static value
       staticOptions: staticOptions
@@ -54,7 +52,7 @@ function simpleTask(taskSpec) {
       frontend: context => {
         return {
           interfaces: manager.interfaces(taskSpec.interfaces, context),
-          transformCondition: manager.transformCondition(context),
+          transformConditionOnClient: manager.transformConditionOnClient(context),
           css: manager.resolve("css", context)
         };
       },
