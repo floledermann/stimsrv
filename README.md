@@ -494,7 +494,7 @@ text({
   text: context => {
     let count = 0;
     return {
-      next: function(lastCondition, lastResponse, trials) {
+      next: (lastCondition, lastResponse, trials) => {
         count++;
         if (lastResponse && lastResponse.choice == "No") return {done: true};
         return { value: "Trial " + count + ". Continue?" };
