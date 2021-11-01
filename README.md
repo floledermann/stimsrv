@@ -324,12 +324,12 @@ See the [CSS override example](https://github.com/floledermann/stimsrv-examples/
 
 ## Configuring tasks
 
-stimsrv comes with a library of reusable tasks that can be configured for the needs of an experiment. Most tasks are implemented as a factory function, receiving a single object with entries for the tasks configuration parameters.
+stimsrv comes with a library of reusable fundamental tasks that can be adapted to the needs of an experiment. See section ["Implementing tasks"](#implementing-tasks) for how to implement your own tasks.
 
-Most configuration parameters are used to specify the condition(s) for the task. Condition parameters can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit.
+To create a task, simply call its creation function, sepcifying the task's configuration parameters.
 
-```
-// Configuring the "text" task
+```JS
+// Create the "text" task
 text({
   name: "task1",                // Name of the task (will be used in results data) 
   text: "Can you read this?",   // Text to display
@@ -339,9 +339,11 @@ text({
 })
 ```
 
-Specifying only constant parameters would repeat the same condition indefinitely, which is rarely what you want in an experiment. Therefore, at least one parameter will usually be specified dynamically, producing a sequence of values for the parameter in subsequent trials. A range of helper functions is available to specify the sequence of values for parameters, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to participants' responses.
+Most configuration parameters are used to specify the condition(s) for the task. Such condition properties can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit (e.g. the `fontSize` parameter in the example above).
 
-```
+Specifying only constant condition properties would cause the same condition to repeat indefinitely, which is rarely what you want in an experiment. Therefore, at least one property will usually be specified to produce a sequence of values for the property in subsequent trials. A range of helper functions is available to specify such sequences for condition properties, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to a participant's responses.
+
+```JS
 const sequence = require("stimsrv/controller/sequence");
 const random = require("stimsrv/controller/random");
 
@@ -360,13 +362,13 @@ text({
 })
 ```
 
-### Generators for task properties
+### Generators for condition properties
 
 The following helpers are provided for generating parameter sequences:
 
-`require("stimsrv/controller/sequence")`
+#### *sequence(items[, options])*
 
-#### sequence(items[, options])
+`const sequence = require("stimsrv/controller/sequence")`
 
 Iterator, going through the specified items one by one.
 
@@ -374,17 +376,17 @@ Iterator, going through the specified items one by one.
 
 **options**: Object with entries for the following options:
 
- Option   | default | Description
-----------|---------|------------
-stepCount | 1       | Repeat each item stepCount times
-loop      | false   | Loop after sequence is exhausted
-loopCount | -       | Stop after loopCount loops
+ Option    | default | Description
+-----------|---------|------------
+`stepCount`| 1       | Repeat each item stepCount times
+`loop`     | false   | Loop after sequence is exhausted
+`loopCount`| -       | Stop after loopCount loops
 
-#### sequence.loop(items[, options])
+#### *sequence.loop(items[, options])*
 
 Identical to `sequence` with `loop` option set to true.
 
-#### sequence.array(items)
+#### *sequence.array(items)*
 
 Iterator, creating a sequence of arrays from an array of iterators.
 
@@ -392,17 +394,17 @@ Iterator, creating a sequence of arrays from an array of iterators.
 
 The iterator is exhausted once the first iterator in the array is exhausted.
 
-`require("stimsrv/controller/random")`
+#### *random(items)*
 
-#### random(items)
+`const random = require("stimsrv/controller/random")`
 
 Picks a random item from the Array of items in each step (sampling with replacement).
 
-#### random.pick(items)
+#### *random.pick(items)*
 
 Same as `random(items)`.
 
-#### random.shuffle(items, options)
+#### *random.shuffle(items, options)*
 
 Shuffles the Array of items and returns items in random order (sampling without replacement).
 
@@ -416,15 +418,15 @@ multiple  | 1       | Duplicate items to create this number of copies of each it
 loop      | false   | Re-shuffle and restart after sequence is exhausted
 preventContinuation | true | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
 
-#### random.sequence(items, options)
+#### *random.sequence(items, options)*
 
 Same as `random.shuffle`.
 
-#### random.loop(items, options)
+#### *random.loop(items, options)*
 
 Same as `random.shuffle` with `loop` option set to true.
 
-#### random.range(from, to, options)
+#### *random.range(from, to, options)*
 
 Generate random numbers in the range from `from` (inclusive) to `to` (exclusive).
 
@@ -467,7 +469,7 @@ maxValue | Infinity | The maximum value to emit.
 
 For example, here is a text task that adjusts the font size in reaction to user feedback:
 
-```
+```JS
 text({
   name: "task1",                
   text: "Can you read this?",
@@ -481,11 +483,11 @@ text({
 ```
 
 
-### Implementing a custom generators
+### Implementing custom generators
 
 Property generators are implemented as a function that gets passed the context and returns an object with a single method `next()`. This function gets called with the last condition, the last response and an array of data of all previous trials, and is expected to return an object containing an entry for `value` and `done` (following the [JavaScript iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol)).
 
-```
+```JS
 text({
   name: "task1",                
   text: context => {
