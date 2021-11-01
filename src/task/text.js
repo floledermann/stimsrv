@@ -1,10 +1,11 @@
 
-const taskManager = require("stimsrv/task/taskManager");
+const simpleTask = require("stimsrv/task/simpleTask");
 const htmlButtons = require("stimsrv/ui/htmlButtons");
 const canvasRenderer = require("stimsrv/stimulus/canvas/canvasRenderer");
 
 
 const RENDER_DEFAULTS = {
+  
   text: "<no text defined>",
   fontFamily: "Arial",
   fontStyle: "normal",
@@ -12,35 +13,39 @@ const RENDER_DEFAULTS = {
   fontWeight: "normal",
   fontSize: 12,
   // not supported by node-canvas
-  //lineHeight: 1.5,
-  //fontStretch: "normal",
+  // fontStretch: "normal",
+  // lineHeight: 1.5,
   angle: 0,
   outline: false,
   outlineWidth: 0.25, // relative to fontSize
   outline2: false,
   outline2Width: 0.02, // relative to fontSize
+  
+  // provided by canvasRenderer:
+  // rotate
+  // translate
+  
 };
 
-const DEFAULTS = Object.assign({}, 
-    RENDER_DEFAULTS, 
-  {
-    // condition
-    fontSize: "4mm",
-    backgroundIntensity: 1.0,
-    foregroundIntensity: 0.0,
-    outlineIntensity: 0.5,
-    outline2Intensity: 0.0,
+const DEFAULTS = { 
+
+  ...RENDER_DEFAULTS, 
+  
+  name: "text",
+  description: "Generic Text Task",
     
-    // config 
-    displayInterface: "display", 
-    responseInterface: "response",
-    monitorInterface: "monitor",
-    
-    interfaces: {}
-    // fonts
-    // css
-  }
-);
+  // condition
+  fontSize: "4mm",
+  backgroundIntensity: 1.0,
+  foregroundIntensity: 0.0,
+  outlineIntensity: 0.5,
+  outline2Intensity: 0.0,
+  
+  // interfaces
+  // fonts
+  // css
+  
+};
 
   
 function renderText(ctx, condition) {
@@ -90,68 +95,42 @@ function renderText(ctx, condition) {
  
 }
 
-
 let defaults = DEFAULTS;
 
-let task = function(controllerConfig, transformConditionOnClient) {
-  
-  let manager = taskManager({
-    defaults: defaults,
-    controllerConfig: controllerConfig,
-    transformConditionOnClient: transformConditionOnClient,
-    // do we need this? may simply throw an error if it does not resolve to a static value
-    staticOptions: ["stimulusInterface", "responseInterface", "monitorInterface", "fonts", "css"]
-  });
+let renderer = config => canvasRenderer(renderText, {
+  dimensions: ["fontSize"],
+  intensities: ["outlineIntensity","outline2Intensity"],
+  fonts: config.fonts         // fonts to load - can be specified with the "fonts" property upon task initialization
+});
 
-  return {
-    name: "text",
-    description: "Text",
-    frontend: function(context) {
+let buttons = config => htmlButtons({
+  buttons: condition => condition.choices.map(
+    choice => ({
+      label: choice,
+      response: {text: choice} 
+    })
+  ),
+  // CSS can be passed to the buttons with the "css" property upon task initialization
+  // TODO: "css" should be a first-level member of the task frontend object, not added to individual UIs like now.
+  css: config.css
+});
 
-      let renderer = canvasRenderer(renderText, {
-        dimensions: ["fontSize"],
-        intensities: ["outlineIntensity","outline2Intensity"],
-        fonts: manager.resolveArray("fonts", context)
-      });
-      
-      let responseButtons = htmlButtons({
-        buttons: condition => condition.choices.map(
-          c => ({
-            label: c,
-            response: {text: c},
-          })
-        )
-      });
-      
-      let interfaces = manager.resolve("interfaces", context);
-      
-      // use user-provided interfaces, or built-in defaults
-      function assignUI(name, defaultUI) {
-        //name = manager.resolve(name + "Interface", context);
-        if (interfaces[name] === undefined) interfaces[name] = defaultUI;
-      }
-      assignUI("display", config => renderer);
-      assignUI("response", config => responseButtons);
-      assignUI("monitor", config => renderer);
-      
-      //interfaces[manager.resolve("responseInterface", context)] = interfaces[manager.resolve("responseInterface", context)] || (config => responseButtons);
-      //interfaces[manager.resolve("monitorInterface", context)] = interfaces[manager.resolve("monitorInterface", context)] || (config => renderer);
-        
-      return {
-        interfaces: manager.interfaces(interfaces, context),
-        transformConditionOnClient: manager.transformConditionOnClient(context),
-        css: manager.resolve("css", context)       
-      };
+/*
+The actual task definition, using the simpleTask helper to tie everything together.
+*/
+let task = simpleTask({
+  defaults: DEFAULTS,
+  // The interfaces the task provides.
+  // These can be remapped by the user with the "<interfaceName>Interface" configuration properties.
+  interfaces: {
+    display: renderer,
+    monitor: renderer,
+    response: buttons,
+  },
+  // Resources to load
+  resources: config => config.fonts
+});
 
-    },
-    controller: manager.controller,
-    resources: manager.resolveResources("fonts")
-  }
-}
-
-task.defaults = function(_defaults) {
-  defaults = Object.assign({}, DEFAULTS, _defaults);
-}
 
 task.render = renderText;
 
