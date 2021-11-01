@@ -7,13 +7,13 @@ const pickProperties = require("stimsrv/util/pickProperties");
 simpleTask
 
 Helper to implement tasks with the following features:
-- Sequence of conditions can be specified for each instance including callbacks and iterators (by way of stimsrv/util/parameterController - see documentation there for how to specify parameters)
-- Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters
-- Default values can be specified and changed globally with the .defaults() method
-- Interfaces can be remapped to named interfaces using "<interfaceName>Interface" properties, e.g.: displayInterface: "specialDisplay"
-- Additional interfaces can be added for each instance using the "interfaces" property.
-- generateCondition, transformConditionOnClient and nextContext can be specified for task instance
-- resources and css can be specified (static or TODO dynamic)
+- Sequence of conditions can be specified using callbacks and iterators (by way of `stimsrv/util/parameterController` - see documentation there for how to specify parameters).
+- Default values can be specified and changed globally with the `.defaults()` method.
+- Interfaces can be remapped to named interfaces using `<interfaceName>Interface` properties, e.g.: `displayInterface: "specialDisplay"`.
+- Additional interfaces can be added for each instance using the `interfaces` property.
+- `resources` and `css` can be specified (static or TODO dynamic).
+- `generateCondition`, `transformConditionOnClient` and `nextContext` can be specified for task instance.
+- Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters.
 */
 
 function simpleTask(taskSpec) {

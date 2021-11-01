@@ -322,13 +322,58 @@ module.exports = {
 
 See the [CSS override example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-css) for the full code and more possibilities for customizing an experiment's CSS.
 
+## Configuring tasks
+
+stimsrv comes with a library of reusable tasks that can be configured for the needs of an experiment. Most tasks are implemented as a factory function, receiving a single object with entries for the tasks configuration parameters.
+
+Most configuration parameters are used to specify the condition(s) for the task. Condition parameters can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit.
+
+```
+// Configuring the "text" task
+text({
+  name: "task1",                // Name of the task (will be used in results data) 
+  text: "Can you read this?",   // Text to display
+  fontSize: "4mm",              // Font size. Dimensions will be converted to pixels internally
+  rotate: 10,                   // Rotate by 10 degrees
+  choices: ["Yes","No"]         // The response choices, displayed as buttons in the response interface
+})
+```
+
+Specifying only constant parameters would repeat the same condition indefinitely, which is rarely what you want in an experiment. Therefore, at least one parameter will usually be specified dynamically, producing a sequence of values for the parameter in subsequent trials. A range of helper functions is available to specify the sequence of values for parameters, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to participants' responses.
+
+```
+const sequence = require("stimsrv/controller/sequence");
+const random = require("stimsrv/controller/random");
+
+// ...
+
+// Configuring a dynamic "text" task
+text({
+  name: "task1",                
+  text: "Can you read this?",
+  // Font size will become increasingly smaller on each trial.
+  // Once the choices are exhausted, the experiment will proceed with the next task.
+  fontSize: sequence(["4mm","3mm","2mm"]),  
+  // Rotate by a random amount on each trial, rounded to full degrees
+  rotate: random.range(-30,30, {round: 1}),
+  choices: ["Yes","No"] 
+})
+```
+
+
+
+
 ## Implementing tasks
 
 A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.)
 
 Generally, most concepts in stimsrv are represented either by *plain JS objects* (for data and objects) or by *functions* (for dynamic behaviour).
 
-### Implementing tasks from scratch
+### Implementing tasks using the simpleTask helper
+
+*(... coming soon ...)*
+
+### Implementing tasks using the low-level API
 
 A stimsrv task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend` and `controller` are functions which recieve a context object and return a plain JS object specifying the behaviour. So the basic structure of a task looks like this:
 
@@ -487,9 +532,6 @@ tasks: [
 
 By stimsrv requiring tasks to only adhere to this simple interface, this opens up the possibility to implement your tasks using whichever programming paradigm you prefer - using plain JS objects, classes or functional-compositional approaches. 
 
-### Implementing tasks using the provided utility functions
-
-*(... coming soon ...)*
 
 
 ## Context & controllers
