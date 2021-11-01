@@ -28,8 +28,8 @@ function simpleTask(taskSpec) {
     //css: null //?
   }, taskSpec);
   
-  // controllerConfig needs to be an object containing the entries for each property of the condition
-  let task = function(controllerConfig) {
+  // userConfig needs to be an object containing the entries for each property of the condition
+  let task = function(userConfig) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
     let staticOptions = interfaceOptions.concat(["css","generateCondition","transformConditionOnClient"]);
@@ -38,9 +38,9 @@ function simpleTask(taskSpec) {
     
     let manager = taskManager({
       defaults: taskSpec.defaults,
-      controllerConfig: pickProperties.without(controllerConfig, ["generateCondition","transformConditionOnClient"]),
-      generateCondition: controllerConfig.generateCondition,
-      transformConditionOnClient: controllerConfig.transformConditionOnClient,
+      controllerConfig: pickProperties.without(userConfig, ["generateCondition","transformConditionOnClient"]),
+      generateCondition: userConfig.generateCondition,
+      transformConditionOnClient: userConfig.transformConditionOnClient,
       nextContext: taskSpec.nextContext,
       interfaces: taskSpec.interfaces,
       // do we need this? may simply throw an error if it does not resolve to a static value
