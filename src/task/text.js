@@ -107,7 +107,7 @@ let buttons = config => htmlButtons({
   buttons: condition => condition.choices.map(
     choice => ({
       label: choice,
-      response: {text: choice} 
+      response: {choice: choice} 
     })
   ),
   // CSS can be passed to the buttons with the "css" property upon task initialization
