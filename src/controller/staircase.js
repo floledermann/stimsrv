@@ -1,8 +1,8 @@
 
 const Dimension = require("another-dimension");
 
-const matchProperties = require("../util/matchProperties.js");
-const valOrFunc = require("../util/valOrFunc.js");
+const matchProperties = require("stimsrv/util/matchProperties");
+const valOrFunc = require("stimsrv/util/valOrFunc");
 
 // see https://github.com/psychopy/psychopy/blob/release/psychopy/data/staircase.py
 module.exports = function(_options) {
