@@ -52,30 +52,24 @@ describe("Text Task", () => {
     
     it("Parameter sets", () => {
       // TODO: move this to a more generic test section
-      let task = text(
-        [
-          // static
-          {
-            angle: sequence.loop([1,-1]),
-          },
-          // dynamic: select word from hierarchical collection
-          context => {           
-            // hierarchical set of generators
-            let sets = sequence.loop([
-              sequence.loop(["AA","AB","AC"]),
-              sequence.loop(["BA","BB","BC"]),
-            ])(context);           
-            return condition => {
-              // get the next category, and from that the next set
-              let set = sets.next().value;
-              return {
-                text: set.next().value,
-                choices: set.items
-              }
+      let task = text({
+        angle: sequence.loop([1,-1]),       
+        generateCondition: context => {           
+          // hierarchical set of generators
+          let sets = sequence.loop([
+            sequence.loop(["AA","AB","AC"]),
+            sequence.loop(["BA","BB","BC"]),
+          ])(context);           
+          return condition => {
+            // get the next category, and from that the next set
+            let set = sets.next().value;
+            return {
+              text: set.next().value,
+              choices: set.items
             }
           }
-        ]
-      );
+        }
+      });
 
       let controller = task.controller({});
       

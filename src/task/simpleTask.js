@@ -29,7 +29,7 @@ function simpleTask(taskSpec) {
   }, taskSpec);
   
   // userConfig needs to be an object containing the entries for each property of the condition
-  let task = function(userConfig) {
+  let task = function(userConfig={}) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
     let staticOptions = interfaceOptions.concat(["css","generateCondition","transformConditionOnClient"]);
