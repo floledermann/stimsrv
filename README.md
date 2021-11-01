@@ -360,11 +360,13 @@ text({
 })
 ```
 
+### Generators for task properties
+
 The following helpers are provided for generating parameter sequences:
 
 `require("stimsrv/controller/sequence")`
 
-### sequence(items[, options])
+#### sequence(items[, options])
 
 Iterator, going through the specified items one by one.
 
@@ -378,11 +380,11 @@ stepCount | 1       | Repeat each item stepCount times
 loop      | false   | Loop after sequence is exhausted
 loopCount | -       | Stop after loopCount loops
 
-### sequence.loop(items[, options])
+#### sequence.loop(items[, options])
 
 Identical to `sequence` with `loop` option set to true.
 
-### sequence.array(items)
+#### sequence.array(items)
 
 Iterator, creating a sequence of arrays from an array of iterators.
 
@@ -392,15 +394,15 @@ The iterator is exhausted once the first iterator in the array is exhausted.
 
 `require("stimsrv/controller/random")`
 
-### random(items)
+#### random(items)
 
 Picks a random item from the Array of items in each step (sampling with replacement).
 
-### random.pick(items)
+#### random.pick(items)
 
 Same as `random(items)`.
 
-### random.shuffle(items, options)
+#### random.shuffle(items, options)
 
 Shuffles the Array of items and returns items in random order (sampling without replacement).
 
@@ -414,15 +416,15 @@ multiple  | 1       | Duplicate items to create this number of copies of each it
 loop      | false   | Re-shuffle and restart after sequence is exhausted
 preventContinuation | true | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
 
-### random.sequence(items, options)
+#### random.sequence(items, options)
 
 Same as `random.shuffle`.
 
-### random.loop(items, options)
+#### random.loop(items, options)
 
 Same as `random.shuffle` with `loop` option set to true.
 
-### random.range(from, to, options)
+#### random.range(from, to, options)
 
 Generate random numbers in the range from `from` (inclusive) to `to` (exclusive).
 
@@ -430,11 +432,75 @@ Generate random numbers in the range from `from` (inclusive) to `to` (exclusive)
 
  Option   | default | Description
 ----------|---------|------------
-round     | false   | If a number, round to multiples of that number (e.g. 10, 2 or 0.1). If true, round to whole numbers.
+round     | false   | If a number, round to whole multiples of that number (e.g. 10, 2 (=round numbers), 1 (whole numbers), 0.1 etc.). If true, round to whole numbers.
 suffix    | null    | A String to be appended to the resulting number.
 
+### Dynamic generators
 
-In some cases, condition parameters 
+In some cases, condition parameters should be determined based on the responses by the participant, for example to adapt the stimulus to successful or unsuccessfule responses.
+
+Currently, only the staircase method is implemented.
+
+`require("stimsrv/controller/staircase")`
+
+#### staircase(options)
+
+Adjusts a dimension depending on the correctness of the previous response.
+
+**options**: Object with entries for the following options:
+
+ Option   | default | Description
+----------|---------|------------
+isResponseCorrect | stimsrv/util/matchProperties.js | A function `context => (condition, response) => <Boolean>`, receiving the last condition and last response and returning a boolean whether the response is considered "correct". This determines the direction of the next staircase step.
+startValue | 1 | The start value. Can be a string containing a unit (e.g. "2mm"), in which case the unit will be used for all output values.
+stepSize | 2 | The step size. Its interpretation depends on the `stepType` option.
+stepSizeFine | 1 | The step size when in "fine" mode.
+stepType | "db" | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size).
+minReversals | 3 | The minimum number of reversals to perform.
+minTrials | 0 | The minimum number of trials to perform.
+numUp | 1 | Number of "incorrect" responses to cause the value to go up.
+numDown | 3 | Number of "correct" response to cause the value to go down.
+numReversalsFine | Infinity | Switch to stepSizeFine after this many reversals.
+initialSingleReverse | true | Whether to advance at each step before the first reversal.
+minValue | -Infinity | The minimum value to emit.
+maxValue | Infinity | The maximum value to emit.
+
+For example, here is a text task that adjusts the font size in reaction to user feedback:
+
+```
+text({
+  name: "task1",                
+  text: "Can you read this?",
+  fontSize: staircase({
+    startValue: "4mm",
+    numDown: 1,           // advance every step
+    isResponseCorrect: context => (condition, response) => response.choice == "Yes"
+  }),
+  choices: ["Yes","No"]
+})
+```
+
+
+### Implementing a custom generators
+
+Property generators are implemented as a function that gets passed the context and returns an object with a single method `next()`. This function gets called with the last condition, the last response and an array of data of all previous trials, and is expected to return an object containing an entry for `value` and `done` (following the [JavaScript iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol)).
+
+```
+text({
+  name: "task1",                
+  text: context => {
+    let count = 0;
+    return {
+      next: function(lastCondition, lastResponse, trials) {
+        count++;
+        if (lastResponse && lastResponse.choice == "No") return {done: true};
+        return { value: "Trial " + count + ". Continue?" };
+      }
+    }
+  },
+  choices: ["Yes","No"]
+})
+```
 
 
 ## Implementing tasks
