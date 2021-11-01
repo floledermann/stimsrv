@@ -352,7 +352,7 @@ text({
   name: "task1",                
   text: "Can you read this?",
   // Font size will become increasingly smaller on each trial.
-  // Once the choices are exhausted, the experiment will proceed with the next task.
+  // Once the sequence is exhausted, the experiment will proceed with the next task.
   fontSize: sequence(["4mm","3mm","2mm"]),  
   // Rotate by a random amount on each trial, rounded to full degrees
   rotate: random.range(-30,30, {round: 1}),
@@ -360,7 +360,81 @@ text({
 })
 ```
 
+The following helpers are provided for generating parameter sequences:
 
+`require("stimsrv/controller/sequence")`
+
+### sequence(items[, options])
+
+Iterator, going through the specified items one by one.
+
+**items**: Array of values the sequence should iterate through. Any item that is a function will be called with the Task's `context` and replaced by its return value before the start of the sequence.
+
+**options**: Object with entries for the following options:
+
+ Option   | default | Description
+----------|---------|------------
+stepCount | 1       | Repeat each item stepCount times
+loop      | false   | Loop after sequence is exhausted
+loopCount | -       | Stop after loopCount loops
+
+### sequence.loop(items[, options])
+
+Identical to `sequence` with `loop` option set to true.
+
+### sequence.array(items)
+
+Iterator, creating a sequence of arrays from an array of iterators.
+
+**items**: An Array containing iterators and values. For each iteration, each iterator will be queried for the next value and the result array will contain those values.
+
+The iterator is exhausted once the first iterator in the array is exhausted.
+
+`require("stimsrv/controller/random")`
+
+### random(items)
+
+Picks a random item from the Array of items in each step (sampling with replacement).
+
+### random.pick(items)
+
+Same as `random(items)`.
+
+### random.shuffle(items, options)
+
+Shuffles the Array of items and returns items in random order (sampling without replacement).
+
+**items**: Array of values the sequence should iterate through. Any item that is a function will be called with the Task's `context` and replaced by its return value before the start of the sequence.
+
+**options**: Object with entries for the following options:
+
+ Option   | default | Description
+----------|---------|------------
+multiple  | 1       | Duplicate items to create this number of copies of each item before shuffling
+loop      | false   | Re-shuffle and restart after sequence is exhausted
+preventContinuation | true | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
+
+### random.sequence(items, options)
+
+Same as `random.shuffle`.
+
+### random.loop(items, options)
+
+Same as `random.shuffle` with `loop` option set to true.
+
+### random.range(from, to, options)
+
+Generate random numbers in the range from `from` (inclusive) to `to` (exclusive).
+
+**options**: Object with entries for the following options:
+
+ Option   | default | Description
+----------|---------|------------
+round     | false   | If a number, round to multiples of that number (e.g. 10, 2 or 0.1). If true, round to whole numbers.
+suffix    | null    | A String to be appended to the resulting number.
+
+
+In some cases, condition parameters 
 
 
 ## Implementing tasks

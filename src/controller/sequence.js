@@ -51,6 +51,9 @@ sequence.loop = function(items, options) {
   return sequence(items, options);
 }
 
+/**
+Iterator, converting an Array of iterators into a sequence of Arrays of those iterators' values.
+*/
 sequence.array = function(items, options) {
   
   return function(context) {
