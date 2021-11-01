@@ -324,7 +324,7 @@ See the [CSS override example](https://github.com/floledermann/stimsrv-examples/
 
 ## Configuring tasks
 
-stimsrv comes with a library of reusable fundamental tasks that can be adapted to the needs of an experiment. See section ["Implementing tasks"](#implementing-tasks) for how to implement your own tasks.
+stimsrv comes with a library of reusable basic tasks that can be adapted to the needs of an experiment. See section ["Implementing tasks"](#implementing-tasks) for how to implement your own tasks.
 
 To create a task, simply call its creation function, sepcifying the task's configuration parameters.
 
@@ -341,7 +341,9 @@ text({
 
 Most configuration parameters are used to specify the condition(s) for the task. Such condition properties can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit (e.g. the `fontSize` parameter in the example above).
 
-Specifying only constant condition properties would cause the same condition to repeat indefinitely, which is rarely what you want in an experiment. Therefore, at least one property will usually be specified to produce a sequence of values for the property in subsequent trials. A range of helper functions is available to specify such sequences for condition properties, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to a participant's responses.
+Specifying only constant condition properties would cause the same condition for the task to repeat indefinitely, which is rarely what you want in an experiment. Therefore, at least one property will need to be specified to produce a sequence of values in subsequent trials. A range of helper functions is available to specify such sequences, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to a participant's responses.
+
+This example adjusts the font size according to a pre-defined sequence, and randomizes the rotation of the text for each trial.
 
 ```JS
 const sequence = require("stimsrv/controller/sequence");
@@ -362,7 +364,7 @@ text({
 })
 ```
 
-### Generators for condition properties
+### Generators for property values
 
 The following helpers are provided for generating parameter sequences:
 
@@ -392,7 +394,7 @@ Iterator, creating a sequence of arrays from an array of iterators.
 
 **items**: An Array containing iterators and values. For each iteration, each iterator will be queried for the next value and the result array will contain those values.
 
-The iterator is exhausted once the first iterator in the array is exhausted.
+The iterator is exhausted when any iterator in the array becomes exhausted.
 
 #### *random(items)*
 
@@ -443,21 +445,21 @@ In some cases, condition parameters should be determined based on the responses 
 
 Currently, only the staircase method is implemented.
 
-`require("stimsrv/controller/staircase")`
-
 #### staircase(options)
 
-Adjusts a dimension depending on the correctness of the previous response.
+`const staircase = require("stimsrv/controller/staircase")`
+
+Adjusts its value depending on the correctness of the previous response.
 
 **options**: Object with entries for the following options:
 
  Option   | default | Description
 ----------|---------|------------
 isResponseCorrect | stimsrv/util/matchProperties.js | A function `context => (condition, response) => <Boolean>`, receiving the last condition and last response and returning a boolean whether the response is considered "correct". This determines the direction of the next staircase step.
-startValue | 1 | The start value. Can be a string containing a unit (e.g. "2mm"), in which case the unit will be used for all output values.
+startValue | 1 | The start value. Can be a string containing a unit (e.g. `"2mm"`), in which case the unit will be used for all output values.
 stepSize | 2 | The step size. Its interpretation depends on the `stepType` option.
 stepSizeFine | 1 | The step size when in "fine" mode.
-stepType | "db" | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size).
+stepType | "db" | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value in each step), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size in each step).
 minReversals | 3 | The minimum number of reversals to perform.
 minTrials | 0 | The minimum number of trials to perform.
 numUp | 1 | Number of "incorrect" responses to cause the value to go up.
@@ -473,15 +475,14 @@ For example, here is a text task that adjusts the font size in reaction to user 
 text({
   name: "task1",                
   text: "Can you read this?",
+  choices: ["Yes","No"],
   fontSize: staircase({
     startValue: "4mm",
     numDown: 1,           // advance every step
     isResponseCorrect: context => (condition, response) => response.choice == "Yes"
-  }),
-  choices: ["Yes","No"]
+  })
 })
 ```
-
 
 ### Implementing custom generators
 
@@ -504,18 +505,28 @@ text({
 })
 ```
 
+### Functions for processing condititions
+
+#### generateCondition
+
+#### transformConditionOnClient
+
+### Further task properties
+
+#### css
+
+#### resources
+
 
 ## Implementing tasks
-
-A stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.)
-
-Generally, most concepts in stimsrv are represented either by *plain JS objects* (for data and objects) or by *functions* (for dynamic behaviour).
 
 ### Implementing tasks using the simpleTask helper
 
 *(... coming soon ...)*
 
 ### Implementing tasks using the low-level API
+
+Internally, a stimsrv task is composed of two parts: the ***controller***, which usually runs on the server and controls the sequence of *conditions* to be processed, and the ***frontend***, which usually runs on the client(s) and is responsible for rendering the condition in one or more *user interfaces* and sending *responses* back to the server. (See [below](#terminology) for the terminology used in stimsrv.)
 
 A stimsrv task is simply a plain JS object with entries for `frontend`, and (optionally) the `controller` and other properties. Both `frontend` and `controller` are functions which recieve a context object and return a plain JS object specifying the behaviour. So the basic structure of a task looks like this:
 
