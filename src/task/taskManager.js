@@ -38,7 +38,9 @@ function taskManager(config) {
     nextContext: context => (context = config.nextContext?.(context) || context, resolve("nextContext", context, context))
   });
   
-  
+  /*
+  Resolve the parameter named name, given the context.
+  */
   function resolve(name, context, defaultValue) {
     let val = config.controllerConfig.reduce((val, current) => {
       if (typeof current == "function") current = current(context);
@@ -53,10 +55,16 @@ function taskManager(config) {
     return val;
   }
   
+  /*
+  Resolve and cast to Array.
+  */
   function resolveArray(name, context, defaultValue) {
     return toArray(resolve(name, context, defaultValue));
   }
   
+  /*
+  Resolve the complete set of parameters.
+  */
   function resolveConfig(context) {
     return config.controllerConfig.reduce((config, spec) => {
       // resolve function with context
@@ -83,7 +91,7 @@ function taskManager(config) {
       if (typeof spec == "function") {
         spec = toArray(spec(resolveConfig(context)));
       }
-      // otherwise reolve property name as array of resources
+      // otherwise resolve property name as array of resources
       else {
         spec = resolveArray(spec, context);
       }        
@@ -107,15 +115,19 @@ function taskManager(config) {
     
     controller: context => params(context),
     
-    interfaces: function(spec, context) {
+    // spec defines the standard interfaces for this task
+    interfaces: function(context) {
       
       let interfaces = {};
       
-      let config = resolveConfig(context);
+      let resolvedConfig = resolveConfig(context);
+      
+      // add/overrule dynamically defined interfaces over standard interfaces
+      let spec = Object.assign({}, config.interfaces, resolvedConfig.interfaces);
       
       Object.keys(spec).forEach(key => {
         resolveArray(key + "Interface", context, key).forEach(ui => {
-          interfaces[ui] = typeof spec[key] == "function" ? spec[key](config) : spec[key];
+          interfaces[ui] = typeof spec[key] == "function" ? spec[key](resolvedConfig) : spec[key];
         })
       });
       

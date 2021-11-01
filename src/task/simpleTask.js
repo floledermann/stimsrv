@@ -10,9 +10,9 @@ Helper to implement tasks with the following features:
 - Sequence of conditions can be specified for each instance including callbacks and iterators (by way of stimsrv/util/parameterController - see documentation there for how to specify parameters)
 - Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters
 - Default values can be specified and changed globally with the .defaults() method
-- Interfaces can be remapped using "<interfaceName>Interface" properties, e.g.: displayInterface: "specialDisplay"
-- TODO: additional interfaces can be added for each instance
-- nextContext and transformConditionOnClient can be specified for task instance
+- Interfaces can be remapped to named interfaces using "<interfaceName>Interface" properties, e.g.: displayInterface: "specialDisplay"
+- Additional interfaces can be added for each instance using the "interfaces" property.
+- generateCondition, transformConditionOnClient and nextContext can be specified for task instance
 - resources and css can be specified (static or TODO dynamic)
 */
 
@@ -28,7 +28,7 @@ function simpleTask(taskSpec) {
     //css: null //?
   }, taskSpec);
   
-  // controllerConfig needs to be an object conttaining the entries for each property of the condition
+  // controllerConfig needs to be an object containing the entries for each property of the condition
   let task = function(controllerConfig) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
@@ -42,6 +42,7 @@ function simpleTask(taskSpec) {
       generateCondition: controllerConfig.generateCondition,
       transformConditionOnClient: controllerConfig.transformConditionOnClient,
       nextContext: taskSpec.nextContext,
+      interfaces: taskSpec.interfaces,
       // do we need this? may simply throw an error if it does not resolve to a static value
       staticOptions: staticOptions
     });
@@ -54,7 +55,7 @@ function simpleTask(taskSpec) {
       description: config.description,
       frontend: context => {
         return {
-          interfaces: manager.interfaces(taskSpec.interfaces, context),
+          interfaces: manager.interfaces(context),
           transformConditionOnClient: manager.transformConditionOnClient(context),
           css: manager.resolve("css", context)
         };
