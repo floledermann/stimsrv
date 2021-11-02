@@ -473,11 +473,11 @@ text({
 ----------------------|------------|------------
 **isResponseCorrect** | [`matchProperties`](https://github.com/floledermann/stimsrv/blob/main/src/util/matchProperties.js) | A function `context => (condition, response) => <Boolean>`, receiving the last condition and last response and returning a boolean whether the response is considered "correct". This determines the direction of the next staircase step.
 **startValue**        | `1`        | The start value. Can be a string containing a unit (e.g. `"2mm"`), in which case the unit will be used for all output values.
+**stepType**          | `"db"`     | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value in each step), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size in each step).
 **stepSize**          | `2`        | The step size. Its interpretation depends on the `stepType` option.
 **stepSizeFine**      | `1`        | The step size when in "fine" mode.
-**stepType**          | `"db"`     | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value in each step), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size in each step).
-**minReversals**      | `3`        | The minimum number of reversals to perform.
-**minTrials**         | `0`        | The minimum number of trials to perform.
+**minReversals**      | `3`        | The minimum number of reversals to perform. The task will end when both minReversals and minTrials are reached.
+**minTrials**         | `0`        | The minimum number of trials to perform. The task will end when both minReversals and minTrials are reached.
 **numUp**             | `1`        | Number of "incorrect" responses to cause the value to go up.
 **numDown**           | `3`        | Number of "correct" response to cause the value to go down.
 **numReversalsFine**  | `Infinity` | Switch to stepSizeFine after this many reversals.
