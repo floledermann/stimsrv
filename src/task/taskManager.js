@@ -43,9 +43,9 @@ function taskManager(config) {
   */
   function resolve(name, context, defaultValue) {
     let val = config.controllerConfig.reduce((val, current) => {
-      if (typeof current == "function") current = current(context);
+      if (context && typeof current == "function") current = current(context);
       let entry = current[name];
-      if (typeof entry == "function") entry = entry(context);
+      if (context && typeof entry == "function") entry = entry(context);
       if (entry !== undefined) val = entry;
       return val;
     }, null);
@@ -66,9 +66,10 @@ function taskManager(config) {
   Resolve the complete set of parameters.
   */
   function resolveConfig(context) {
+    if (!context) throw new Error("No context provided to taskManager.resolveConfig() - use resolveStaticConfig to resolve pre-context!");
     return config.controllerConfig.reduce((config, spec) => {
       // resolve function with context
-      if (typeof spec == "function") {
+      if (context && typeof spec == "function") {
         spec = spec(context);
       }
       // for each entry in spec object, resolve with context if it is a function
@@ -83,13 +84,22 @@ function taskManager(config) {
     }, {});
   }
   
+  function resolveStaticConfig() {
+    // if we need to access config before we have a context, simply copy together the specs
+    return config.controllerConfig.reduce((config, spec) => {
+      Object.assign(config, spec);
+      return config;
+    }, {});
+  }
+  
   return {
     resolve: resolve,
     resolveArray: resolveArray,
     resolveResources: function(spec, context) {
-       // if spec is a function, resolve with config object
+       // if spec is a function, resolve with (static) config object
+       // this will usually happen before we have a context, so dynamic behaviour is not supported
       if (typeof spec == "function") {
-        spec = toArray(spec(resolveConfig(context)));
+        spec = toArray(spec(resolveStaticConfig()));
       }
       // otherwise resolve property name as array of resources
       else {
@@ -100,6 +110,7 @@ function taskManager(config) {
       return spec.map(res => res.resource ? res.resource : res).filter(r => r);
     },
     resolveConfig: resolveConfig,
+    resolveStaticConfig: resolveStaticConfig,
     transformConditionOnClient: context => condition => {
       return config.transformConditionOnClient.reduce((condition, transform) => {
         if (typeof transform == "function") {

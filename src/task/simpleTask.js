@@ -47,12 +47,9 @@ function simpleTask(taskSpec) {
       staticOptions: staticOptions
     });
     
-    // resolve without context for name and description
-    let config = manager.resolveConfig();
-    
     return {
-      name: config.name,
-      description: config.description,
+      name: manager.resolve("name"),
+      description: manager.resolve("description"),
       frontend: context => {
         return {
           interfaces: manager.interfaces(context),
