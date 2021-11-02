@@ -381,9 +381,9 @@ Iterator, going through the specified items one by one.
 
  Option    | default | Description
 -----------|---------|------------
-`stepCount`| 1       | Repeat each item stepCount times
-`loop`     | false   | Loop after sequence is exhausted
-`loopCount`| -       | Stop after loopCount loops
+`stepCount`| `1`     | Repeat each item stepCount times
+`loop`     | `false` | Loop after sequence is exhausted
+`loopCount`| `null`  | Stop after loopCount loops
 
 #### *sequence.loop(items[, options])*
 
@@ -415,11 +415,11 @@ Shuffles the Array of items and returns items in random order (sampling without 
 
 **options**: Object with entries for the following options:
 
- Option   | default | Description
-----------|---------|------------
-multiple  | 1       | Duplicate items to create this number of copies of each item before shuffling
-loop      | false   | Re-shuffle and restart after sequence is exhausted
-preventContinuation | true | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
+ Option             | default | Description
+--------------------|---------|------------
+multiple            | `1`     | Duplicate items to create this number of copies of each item before shuffling
+loop                | `false` | Re-shuffle and restart after sequence is exhausted
+preventContinuation | `true`  | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
 
 #### *random.sequence(items, options)*
 
@@ -437,8 +437,8 @@ Generate random numbers in the range from `from` (inclusive) to `to` (exclusive)
 
  Option   | default | Description
 ----------|---------|------------
-round     | false   | If a number, round to whole multiples of that number (e.g. 10, 2 (=round numbers), 1 (whole numbers), 0.1 etc.). If true, round to whole numbers.
-suffix    | null    | A String to be appended to the resulting number.
+round     | `false` | If a number, round to whole multiples of that number (e.g. 10, 2 (=round numbers), 1 (whole numbers), 0.1 etc.). If true, round to whole numbers.
+suffix    | `null`  | A String to be appended to the resulting number.
 
 ### Dynamic parameter generators
 
@@ -469,21 +469,21 @@ text({
 
 **options**: Object with entries for the following options:
 
- Option   | default | Description
-----------|---------|------------
-isResponseCorrect | stimsrv/util/matchProperties.js | A function `context => (condition, response) => <Boolean>`, receiving the last condition and last response and returning a boolean whether the response is considered "correct". This determines the direction of the next staircase step.
-startValue | 1 | The start value. Can be a string containing a unit (e.g. `"2mm"`), in which case the unit will be used for all output values.
-stepSize | 2 | The step size. Its interpretation depends on the `stepType` option.
-stepSizeFine | 1 | The step size when in "fine" mode.
-stepType | "db" | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value in each step), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size in each step).
-minReversals | 3 | The minimum number of reversals to perform.
-minTrials | 0 | The minimum number of trials to perform.
-numUp | 1 | Number of "incorrect" responses to cause the value to go up.
-numDown | 3 | Number of "correct" response to cause the value to go down.
-numReversalsFine | Infinity | Switch to stepSizeFine after this many reversals.
-initialSingleReverse | true | Whether to advance at each step before the first reversal.
-minValue | -Infinity | The minimum value to emit.
-maxValue | Infinity | The maximum value to emit.
+ Option           | default    | Description
+------------------|------------|------------
+isResponseCorrect | [`matchProperties`](https://github.com/floledermann/stimsrv/blob/main/src/util/matchProperties.js) | A function `context => (condition, response) => <Boolean>`, receiving the last condition and last response and returning a boolean whether the response is considered "correct". This determines the direction of the next staircase step.
+startValue        | `1`        | The start value. Can be a string containing a unit (e.g. `"2mm"`), in which case the unit will be used for all output values.
+stepSize          | `2`        | The step size. Its interpretation depends on the `stepType` option.
+stepSizeFine      | `1`        | The step size when in "fine" mode.
+stepType          | `"db"`     | The step type, one of "db" (step size specified in dB), "linear" (step size will be added/subtracted to the current value in each step), "log" (step size is specified in log10), "multiply" (current value will be multiplied/divided by step size in each step).
+minReversals      | `3`        | The minimum number of reversals to perform.
+minTrials         | `0`        | The minimum number of trials to perform.
+numUp             | `1`        | Number of "incorrect" responses to cause the value to go up.
+numDown           | `3`        | Number of "correct" response to cause the value to go down.
+numReversalsFine  | `Infinity` | Switch to stepSizeFine after this many reversals.
+initialSingleReverse | `true`  | Whether to advance at each step before the first reversal.
+minValue          | `-Infinity`| The minimum value to emit.
+maxValue          | `Infinity` | The maximum value to emit.
 
 
 ### Implementing custom parameter generators
@@ -612,13 +612,13 @@ The simpleTask helper function can be used to implement tasks that follow the mo
 
 **taskSpec** is an object containing the specification for the task.
 
-Option    | default | Description
-----------|---------|------------
-name | "Unnamed Task" | The default name of the task (can be overridden by user configuration)
-description | "" | The default description of the task (can be overridden by user configuration)
-defaults | {} | The default settings for the task (mainly condition parameters)
-interfaces | {} | The tasks user interfaces. An object with one entry for each interface, with the key specifying the default interface and the value being a function `config => context => UserInterface` to construct the interface (see below).
-nextContext | null | A function to modify the context at the end of the task.
+Option      | default         | Description
+------------|-----------------|------------
+name        | `"Unnamed Task"`| The default name of the task (can be overridden by user configuration)
+description | `""`            | The default description of the task (can be overridden by user configuration)
+defaults    | `{}`            | The default settings for the task (mainly condition parameters)
+interfaces  | `{}`            | The tasks user interfaces. An object with one entry for each interface, with the key specifying the default interface and the value being a function `config => context => UserInterface` to construct the interface (see below).
+nextContext | `null`          | A function to modify the context at the end of the task.
 
 *(... coming soon ...)*
 
