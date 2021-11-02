@@ -23,7 +23,7 @@ function simpleTask(taskSpec) {
     description: "",
     defaults: {},
     interfaces: {},
-    nextContext: null,
+    nextContext: null, // should this simply go into defaults?
     //resources: null, //?
     //css: null //?
   }, taskSpec);

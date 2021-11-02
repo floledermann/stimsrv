@@ -450,7 +450,22 @@ Currently, only the staircase method is implemented.
 
 `const staircase = require("stimsrv/controller/staircase")`
 
-Adjusts its value depending on the correctness of the previous response.
+Adjusts its value up/down depending on the correctness of the previous response(s), using a [staircase method](https://dictionary.apa.org/staircase-method).
+
+For example, here is a text task that adjusts the font size in reaction to user feedback:
+
+```JS
+text({
+  name: "task1",                
+  text: "Can you read this?",
+  choices: ["Yes","No"],
+  fontSize: staircase({
+    startValue: "4mm",
+    numDown: 1,           // advance every step
+    isResponseCorrect: context => (condition, response) => response.choice == "Yes"
+  })
+})
+```
 
 **options**: Object with entries for the following options:
 
@@ -470,20 +485,6 @@ initialSingleReverse | true | Whether to advance at each step before the first r
 minValue | -Infinity | The minimum value to emit.
 maxValue | Infinity | The maximum value to emit.
 
-For example, here is a text task that adjusts the font size in reaction to user feedback:
-
-```JS
-text({
-  name: "task1",                
-  text: "Can you read this?",
-  choices: ["Yes","No"],
-  fontSize: staircase({
-    startValue: "4mm",
-    numDown: 1,           // advance every step
-    isResponseCorrect: context => (condition, response) => response.choice == "Yes"
-  })
-})
-```
 
 ### Implementing custom parameter generators
 
@@ -580,16 +581,44 @@ text({
 })
 ```
 
+#### nextContext
+
 ### Further task properties
 
 #### css
 
 #### resources
 
+### Task default settings
+
 
 ## Implementing tasks
 
+For most experiments it will be necessary to implement your own tasks. stimsrv provides a low-level API for tasks that puts very few constraints on how they are impelmented. For tasks which follow a more standardized model, a high-level helper function is provided.
+
 ### Implementing tasks using the simpleTask helper
+
+The simpleTask helper function can be used to implement tasks that follow the model of the built-in tasks. Using the simpleTask function, several features are provided for your task:
+
+- The sequence of conditions can be specified by users of your tasks using constant values, callbacks and iterators, as discussed above.
+- Default settings for the task can be specified and changed globally.
+- User interfaces can be remapped to named interfaces.
+- Additional user interfaces can be added for each instance.
+- `resources` and `css` can be specified and will be loaded automatically.
+- `generateCondition`, `transformConditionOnClient` and `nextContext` can be specified.
+- Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters when results are saved.
+
+#### simpleTask(taskSpec)
+
+**taskSpec** is an object containing the specification for the task.
+
+Option    | default | Description
+----------|---------|------------
+name | "Unnamed Task" | The default name of the task (can be overridden by user configuration)
+description | "" | The default description of the task (can be overridden by user configuration)
+defaults | {} | The default settings for the task (mainly condition parameters)
+interfaces | {} | The tasks user interfaces. An object with one entry for each interface, with the key specifying the default interface and the value being a function `config => context => UserInterface` to construct the interface (see below).
+nextContext | null | A function to modify the context at the end of the task.
 
 *(... coming soon ...)*
 
