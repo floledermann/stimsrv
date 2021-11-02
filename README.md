@@ -192,13 +192,13 @@ devices: [
     id: "supervisor_tablet",
     name: "Tablet of experimenter",
     resolution: "1920x1080",
-    pixeldensity: 150
+    pixelDensity: 150
   },
   {
     id: "participant_phone",
     name: "Phone for participant",
     resolution: "1080x1920",
-    pixeldensity: 441
+    pixelDensity: 441
   }
 ],
 ```
@@ -564,7 +564,7 @@ text({
 
 #### transformConditionOnClient
 
-transformConditionOnClient allows a further transformation of the condition parameters in the context of the client device. It gets passed the client context, containing information about the particular device (e.g. screen resolution etc.). It is therefore possible to adapt conditions to the particular circumstances of the device.
+transformConditionOnClient allows a further transformation of the condition parameters in the context of the client device. It gets passed the *client context* (the task context mixed with the properties of the client's [device specification](#device-configuration--roles)), containing information about the particular device (e.g. screen resolution etc.). It is therefore possible to adapt conditions to the particular circumstances of the device.
 
 ```JS
 text({
