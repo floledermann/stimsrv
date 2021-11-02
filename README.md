@@ -509,15 +509,15 @@ text({
 
 ### Functions for processing condititions
 
-In addition to parameter generators, two functions can be specified in the task configuration that affect the conditions of the task.
+In addition to parameter generators, two functions can be specified in the task configuration that further affect the conditions of the task.
 
 #### *generateCondition*
 
-Here a function can be defined which is called after a new condition has been constructed (from constant parameters and parameter generators), before it is sent out to clients. The properties of the returned object will be merged with the condition.
+A function which is called after a new condition has been constructed (from constant parameters and parameter generators), before it is sent out to clients. The properties of the returned object will be merged with the condition.
 
 The signature for generateCondition is `context => (currentCondition, lastCondition, lastResponse, trials) => Object`. The properties of the returned object will be added to the condition, overwriting any parameters defined in both. If the value of a parameter is `undefined`, it is removed from the condition.
 
-This allows very flexible definition of related condition parameters. It can be used with the provided generators, or with a custom implementation.
+This allows, among other things, for the definition of related condition parameters. It can be used with the provided generators, or by providing a custom function.
 
 In the following examples, the text and font size are set to matching values. The first example uses a generator to populate multiple parameters in unison, the second implementation has a simple generator assign the font size and sets the matching text in generateCondition().
 
