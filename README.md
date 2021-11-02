@@ -6,6 +6,7 @@
 <a href="#defining--running-experiments">Running&nbsp;Experiments</a> ·
 <a href="#experiment-results">Experiment&nbsp;results</a> ·
 <a href="#device-configuration--roles">Device&nbsp;configuration&nbsp;&amp;&nbsp;roles</a> ·
+<a href="#configuring-tasks">Configuring&nbsp;tasks</a> ·
 <a href="#implementing-tasks">Implementing&nbsp;tasks</a> ·
 <a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·
 <a href="#license-credits--acknowledgements">License&nbsp;&amp;&nbsp;Credits</a>
@@ -324,9 +325,9 @@ See the [CSS override example](https://github.com/floledermann/stimsrv-examples/
 
 ## Configuring tasks
 
-stimsrv comes with a library of reusable basic tasks that can be adapted to the needs of an experiment. See section ["Implementing tasks"](#implementing-tasks) for how to implement your own tasks.
+stimsrv comes with a library of reusable basic tasks that can be adapted to the needs of an experiment. See the [task directory](https://github.com/floledermann/stimsrv/tree/main/src/task) for the built-in tasks. See section ["Implementing tasks"](#implementing-tasks) for how to implement your own tasks.
 
-To create a task, simply call its creation function, sepcifying the task's configuration parameters.
+To create a task, simply call its creation function, specifying the task's configurable properties in an object.
 
 ```JS
 // Create the "text" task
@@ -339,9 +340,9 @@ text({
 })
 ```
 
-Most configuration parameters are used to specify the condition(s) for the task. Such condition properties can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit (e.g. the `fontSize` parameter in the example above).
+Most configuration properties are used to specify the condition(s) for the task. Such condition parameters can be constant (numbers, strings, arrays or objects) or they can be generated dynamically. Some tasks may allow dimensions to be specified as a string, containing the numeric value and a unit (e.g. the `fontSize` parameter in the example above).
 
-Specifying only constant condition properties would cause the same condition for the task to repeat indefinitely, which is rarely what you want in an experiment. Therefore, at least one property will need to be specified to produce a sequence of values in subsequent trials. A range of helper functions is available to specify such sequences, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to a participant's responses.
+Specifying only constant condition parameters would cause the same condition for the task to repeat indefinitely, which is rarely what you want in an experiment. Therefore, at least one property will need to be specified to produce a sequence of values in subsequent trials. A range of helper functions is available for specifying such sequences, including pre-defined sequences, randomized sequences, random values within a range, or dynamic parameters adapting to a participant's responses.
 
 This example adjusts the font size according to a pre-defined sequence, and randomizes the rotation of the text for each trial.
 
@@ -439,13 +440,13 @@ Generate random numbers in the range from `from` (inclusive) to `to` (exclusive)
 round     | false   | If a number, round to whole multiples of that number (e.g. 10, 2 (=round numbers), 1 (whole numbers), 0.1 etc.). If true, round to whole numbers.
 suffix    | null    | A String to be appended to the resulting number.
 
-### Dynamic generators
+### Dynamic parameter generators
 
 In some cases, condition parameters should be determined based on the responses by the participant, for example to adapt the stimulus to successful or unsuccessfule responses.
 
 Currently, only the staircase method is implemented.
 
-#### staircase(options)
+#### *staircase(options)*
 
 `const staircase = require("stimsrv/controller/staircase")`
 
@@ -484,9 +485,9 @@ text({
 })
 ```
 
-### Implementing custom generators
+### Implementing custom parameter generators
 
-Property generators are implemented as a function that gets passed the context and returns an object with a single method `next()`. This function gets called with the last condition, the last response and an array of data of all previous trials, and is expected to return an object containing an entry for `value` and `done` (following the [JavaScript iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol)).
+Parameter generators are implemented as a function that gets passed the context and returns an object with a single method `next()`. This function gets called with the last condition, the last response and an array of data of all previous trials, and is expected to return an object containing an entry for `value` and `done` (following the [JavaScript iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol)).
 
 ```JS
 text({
@@ -507,9 +508,77 @@ text({
 
 ### Functions for processing condititions
 
-#### generateCondition
+In addition to parameter generators, two functions can be specified in the task configuration that affect the conditions of the task.
+
+#### *generateCondition*
+
+Here a function can be defined which is called after a new condition has been constructed (from constant parameters and parameter generators), before it is sent out to clients. The properties of the returned object will be merged with the condition.
+
+The signature for generateCondition is `context => (currentCondition, lastCondition, lastResponse, trials) => Object`. The properties of the returned object will be added to the condition, overwriting any parameters defined in both. If the value of a parameter is `undefined`, it is removed from the condition.
+
+This allows very flexible definition of related condition parameters. It can be used with the provided generators, or with a custom implementation.
+
+In the following examples, the text and font size are set to matching values. The first example uses a generator to populate multiple parameters in unison, the second implementation has a simple generator assign the font size and sets the matching text in generateCondition().
+
+```JS
+/*
+Conditions will be either
+{ angle: 15, text: "Large Text", fontSize: "10mm" }
+or
+{ angle: 15, text: "Small Text", fontSize: "3mm" }
+*/
+
+text({
+  angle: 15,    // constant for all conditions
+  generateCondition: random.shuffle([
+    {
+      text: "Large Text",
+      fontSize: "10mm",
+    },
+    {
+      text: "Small Text",
+      fontSize: "3mm",
+    }
+  ])
+})
+```
+
+```JS
+/*
+Identical behaviour as above, different implementation strategy.
+*/
+
+text({
+  angle: 15,
+  fontSize: random.shuffle(["10mm","5mm"]),
+  generateCondition: context => condition => {
+    // Parameter generators will have been run before generateCondition is called, 
+    // so we can "react" on the chosen font size.
+    return {
+      text: parseFloat(condition.fontSize) > 7 ? "Large Text" : "Small Text"
+     }
+  }
+})
+```
 
 #### transformConditionOnClient
+
+transformConditionOnClient allows a further transformation of the condition parameters in the context of the client device. It gets passed the client context, containing information about the particular device (e.g. screen resolution etc.). It is therefore possible to adapt conditions to the particular circumstances of the device.
+
+```JS
+text({
+  text: "Can you read this?",
+  fontSize: "5mm",
+  transformConditionOnClient: clientContext => condition => {
+    // Enlarge font on clients with a large viewing distance
+    if (clientContext.viewingDistance > 600) {
+      return {
+        fontSize: "10mm"
+      }
+    }
+  }
+})
+```
 
 ### Further task properties
 
