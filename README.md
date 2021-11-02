@@ -825,6 +825,14 @@ This graphics shows an overview of the flow of information in stimsrv.
 ![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
 
 <!--
+Why higher-order functions:
+
+- Modular components which are simply functions (e.g. reusable generators)
+- Room to add a closure for state, e.g. context => { let count = 0; return condition => ({ text: count++ }); }
+- Functional programming style, needs only a subset of JS to be taught to non-experts.
+-->
+
+<!--
 ## Available tasks
 
 ### Tasks provided as part of stimsrv
