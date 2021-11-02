@@ -1,3 +1,10 @@
+
+// create (shallow) clones of returned objects to avoid complications when result is modified
+function clone(val) {
+  if (typeof val == "object") return Object.assign({}, val);
+  return val;
+}
+
 let sequence = function(items, options) {
   
   options = Object.assign({
@@ -34,7 +41,7 @@ let sequence = function(items, options) {
           }
           index=0;    
         }
-        return {value: val};
+        return {value: clone(val)};
       },
       items: items
     }
@@ -73,7 +80,7 @@ sequence.array = function(items, options) {
           }
           val.push(next);
         }
-        return {value: val};
+        return {value: clone(val)};
       },
       items: items
     }

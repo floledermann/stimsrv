@@ -1,5 +1,11 @@
 const deepEqual = require("fast-deep-equal");
 
+// create (shallow) clones of returned objects to avoid complications when result is modified
+function clone(val) {
+  if (typeof val == "object") return Object.assign({}, val);
+  return val;
+}
+
 function randomPick(items, options) {
   
   return function(context) {
@@ -13,7 +19,7 @@ function randomPick(items, options) {
     });
     
     return {
-      next: () => ({ value: items[Math.floor(items.length * Math.random())] }),
+      next: () => ({ value: clone(items[Math.floor(items.length * Math.random())])}),
       items: items
     }
   
@@ -64,25 +70,28 @@ function randomShuffle(items, options) {
     return result;
   }
   
+  let multipledItems = [];
+  
   if (options.multiple > 1) {
-    let multipledItems = [];
     for (let i=0; i<options.multiple; i++) {
       multipledItems = multipledItems.concat(items);
     }
-    items = multipledItems;
+  }
+  else {
+    multipledItems = items.slice();
   }
     
   return function(context) {
     
     // initialize any dynamic values
-    items = items.map(c => {
+    multipledItems = multipledItems.map(c => {
       if (typeof c == "function") {
         c = c(context);
       }
       return c;
     });
  
-    let shuffledItems = shuffled(items);
+    let shuffledItems = shuffled(multipledItems);
     
     let index = 0;
     let done = false;
@@ -99,17 +108,17 @@ function randomShuffle(items, options) {
           if (!options.loop) done = true;
           else {
             let lastItem = shuffledItems[shuffledItems.length-1];
-            shuffledItems = shuffled(items);
-            if (options.preventContinuation && items.length > 1) {
+            shuffledItems = shuffled(multipledItems);
+            if (options.preventContinuation && multipledItems.length > 1) {
               while (deepEqual(shuffledItems[0], lastItem)) {
-                shuffledItems = shuffled(items);
+                shuffledItems = shuffled(multipledItems);
               }
             }
             index = 0;
           }
         }       
           
-        return {value: val};
+        return {value: clone(val)};
         
       },
       items: items

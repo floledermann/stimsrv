@@ -182,6 +182,30 @@ describe("Iterators", () => {
 
     });  
 
+    it("Modifying result object doesn't modify generator items", () => {
+      
+      let iter = sequence([{ val: 1 }, { val: 2 }],{loop:true})();
+      
+      let next = iter.next().value;
+      assert.equal(next.val, 1);
+      next.val = 99;
+      assert.equal(next.val, 99);
+      
+      next = iter.next().value;
+      assert.equal(next.val, 2);
+      next.val = 99;
+      assert.equal(next.val, 99);
+      
+      next = iter.next().value;
+      assert.equal(next.val, 1);
+
+      next = iter.next().value;
+      assert.equal(next.val, 2);
+
+
+    });  
+
+
   });
 
 
