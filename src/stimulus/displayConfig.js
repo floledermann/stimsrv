@@ -41,9 +41,18 @@ function displayConfig(spec) {
   
   return function(config) {
     
-    function valFunc(name) {
+    // helper to retrieve a property from the provided options object, or the config or spec objects if not defined
+    function val(name, options) {
+      return options?.[name] || config?.[name] || spec?.[name];
+    }
+
+    // helper to retrieve a property, which may be a callback function, from the provided options object, 
+    // or the config or spec objects if not defined. If the property is a function it will be called on the
+    // merged spec, config and options objects. If the property is not defined, falls back to a (static) 
+    // default value.
+    function valFunc(name, defaultName) {
       
-      let defaultName = "default" + capitalize(name);
+      defaultName = defaultName || "default" + capitalize(name);
       
       return function(options) {
         
@@ -67,11 +76,6 @@ function displayConfig(spec) {
         
         return warn(defaultValue, "No value for " + name + " specified, using default of " + defaultValue + ".");
       }
-    }
-    
-    // helper to retrieve a key from the provided options object, or the config or spec objects if not defined
-    function val(name, options) {
-      return options?.[name] || config?.[name] || spec?.[name];
     }
     
     let pixelDensity = valFunc("pixelDensity");
