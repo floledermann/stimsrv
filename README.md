@@ -425,7 +425,8 @@ const text = require("stimsrv/task/text");
 
 // ...
 
-// This will display "Red","Green","Blue","Red","Green","Blue" and then end the task
+// This will display conditions "Red","Green","Blue","Red","Green","Blue" 
+// and then end the task
 text({
   text: sequence(["Red","Green","Blue"], { loop: true, loopCount: 2 })
 })
