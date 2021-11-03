@@ -35,6 +35,7 @@ const DEFAULTS = {
   description: "Generic Text Task",
     
   // condition
+  choices: ["Continue"],
   fontSize: "4mm",
   backgroundIntensity: 1.0,
   foregroundIntensity: 0.0,
