@@ -417,7 +417,7 @@ Iterator, going through the specified items one by one. Stops the task by defaul
 **loop**      | `false`   | Loop after sequence is exhausted
 **loopCount** | `Infinity`| Stop after loopCount loops
 
-Example:
+##### Example:
 
 ```JS
 const sequence = require("stimsrv/controller/sequence");
