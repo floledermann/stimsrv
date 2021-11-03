@@ -209,6 +209,71 @@ describe("Iterators", () => {
   });
 
 
+  describe("random.pick", () => {
+
+    it("returns items from set", () => {
+      
+      let values = [1,2,3];
+
+      let iter = random.pick(values)();
+      
+      
+      let next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+      
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+      
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+    });
+    
+    it("returns itemsCount items", () => {
+      
+      let values = [1,2,3];
+
+      let iter = random.pick(values, {itemCount: 5})();
+      
+      
+      let next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+      
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+      
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+      next = iter.next();
+      assert(values.includes(next.value));
+      assert(!next.done);
+          
+      next = iter.next();
+       assert(next.done);
+       
+    });
+
+  });
+
   describe("random.shuffle", () => {
 
     it("shuffles items", () => {
