@@ -405,17 +405,31 @@ The following helpers are provided for generating parameter sequences:
 
 `const sequence = require("stimsrv/controller/sequence")`
 
-Iterator, going through the specified items one by one.
+Iterator, going through the specified items one by one. Stops the task by default once all items have been processed.
 
 **items**: Array of values the sequence should iterate through. Any item that is a function will be called with the Task's `context` and replaced by its return value before the start of the sequence.
 
 **options**: Object with entries for the following options:
 
- Option       | default | Description
---------------|---------|------------
-**stepCount** | `1`     | Repeat each item stepCount times
-**loop**      | `false` | Loop after sequence is exhausted
-**loopCount** | `null`  | Stop after loopCount loops
+ Option       | default   | Description
+--------------|-----------|------------
+**stepCount** | `1`       | Repeat each item stepCount times
+**loop**      | `false`   | Loop after sequence is exhausted
+**loopCount** | `Infinity`| Stop after loopCount loops
+
+Example:
+
+```JS
+const sequence = require("stimsrv/controller/sequence");
+const text = require("stimsrv/task/text");
+
+// ...
+
+// This will display "A","B","C","A","B","C" and then end the task
+text({
+  text: sequence(["A","B","C"], { loop: true, loopCount: 2 })
+})
+```
 
 #### *sequence.loop(items[, options])*
 
@@ -429,13 +443,19 @@ Iterator, creating a sequence of arrays from an array of iterators.
 
 The iterator is exhausted when any iterator in the array becomes exhausted.
 
-#### *random(items)*
+#### *random(items, options)*
 
 `const random = require("stimsrv/controller/random")`
 
 Picks a random item from the Array of items in each step (sampling with replacement).
 
-#### *random.pick(items)*
+**options**: Object with entries for the following options:
+
+ Option       | default   | Description
+--------------|-----------|------------
+**itemCount** | `Infinity`| Stop after this number of items
+
+#### *random.pick(items, options)*
 
 Same as `random(items)`.
 
@@ -449,7 +469,7 @@ Shuffles the Array of items and returns items in random order (sampling without 
 
  Option                 | default | Description
 ------------------------|---------|------------
-**multiple**            | `1`     | Duplicate items to create this number of copies of each item before shuffling
+**multiple**            | `1`     | Duplicate items to create this number of copies of each item *before* shuffling
 **loop**                | `false` | Re-shuffle and restart after sequence is exhausted
 **preventContinuation** | `true`  | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
 
