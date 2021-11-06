@@ -261,7 +261,7 @@ When starting an experiment, stimsrv outputs the available device IDs to the con
 
 ![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-console-output.png)
 
-Upon entering the specified URL in your web browser (or, when using the `--open` option, the web browser will be launched automatically), you are shown a form in which you can enter the client ID, and get to select the roles available for the selected client.
+Opening the specified URL in a web browser (or, when using the `--open` option, the web browser will be launched automatically) shows the experiment start page, on which the client ID can be entered and a role can be selected from the list of roles available for the client.
 
 ![stimsrv console output](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-experiment-start.png)
 
