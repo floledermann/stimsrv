@@ -214,7 +214,9 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
-The *devices* in an experiment each participate in a specific *role*, which specifies the arrangement of *interfaces* for stimulus display and user interaction. In the experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
+The *devices* in an experiment each participate in a specific *role*, which specifies the arrangement of *interfaces* for stimulus display and user interaction. In the experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** followed by properties of the device.
+
+For example, to accurately convert from millimeters to pixels for our visual acuity experiment, information on display device's pixel density needs to be provided. Furthermore, in order to calculate the participant's logMAR score, information about the viewing distance (the distance from the participants eyes to the display) needs to be provided.
 
 ```JS
 // *devices* entry of your experiment
@@ -229,7 +231,8 @@ devices: [
     id: "participant_phone",
     name: "Phone for participant",
     resolution: "1080x1920",
-    pixelDensity: 441
+    pixelDensity: 441,
+    viewingDistance: 500  // viewing distance in mm
   }
 ],
 ```
@@ -266,7 +269,7 @@ Chose a role and click on "Start" to join the experiment with that browser and t
 
 ### Support for old & simple web browsers
 
-By default, stimsrv relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like older smartphones or e-book readers) can be used for stimulus display by rendering on the server and delivering the graphics to the client as an image.
+By default, stimsrv relies on clients having an up-to-date web browser for full interactivity and accurate rendering. However, devices with older or simple web browsers (like e-book readers or older smartphones) can be used for stimulus display by rendering on the server and delivering the graphics to the client as an image.
 
 See [stimsrv-client-puppeteer](https://github.com/floledermann/stimsrv-client-puppeteer) for more details on how to enable and configure server-side rendering.
 
@@ -353,12 +356,6 @@ module.exports = {
 ```
 
 See the [CSS override example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-css) for the full code and more possibilities for customizing an experiment's CSS.
-
-### System overview
-
-This graphics shows an overview of the flow of information in stimsrv.
-
-![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
 
 ## Configuring tasks
 
@@ -877,6 +874,13 @@ The [n-sided Pong example](https://github.com/floledermann/stimsrv-examples/tree
 <!--
 ## Experiments examples
 -->
+
+## System overview
+
+This graphics shows an overview of the flow of information in stimsrv.
+
+![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
+
 
 ## License, Credits & Acknowledgements
 
