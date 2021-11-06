@@ -16,17 +16,19 @@
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments, potentially across multiple devices.
 
-! | This is alpha version software – everything may still change without prior notice | !
---|-----------------------------------------------------------------------------------|--
+| This is alpha version software – everything may still change without prior notice |
+|-----------------------------------------------------------------------------------|
 
 ### Main features
 
 - Run ***distributed experiments*** with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - ***Central control*** of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
-- Utilities that help to develop new experiment components with ***very little code***, allowing researchers to focus on the core functionality of their experiments.
+- Utilities that help to develop new experiment components with ***little boilerplate code***, allowing researchers to focus on the core functionality of their experiments.
+- Adaption the components of an experiment to ***device contexts***, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
 - ***Timestamp synchronization*** between multiple clients for temporal precision down to a few milliseconds in local WiFi networks.
-- Adaption of experiments to the ***device contexts***, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
-- Implemented in ***JavaScript***, leveraging a modern, function-based programming style, supporting seamless transitions from server to client code and making use of the web browser as a modern and versatile runtime environment.
+- Storing ***experiment resuts*** including conditions, responses, timing information and warnings about potential problems as a JSON file for further processing. 
+- Implemented in ***JavaScript***, leveraging a modern, function-based programming style, supporting seamless transitions of code from server to client and making use of the web browser as a modern and versatile runtime environment.
+- ***Packaging and distributing*** the code of an experiment to participating clients, so you don't have to mess with JavaScript build systems.
 - Follows the design principle of ***“Simple things should be simple, complex things should be possible.”*** (Alan Kay)
 
 ### Try it out
@@ -562,7 +564,7 @@ text({
 })
 ```
 
-#### transformConditionOnClient
+#### *transformConditionOnClient*
 
 transformConditionOnClient allows a further transformation of the condition parameters in the context of the client device. It gets passed the *client context* (the task context mixed with the properties of the client's [device specification](#device-configuration--roles)), containing information about the particular device (e.g. screen resolution etc.). It is therefore possible to adapt conditions to the particular circumstances of the device.
 
@@ -581,13 +583,13 @@ text({
 })
 ```
 
-#### nextContext
+#### *nextContext*
 
 ### Further task properties
 
-#### css
+#### *css*
 
-#### resources
+#### *resources*
 
 ### Task default settings
 
@@ -608,7 +610,7 @@ The simpleTask helper function can be used to implement tasks that follow the mo
 - `generateCondition`, `transformConditionOnClient` and `nextContext` can be specified.
 - Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters when results are saved.
 
-#### simpleTask(taskSpec)
+#### *simpleTask(taskSpec)*
 
 **taskSpec** is an object containing the specification for the task.
 
@@ -667,7 +669,7 @@ Option |  | type | Description
 **`interfaces`** | mandatory | Object | Plain JS object with an entry for each interface (e.g. `display`, `response` etc.).
 `transformCondition` | optional | Function | Function `context => condition => condition`, returning an object with entries to extend / alter the condition on the client. The passed in `context` contains the device's and role's specific properties. The properties of the returned object will be added to the current condition object before passing it to each interface's `render()` function.
 
-#### Entries for frontend.interfaces.*
+#### Entries for *frontend.interfaces*.
 
 For each entry of `interfaces`, you can either use ready made components such as `canvasRenderer()` or `htmlButtons()`, or provide your own implementation. For custom interfaces, two methods need to be provided: **`initialize()`** which is called once when the task activates (and gets passed the parent DOM object and a reference to the stimsrv client API), and **`render()`**, which is called once for each new condition the task receives (which is passed as its parameter).
 
