@@ -16,8 +16,8 @@
 
 stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies and psychological experiments, potentially across multiple devices.
 
-| !! This is alpha version software – everything may still change without prior notice !! |
-|-----------------------------------------------------------------------------------------|
+| ⚠️ This is alpha version software – everything may still change without prior notice ⚠️ |
+|----------------------------------------------------------------------------------------|
 
 ### Main features
 
@@ -35,8 +35,8 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 
 To try out stimsrv, check out the [stimsrv examples repository](https://github.com/floledermann/stimsrv-examples). To start with implementing your own experiment, you can use the [stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template).
 
-| *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting publicly accessible online experiments. Stimsrv is currently intended for local use in private (lab) networks only!* |
-|-----------------------------------------------------------------------------------------|
+⚠️ *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting publicly accessible online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
+
 
 ## Design Philosophy & Terminology
 
