@@ -35,6 +35,7 @@ let options = mri(process.argv.slice(2), {
 const errorHelpers = {
   // TODO: this also suppresses module not found errors e.g. in tasks, which is not helpful!
   //'MODULE_NOT_FOUND': error => "No module found."
+  "EADDRINUSE": error => "Network port " + error.port + " is in use."
 }
 
 function exitError(message, error) {
@@ -237,6 +238,7 @@ app.use(clientRoleMiddleware(experiment));
 
 let port = options.port || 8080;
 
+
 let server = app.listen(port, () => {
   
   const networks = networkInterfaces();
@@ -279,6 +281,10 @@ let server = app.listen(port, () => {
     const open = require("open");
     let firstAdr = "http://" + ips[0] + ":" + port + "/";
     open(firstAdr);
+  }
+}).on("error", err => {
+  if (err.code === 'EADDRINUSE') {
+    exitError("Port " + port + " is already in use on your system.\nMake sure to close any running stimsrv instances,\nor change the port number used by stimsrv using the --port option.", err);
   }
 });
 

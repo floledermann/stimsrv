@@ -7,7 +7,11 @@ function clone(val) {
 }
 
 function randomPick(items, options) {
-  
+ 
+  options = Object.assign({
+    itemCount: Infinity
+  }, options);
+ 
   return function(context) {
     
     // initialize any dynamic values
@@ -18,8 +22,13 @@ function randomPick(items, options) {
       return c;
     });
     
+    let count = 0;
+    
     return {
-      next: () => ({ value: clone(items[Math.floor(items.length * Math.random())])}),
+      next: () => {
+        if (count++ >= options.itemCount) return { done: true };
+        return { value: clone(items[Math.floor(items.length * Math.random())])}
+      },
       items: items
     }
   

@@ -37,6 +37,38 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 
 *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting publicly accessible online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
+## Design Philosophy & Terminology
+
+Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs, inheritance or class hierarchies. Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each task that you need to implement for your experiment. Because experiment definitions are JavaScript files, all features of the language (such as inline functions or iterators) can be used to configure an experiment. The stimsrv server takes care of packaging and delivering the experiment code for web browsers and coordinating multiple clients, among other things.
+
+The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible science.
+
+### Terminology
+
+- ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
+- ***Task***: Part of an experiment, usually presenting some stimulus to the participant and expecting some kind of response from them. (Example: A Task may show letters of the alphabet to the participant and let the participant respond with corresponding on-screen buttons). A sequence of tasks is run during an experiment.
+- ***Configuration***: The structure and settings for all parts of the experiment and its tasks, defined in advance. The configuration does not change during an experiment run.
+- ***Context***: The current circumstances under which a task is run. The context may change between one task and the next, but not during a single task.
+- ***Trial***: A single run of a task. Usually, the participant is presented with a specific stimulus, and reacts with a specific response. (Example: in a single trial, above task may display the letter "B" to the participant, and wait for their response. For the next trial, another letter may be displayed.) A single task may run multiple trials, until a condition for going to the next task is met.
+- ***Condition***: A set of properties that define the stimulus for a trial. In the example above, the condition specifies the specific letter to be shown, plus other aspects of the presentation (e.g. the font size to use, the contrast ratio etc.).
+- ***Response***: A set of properties that define the response of the participant. In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed).
+- ***Result***: The result of a trial. Contains information about the condition, the response, the context plus additional information, such as timing information.
+- ***User***: The user of stimsrv, usually the experiment designer or supervisor. *Not* usually the person participating in the experiment.
+- ***Participant***: The person participating in the experiment.
+
+### System overview
+
+This graphics shows an overview of the flow of information in stimsrv.
+
+![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
+
+<!--
+Why higher-order functions:
+
+- Modular components which are simply functions (e.g. reusable generators)
+- Room to add a closure for state, e.g. context => { let count = 0; return condition => ({ text: count++ }); }
+- Functional programming style, needs only a subset of JS to be taught to non-experts.
+-->
 
 ## Defining & running experiments
 
@@ -375,17 +407,32 @@ The following helpers are provided for generating parameter sequences:
 
 `const sequence = require("stimsrv/controller/sequence")`
 
-Iterator, going through the specified items one by one.
+Iterator, going through the specified items one by one. Stops the task by default once all items have been processed.
 
 **items**: Array of values the sequence should iterate through. Any item that is a function will be called with the Task's `context` and replaced by its return value before the start of the sequence.
 
 **options**: Object with entries for the following options:
 
- Option       | default | Description
---------------|---------|------------
-**stepCount** | `1`     | Repeat each item stepCount times
-**loop**      | `false` | Loop after sequence is exhausted
-**loopCount** | `null`  | Stop after loopCount loops
+ Option       | default   | Description
+--------------|-----------|------------
+**stepCount** | `1`       | Repeat each item stepCount times
+**loop**      | `false`   | Loop after sequence is exhausted
+**loopCount** | `Infinity`| Stop after loopCount loops
+
+##### Example:
+
+```JS
+const sequence = require("stimsrv/controller/sequence");
+const text = require("stimsrv/task/text");
+
+// ...
+
+// This will display conditions "Red","Green","Blue","Red","Green","Blue" 
+// and then end the task
+text({
+  text: sequence(["Red","Green","Blue"], { loop: true, loopCount: 2 })
+})
+```
 
 #### *sequence.loop(items[, options])*
 
@@ -399,13 +446,19 @@ Iterator, creating a sequence of arrays from an array of iterators.
 
 The iterator is exhausted when any iterator in the array becomes exhausted.
 
-#### *random(items)*
+#### *random(items, options)*
 
 `const random = require("stimsrv/controller/random")`
 
 Picks a random item from the Array of items in each step (sampling with replacement).
 
-#### *random.pick(items)*
+**options**: Object with entries for the following options:
+
+ Option       | default   | Description
+--------------|-----------|------------
+**itemCount** | `Infinity`| Stop after this number of items
+
+#### *random.pick(items, options)*
 
 Same as `random(items)`.
 
@@ -419,7 +472,7 @@ Shuffles the Array of items and returns items in random order (sampling without 
 
  Option                 | default | Description
 ------------------------|---------|------------
-**multiple**            | `1`     | Duplicate items to create this number of copies of each item before shuffling
+**multiple**            | `1`     | Duplicate items to create this number of copies of each item *before* shuffling
 **loop**                | `false` | Re-shuffle and restart after sequence is exhausted
 **preventContinuation** | `true`  | When looping, shuffle repeatedly until first item of next sequence is not equal to the last item of the previous sequence.
 
@@ -587,28 +640,31 @@ text({
 
 ### Further task properties
 
-#### *css*
+#### interfaces
+
+#### css
 
 #### *resources*
 
 ### Task default settings
 
 
+
 ## Implementing tasks
 
-For most experiments it will be necessary to implement your own tasks. stimsrv provides a low-level API for tasks that puts very few constraints on how they are impelmented. For tasks which follow a more standardized model, a high-level helper function is provided.
+For most experiments it will be necessary to implement your own tasks. stimsrv provides a low-level API for tasks that puts very few constraints on how they are impelmented. For tasks which follow a more standardized model, a high-level helper function to create tasks is provided.
 
 ### Implementing tasks using the simpleTask helper
 
-The simpleTask helper function can be used to implement tasks that follow the model of the built-in tasks. Using the simpleTask function, several features are provided for your task:
+The simpleTask helper function can be used to implement tasks that follow the model of the built-in tasks described in section [configuring tasks](#configuring-tasks). Using the simpleTask function, your task will automatically benefit from several features which are provided by the utility:
 
-- The sequence of conditions can be specified by users of your tasks using constant values, callbacks and iterators, as discussed above.
-- Default settings for the task can be specified and changed globally.
-- User interfaces can be remapped to named interfaces.
-- Additional user interfaces can be added for each instance.
-- `resources` and `css` can be specified and will be loaded automatically.
-- `generateCondition`, `transformConditionOnClient` and `nextContext` can be specified.
-- Task parameters are split into static (constant for context) and dynamic (changing with every trial) parameters when results are saved.
+- The conditions for your task can be specified using constant values, callback functions or iterators, as discussed above.
+- Default settings for the task can be specified and changed globally using the `.defaults()` method.
+- User interfaces can be remapped to named interface areas.
+- Additional user interfaces can be added using the `interfaces` property.
+- `resources` and `css` can be specified and will be processed.
+- `generateCondition`, `transformConditionOnClient` and `nextContext` functions can be specified and will be processed.
+- Condition parameters are split into static (constant during the run of a task) and dynamic (changing with every trial) parameters when results are saved.
 
 #### *simpleTask(taskSpec)*
 
@@ -618,11 +674,13 @@ Option          | default         | Description
 ----------------|-----------------|------------
 **name**        | `"Unnamed Task"`| The default name of the task (can be overridden by user configuration)
 **description** | `""`            | The default description of the task (can be overridden by user configuration)
-**defaults**    | `{}`            | The default settings for the task (mainly condition parameters)
+**defaults**    | `{}`            | The default settings for the task (mainly the default condition parameters)
 **interfaces**  | `{}`            | The tasks user interfaces. An object with one entry for each interface, with the key specifying the default interface and the value being a function `config => context => UserInterface` to construct the interface (see below).
-**nextContext** | `null`          | A function to modify the context at the end of the task.
+**nextContext** | `null`          | A function to modify the context at the end of the task. This will be applied in addition to any nextContext function defined for the task instance.
 
-*(... coming soon ...)*
+See the [simple task example](https://github.com/floledermann/stimsrv-examples/tree/main/examples/custom-simple-task) for a demonstration how the simpleTask helper can be used to implement your own tasks.
+
+*(... description coming soon ...)*
 
 ### Implementing tasks using the low-level API
 
@@ -803,36 +861,6 @@ The [n-sided Pong example](https://github.com/floledermann/stimsrv-examples/tree
 
 [![3-sided Pong on stimsrv](https://img.youtube.com/vi/oe6Ff-pTMS4/0.jpg)](https://www.youtube.com/watch?v=oe6Ff-pTMS4)
 
-## Design Philosophy & Terminology
-
-Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with [plain javascript objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#using_object_initializers) (for configuration) and [functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions) (for dynamic behaviour), without having to deal with complex APIs or class hierarchies. Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each task that you need to implement for your experiment. Because experiment definitions are JavaScript files, all features of the language (such as inline functions or iterators) can be used to configure an experiment. The stimsrv server takes care of packaging and delivering the experiment code for web browsers and coordinating multiple clients, among other things.
-
-The hope is that by defining experiments in a concise yet comprehensive format, the details of an experiment will be less opaque and better reproducible, aiding the ideal of open and reproducible science.
-
-### Terminology
-
-- ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
-- ***Task***: Part of an experiment, usually presenting some stimulus to the participant and expecting some kind of response from them. (Example: A Task may show letters of the alphabet to the participant and let the participant respond with corresponding on-screen buttons). A sequence of tasks is run during an experiment.
-- ***Configuration***: The structure and settings for all parts of the experiment and its tasks, defined in advance. The configuration does not change during an experiment run.
-- ***Context***: The current circumstances under which a task is run. The context may change between one task and the next, but not during a single task.
-- ***Trial***: A single run of a task. Usually, the participant is presented with a specific stimulus, and reacts with a specific response. (Example: in a single trial, above task may display the letter "B" to the participant, and wait for their response. For the next trial, another letter may be displayed.) A single task may run multiple trials, until a condition for going to the next task is met.
-- ***Condition***: A set of properties that define the stimulus for a trial. In the example above, the condition specifies the specific letter to be shown, plus other aspects of the presentation (e.g. the font size to use, the contrast ratio etc.).
-- ***Response***: A set of properties that define the response of the participant. In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed).
-- ***Result***: The result of a trial. Contains information about the condition, the response, the context plus additional information, such as timing information.
-
-### System overview
-
-This graphics shows an overview of the flow of information in stimsrv.
-
-![stimsrv overview](https://raw.githubusercontent.com/floledermann/stimsrv/main/docs/stimsrv-diagram-small.png)
-
-<!--
-Why higher-order functions:
-
-- Modular components which are simply functions (e.g. reusable generators)
-- Room to add a closure for state, e.g. context => { let count = 0; return condition => ({ text: count++ }); }
-- Functional programming style, needs only a subset of JS to be taught to non-experts.
--->
 
 <!--
 ## Available tasks
