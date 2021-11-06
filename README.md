@@ -56,7 +56,8 @@ The following terms are used throughout this documentation to denote specific pa
 - ***Condition***: A set of properties that define the setting for a trial. In the example above, the condition will specify the specific letter to be shown and the font size to use, potentially among other aspects of the presentation (e.g. contrast ratio etc.).
 - ***Response***: A set of properties that define the response of the participant to the given condition, and will trigger the next condition (or the end of the task). In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed) and will be used to determine the next condition to be shown.
 - ***Event***: Events are additional data gathered during a trial which do not immediately trigger a change of condition, but may be stored and/or processed.
-- ***Result***: The result of a trial. Contains information about the condition, the response, any events gathered during the trial plus additional information, such as timing information or the context in which a task was run.
+- ***Result***: The result of a single trial. Contains information about the condition, the response, any events gathered during the trial plus additional information, such as timing information or the context in which a task was run.
+- ***Task results, experiment results***: The collected results for the run of a task (multiple trials), or an entire experiment run.
 
 <!--
 Why higher-order functions:
@@ -78,7 +79,7 @@ npm install stimsrv
 
 (The *[stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template)* provides scripts for Windows to perform such tasks without using the command line.)
 
-A minimal experiment specification file looks like this:
+A minimal experiment specification file could look like this:
 
 ```javascript
 // Load the "pause" task
@@ -100,17 +101,17 @@ module.exports = {
 }
 ```
 
-After saving the file (e.g. as `experiment-simple.js`), you can run this experiment from your project directory with:
+After saving the file (e.g. as `experiment.js`), you can run this experiment from your project directory with:
 
 ```
-npx stimsrv --open experiment-simple.js
+npx stimsrv --open experiment.js
 ```
 
-(Replace `experiment-simple.js` with the actual name of your experiment file.)
+(The *[stimsrv experiment template](https://github.com/floledermann/stimsrv-experiment-template)* provides the run.bat script which you can double-click to run the experiment defined in `experiment.js`.)
 
 This will start the stimsrv server and open a browser window, showing the experiment start page. (Omit `--open` if you only want to start the server and want to open the browser window(s) manually. The server will show the URL to connect to in its output.)
 
-After choosing one of the two available *roles* in the web browser (which are provided by default and [can be changed](#device-configuration--roles)), the experiment will display the message "Hello from stimsrv" and a "Continue" button (the default for the pause task). When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately (again, all of this is the default behaviour which can be changed if desired).
+After choosing one of the two available *roles* in the web browser (which are provided by default and [can be changed](#device-configuration--roles)), the experiment will display the message "Hello from stimsrv" and a "Continue" button. When the button is clicked, the experiment ends, the results are stored in the `data` folder inside your project directory, and the experiment is run again immediately for the next participant. (Note that all of this is the default behaviour which can be changed if desired.)
 
 A more complex experiment that actually delivers useful data could look like this:
 
@@ -130,19 +131,19 @@ module.exports = {
       message: "Press 'Continue' when you are ready to start the experiment"
     }),
     
-    // Task that shows Sloan letters and offers buttons for response
+    // task that shows Sloan letters and offers corresponding buttons for response
     sloan({
       backgroundIntensity: 1,      // white background
       foregroundIntensity: 0,      // black foreground
-      size:                        // size will be changed using the staircase method with 5 reversals
+      size:                        // size will be changed using a staircase method
         staircase({
-          startValue: "5mm",
+          startValue: "5mm",       // dimension specified in real-world units!
           stepSize: 1.2,
           stepType: "multiply",
           minReversals: 5
       }),
-      // add the resulting logMAR score to the context
-      nextContext: trials => ({logMAR: sloan.logMAR(trials)})
+      // at the end of the task, add the resulting logMAR score to the context
+      nextContext: taskResults => ({logMAR: sloan.logMAR(taskResults)})
     }),
     
     pause({
@@ -157,7 +158,7 @@ module.exports = {
 
 ## Experiment results
 
-By default, results data is written to the `data` subdirectory relative to the experiment specification, as a JSON file, after each run of the experiment. The results file contains information for each trial of each task of the experiment, plus additional information such as timestamps, errors and warnings that may have occured during the experiment run.
+By default, results data is written to the `data` subdirectory relative to the experiment specification, with a separate file for each participant. Data is stored as a JSON file which contains detailed information for each trial of each task of the experiment - conditions, reponses, timestamps etc., but also errors and warnings that may have occured during the experiment run.
 
 For the example above, a results file could look like this:
 
@@ -169,7 +170,7 @@ For the example above, a results file could look like this:
 // ...
   "warnings": [
     {
-      "message": "No value for pixeldensity provided, using default of 96.",
+      "message": "No value for pixelDensity provided, using default of 96.",
       "timeOffset": 5883
     },
     {
@@ -213,7 +214,7 @@ What springs to mind are two warnings at the beginning of the file. These warnin
 
 ## Device configuration & roles
 
-The *devices* in your experiment each participate in a specific *role*, which determines the arrangement of interfaces provided for stimulus display and user response/interaction. In your experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
+The *devices* in an experiment each participate in a specific *role*, which specifies the arrangement of *interfaces* for stimulus display and user interaction. In the experiment configuration, **`devices`** are defined as an Array of plain JS objects, each with a mandatory **`id`** entry, and optionally a human-readable **`name`** and (hardware) properties of the device.
 
 ```JS
 // *devices* entry of your experiment
@@ -251,7 +252,7 @@ roles: [
 ],
 ```
 
-A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring the experment (by the supervisor), `"control"` for the supervisor's controls. But these names are only conventions and can be changed according to the requirements of your particular experiment.
+A few standardized names for interfaces are established by convention – `"display"` for the participant's display, `"response"` for the response input, `"monitor"` for monitoring of the experment (by the supervisor), `"control"` for the supervisor's controls. But these names are only conventions and can be changed according to the requirements of your particular experiment.
 
 When starting an experiment, stimsrv outputs the available device IDs to the console, together with information on how to connect to the stimsrv server.
 
