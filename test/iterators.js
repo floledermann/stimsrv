@@ -216,8 +216,7 @@ describe("Iterators", () => {
       let values = [1,2,3];
 
       let iter = random.pick(values)();
-      
-      
+         
       let next = iter.next();
       assert(values.includes(next.value));
       assert(!next.done);
