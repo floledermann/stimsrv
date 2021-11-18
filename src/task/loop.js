@@ -21,6 +21,12 @@ module.exports = function(config) {
   
   let taskResources = [];
   for (let t of config.tasks) {
+    try {
+      if (typeof t == "function") t = t();
+    }
+    catch (e) {
+      // ignore error for dummy initialization
+    }
     taskResources = taskResources.concat(t.resources || []);
   }
   
@@ -35,12 +41,14 @@ module.exports = function(config) {
     // this is called on client - it cannot return a (changed) context, but only set up internal configuration
     frontend: function(context) {   
     
-      if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex]?.frontend) {
+      if (context.taskIndex < config.tasks.length && typeof config.tasks[context.taskIndex]) {
         // pass merged context to subtask, excluding taskIndex if not defined in sub-context
         let subContext = Object.assign({}, context);
         delete subContext.taskIndex;
         Object.assign(subContext, context.context);
-        currentTask = config.tasks[context.taskIndex]?.frontend(subContext);
+        currentTask = config.tasks[context.taskIndex];
+        if (typeof currentTask == "function") currentTask = currentTask(subContext);
+        currentTask = currentTask?.frontend?.(subContext);
       }
       else {
         config.error("No task found for taskIndex " + context.taskIndex + ".");
@@ -49,16 +57,16 @@ module.exports = function(config) {
       
       return {
         get interfaces() {
-          return currentTask.interfaces;
+          return currentTask?.interfaces;
         },
         get name() {
           return currentTask?.name || config.tasks[context.taskIndex]?.name || "loop";
         },
         get css() {
-          return currentTask.css;
+          return currentTask?.css;
         },
         get transformConditionOnClient() {
-          return currentTask.transformConditionOnClient;
+          return currentTask?.transformConditionOnClient;
         }
       }
     },
@@ -110,12 +118,13 @@ module.exports = function(config) {
           
           context = Object.assign({}, context, localContext, {taskIndex: 0});
           
-          if (context.taskIndex < config.tasks.length && config.tasks[context.taskIndex]?.controller) {
+          if (context.taskIndex < config.tasks.length && config.tasks[context.taskIndex]) {
             // pass merged context to subtask, excluding taskIndex if not defined in sub-context
             let subContext = Object.assign({}, context);
             delete subContext.taskIndex;
             Object.assign(subContext, context.context);
             currentTask = config.tasks[context.taskIndex]; 
+            if (typeof currentTask == "function") currentTask = currentTask(subContext);
             currentController = currentTask.controller?.(subContext);
             context.context = currentController.initialContext?.(subContext);
           }
@@ -187,12 +196,13 @@ module.exports = function(config) {
             
           }
 
-          if (config.tasks[context.taskIndex]?.controller) {
+          if (config.tasks[context.taskIndex]) {
             // pass merged context to subtask, excluding taskIndex from current context
             let subContext = Object.assign({}, context);
             delete subContext.taskIndex;
             Object.assign(subContext, context.context);
             currentTask = config.tasks[context.taskIndex];
+            if (typeof currentTask == "function") currentTask = currentTask(subContext);
             currentController = currentTask.controller?.(subContext);
             context.context = currentController.initialContext?.(subContext);
           }

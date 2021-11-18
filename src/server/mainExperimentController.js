@@ -153,6 +153,7 @@ function MainExperimentController(experiment, options) {
         //console.log("starting task " + taskIndex);
         //console.log(context);
         currentTask = experiment.tasks[taskIndex];
+        if (typeof currentTask == "function") currentTask = currentTask(context);
         currentController = currentTask.controller?.(context) || options.defaultController(context);
         //console.log(currentController.initialContext);
         context = currentController.initialContext?.(context) || context;      

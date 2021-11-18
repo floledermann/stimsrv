@@ -281,8 +281,10 @@ function clientFactory(options) {
             endTask(currentTaskFrontend);
           }
         
-          currentTaskFrontend = experiment.tasks[taskIndex].frontend(fullContext);
-          currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
+          let currentTask = experiment.tasks[taskIndex];
+          if (typeof currentTask == "function") currentTask = currentTask(context);
+          currentTaskFrontend = currentTask.frontend(fullContext);
+          currentTaskFrontend.name = currentTask.name;
           prepareCurrentTask(fullContext);
         }
         
@@ -299,10 +301,12 @@ function clientFactory(options) {
           endTask(currentTaskFrontend);
         }
         
-        currentTaskFrontend = experiment.tasks[data.taskIndex].frontend(fullContext);
+        let currentTask = experiment.tasks[taskIndex];
+        if (typeof currentTask == "function") currentTask = currentTask(context);
+        currentTaskFrontend = currentTask.frontend(fullContext);
         // hack: add name to ui part of task
         if (!currentTaskFrontend.name) {
-          currentTaskFrontend.name = experiment.tasks[data.taskIndex].name;
+          currentTaskFrontend.name = currentTask.name;
         }
         prepareCurrentTask(fullContext);
 
