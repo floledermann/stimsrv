@@ -120,6 +120,10 @@ function displayConfig(spec) {
     }
     
     function dimensionToScreenPixels(dimension, options) {
+      if (Array.isArray(dimension)) {
+        return dimension.map(d => dimensionToScreenPixels(d, options));
+      }
+      
       Dimension.configure({
         pixelDensity: pixelDensity(options),
         viewingDistance: viewingDistance(options)
