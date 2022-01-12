@@ -146,14 +146,7 @@ function canvasRenderer(renderFunc, options) {
           
           // convert dimensions to pixels
           for (let key of options.dimensions) {
-            let cond = condition[key];
-            if (Array.isArray(cond)) {
-              condition[key] = cond.map(c => display.dimensionToScreenPixels(c, condition));
-            }
-            else {
-              condition[key] = display.dimensionToScreenPixels(cond, condition)  
-              //console.log("Converting " + cond + " to " + condition[key]);
-            }
+            condition[key] = display.dimensionToScreenPixels(condition[key], condition);
           }
           
          // default case, use maximum intensity as high intensity
