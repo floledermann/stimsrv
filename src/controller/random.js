@@ -2,6 +2,7 @@ const deepEqual = require("fast-deep-equal");
 
 // create (shallow) clones of returned objects to avoid complications when result is modified
 function clone(val) {
+  if (Array.isArray(val)) return val.map(v => v);
   if (typeof val == "object") return Object.assign({}, val);
   return val;
 }
