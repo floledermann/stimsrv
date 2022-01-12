@@ -24,6 +24,7 @@ function simpleTask(taskSpec) {
     defaults: {},
     interfaces: {},
     nextContext: null, // should this simply go into defaults?
+    staticOptions: [],
     //resources: null, //?
     //css: null //?
   }, taskSpec);
@@ -32,7 +33,10 @@ function simpleTask(taskSpec) {
   let task = function(userConfig={}) {
     
     let interfaceOptions = Object.keys(taskSpec.interfaces).map(i => i + "Interface");
-    let staticOptions = interfaceOptions.concat(["css","generateCondition","transformConditionOnClient"]);
+    let staticOptions = 
+      interfaceOptions
+        .concat(["css","generateCondition","transformConditionOnClient"]);
+        //.concat(taskSpec.staticOptions);
     
     //let interfaceConstructors = Object.fromEntries(Object.entries(taskSpec.interfaces).map([key, spec] => [key, spec(taskSpec)]));
     
