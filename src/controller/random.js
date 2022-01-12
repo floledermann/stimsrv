@@ -13,7 +13,7 @@ function randomPick(items, options) {
     itemCount: Infinity
   }, options);
  
-  return function(context) {
+  return function create(context) {
     
     // initialize any dynamic values
     items = items.map(c => {
@@ -30,7 +30,10 @@ function randomPick(items, options) {
         if (count++ >= options.itemCount) return { done: true };
         return { value: clone(items[Math.floor(items.length * Math.random())])}
       },
-      items: items
+      items: items,
+      // iterable protocol - return new iterator
+      [Symbol.iterator]: function() { return create(context); }
+
     }
   
   }
@@ -91,7 +94,7 @@ function randomShuffle(items, options) {
     multipledItems = items.slice();
   }
     
-  return function(context) {
+  return function create(context) {
     
     // initialize any dynamic values
     multipledItems = multipledItems.map(c => {
@@ -131,7 +134,9 @@ function randomShuffle(items, options) {
         return {value: clone(val)};
         
       },
-      items: items
+      items: items,
+      // iterable protocol - return new iterator
+      [Symbol.iterator]: function() { return create(context); }
     }
     
   }

@@ -13,7 +13,7 @@ let sequence = function(items, options) {
     loopCount: undefined, // stop after loopCount loops
   }, options);
   
-  return function(context) {
+  return function create(context) {
     
     // initialize any dynamic values
     items = items.map(item => typeof item == "function" ? item(context) : item);
@@ -44,6 +44,8 @@ let sequence = function(items, options) {
         return {value: clone(val)};
       },
       items: items
+      // iterable protocol - return new iterator
+      [Symbol.iterator]: function() { return create(context); }
     }
   }
 
@@ -63,7 +65,7 @@ Iterator, converting an Array of iterators into a sequence of Arrays of those it
 */
 sequence.array = function(items, options) {
   
-  return function(context) {
+  return function create(context) {
   
     items = items.map(item => typeof item == "function" ? item(context) : item);
     
@@ -83,6 +85,8 @@ sequence.array = function(items, options) {
         return {value: clone(val)};
       },
       items: items
+      // iterable protocol - return new iterator
+      [Symbol.iterator]: function() { return create(context); }
     }
   
   }
