@@ -15,6 +15,8 @@ let defaults = {
     labelClass: "label",
     subUiTag: "span",
     subUiClass: "sub-ui",
+    headerTag: "header",
+    footerTag: "footer",
     buttonEvent: ["touchstart","mousedown"], // String or Array of Strings
     broadcastEvents: null,
     alwaysRerender: false,
@@ -45,6 +47,8 @@ function htmlButtons(config) {
   let runtime = null;
   let document = null;
   let wrapper = null;
+  let headerEl = null;
+  let footerEl = null;
   
   let lastButtonDefs = null;
   
@@ -65,12 +69,22 @@ function htmlButtons(config) {
         parent.appendChild(styleEl);
       }
       
+      if (config.header) {
+        headerEl = document.createElement(config.headerTag);
+        parent.appendChild(headerEl);
+      }
+      
       wrapper = document.createElement(config.wrapperTag);
       if (config.wrapperClass) {
         wrapper.className = config.wrapperClass;
       }
       parent.appendChild(wrapper);
       
+      if (config.footer) {
+        headerEl = document.createElement(config.footerTag);
+        parent.appendChild(footer);
+      }
+
       if (config.clickSound) {
         clickSound = new Audio(config.clickSound);
         // attempt at better preloading for mobile - does not work
@@ -83,6 +97,14 @@ function htmlButtons(config) {
     render: function(condition) {
       
       respondedToCurrentCondition = false;
+      
+      if (config.header) {
+        headerEl.innerHTML = valOrFunc(config.header, condition);
+      }
+      
+      if (config.footer) {
+        footerEl.innerHTML = valOrFunc(config.footer, condition);
+      }
       
       let _buttonDefs = valOrFunc.array(config.buttons, condition);
       
@@ -121,20 +143,19 @@ function htmlButtons(config) {
           if (buttonDef.style) {
             el.style.cssText = buttonDef.style;
           }
-          
-          let subUiWrapper = el;
-          if (config.subUiTag) {
-            subUiWrapper = document.createElement(config.subUiTag);
-            subUiWrapper.className = config.subUiClass;
-            
-            // act as offset parent for content
-            subUiWrapper.style.position = "relative";
-
-            el.appendChild(subUiWrapper);
-          }
-          
+                    
           let subUI = buttonDef.subUI;
           if (subUI) {
+            let subUiWrapper = el;
+            if (config.subUiTag) {
+              subUiWrapper = document.createElement(config.subUiTag);
+              subUiWrapper.className = config.subUiClass;
+              
+              // act as offset parent for content
+              subUiWrapper.style.position = "relative";
+
+              el.appendChild(subUiWrapper);
+            }
             if (typeof subUI == "function") subUI = subUI(context);
             subUI.initialize(subUiWrapper, runtime);
             subUI.render(buttonCondition);
