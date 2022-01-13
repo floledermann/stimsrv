@@ -43,7 +43,7 @@ let sequence = function(items, options) {
         }
         return {value: clone(val)};
       },
-      items: items
+      items: items,
       // iterable protocol - return new iterator
       [Symbol.iterator]: function() { return create(context); }
     }
@@ -84,7 +84,7 @@ sequence.array = function(items, options) {
         }
         return {value: clone(val)};
       },
-      items: items
+      items: items,
       // iterable protocol - return new iterator
       [Symbol.iterator]: function() { return create(context); }
     }
