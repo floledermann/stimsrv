@@ -39,7 +39,8 @@ module.exports = function(config) {
       }
     },
     controller: parameterController({
-      parameters: pick(config, ["image","baseURL"])
+      parameters: pick.without(config, ["imageUIs","responseUIs","responseUI","resources","css","transformCondition"]),
+      generateCondition: config.transformCondition
     }),
     resources: config.resources
   }
