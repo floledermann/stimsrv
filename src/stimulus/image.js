@@ -15,10 +15,12 @@ module.exports = function(config) {
   
   let imgEl = null;
   let context = null;
+  let parent = null;
   
   return {
-    initialize: function(parent, stimsrv, _context) {
+    initialize: function(_parent, stimsrv, _context) {
       context = _context;
+      parent = _parent;
       imgEl = parent.ownerDocument.createElement("img");
       parent.appendChild(imgEl);
       
@@ -46,6 +48,8 @@ module.exports = function(config) {
       Object.assign(imgEl.style, (condition.style || valOrFunc(config.style, condition)));
       
       imgEl.src = baseURL + (condition.image || valOrFunc(config.image, condition));
+      
+      parent.style.backgroundColor = condition.background || "#000000";
                   
     }
   }
