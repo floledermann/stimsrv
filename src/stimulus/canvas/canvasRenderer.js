@@ -124,7 +124,12 @@ function canvasRenderer(renderFunc, options) {
       // contract: if render() returns a string or element, then replace the parent content
       render: function(condition) {
         
-        condition = Object.assign({}, condition, options.overrideCondition);
+        let overrideCondition = options.overrideCondition;
+        if (overrideCondition && typeof overrideCondition == "function") {
+          overrideCondition = overrideCondition(condition);
+        }
+        
+        condition = Object.assign({}, condition, overrideCondition);
         
         // remember for redrawing on resize
         lastCondition = condition;
