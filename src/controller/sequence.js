@@ -9,9 +9,14 @@ let sequence = function(items, options) {
   
   options = Object.assign({
     stepCount: 1,         // repeat each item stepCount times
-    loop: false,          // loop after sequence is exhausted
+    loop: undefined,          // loop after sequence is exhausted
     loopCount: undefined, // stop after loopCount loops
   }, options);
+  
+  // loop by default if loopCount is specified
+  if (options.loopCount && options.loop === undefined) {
+    options.loop = true;
+  }
   
   return function create(context) {
     
