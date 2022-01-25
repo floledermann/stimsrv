@@ -56,6 +56,7 @@ function simpleTask(taskSpec) {
       description: manager.resolve("description"),
       frontend: context => {
         return {
+          name: manager.resolve("name"),
           interfaces: manager.interfaces(context),
           transformConditionOnClient: manager.transformConditionOnClient(context),
           css: manager.resolve("css", context)
