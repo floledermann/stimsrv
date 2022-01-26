@@ -5,7 +5,7 @@
 A System for Distributed User Studies and Behavioural Experiments</h1>
 
 
-<a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·
+<!--<a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·-->
 <a href="#defining--running-experiments">Running&nbsp;Experiments</a> ·
 <a href="#experiment-results">Experiment&nbsp;results</a> ·
 <a href="#device-configuration--roles">Device&nbsp;configuration&nbsp;&amp;&nbsp;roles</a> ·
