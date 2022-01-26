@@ -9,7 +9,7 @@ let sequence = function(items, options) {
   
   options = Object.assign({
     stepCount: 1,         // repeat each item stepCount times
-    loop: undefined,          // loop after sequence is exhausted
+    loop: undefined,      // loop after sequence is exhausted
     loopCount: undefined, // stop after loopCount loops
   }, options);
   
