@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>stimsrv <br> A System for Distributed User Studies and Behavioural Experiments</h1>
+<h1>🧪🔬📲 stimsrv 🔎🗺📈<br> A System for Distributed User Studies and Behavioural Experiments</h1>
 
 
 <a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·
@@ -10,7 +10,7 @@
 <a href="#configuring-tasks">Configuring&nbsp;tasks</a> ·
 <a href="#modifying-the-frontend-with-css">Modifying&nbsp;the&nbsp;frontend with&nbsp;CSS</a> ·
 <a href="#implementing-tasks">Implementing&nbsp;tasks</a> ·
-<a href="#system-overview">System&nbsp;overview</a> ·
+<a href="#terminology--system-overview">Terminology&nbsp;&amp;&nbsp;System&nbsp;overview</a> ·
 <a href="#license-credits--acknowledgements">License&nbsp;&amp;&nbsp;Credits</a>
 </div>
 
@@ -40,26 +40,13 @@ To try out stimsrv, check out the [stimsrv examples repository](https://github.c
 ⚠️ *Important Note: While stimsrv experiments run in a web browser, currently its code is not audited for hosting publicly accessible online experiments. Stimsrv is currently intended for local use in private (lab) networks only!*
 
 
-## Design Philosophy & Terminology
+### Design Philosophy & Terminology
 
-Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with *plain javascript objects* (for configuration) and *functions* (for dynamic behaviour). Even complex, distributed experiments can usually be implemented by creating a single experiment definition file, plus one file for each proprietary task that you want to run in your experiment. The stimsrv server takes care of packaging and delivering the experiment code and coordinating the experiment state across multiple clients, among other things.
+Stimsrv follows a [function-based](https://en.wikipedia.org/wiki/Functional_programming), [composition-over-inheritance](https://en.wikipedia.org/wiki/Composition_over_inheritance) programming style. This means that the dynamic behaviour of an experiment can be expressed concisely with *plain javascript objects* (for configuration) and *functions* (for dynamic behaviour). Even complex, distributed experiments can usually be implemented by creating a single concise experiment definition file. The stimsrv server takes care of packaging and delivering the experiment code and coordinating the experiment state across multiple clients, among other things.
 
-### Key Terminology
+See <a href="#terminology--system-overview">below</a> for <a href="#terminology--system-overview">key terminology and a system overview</a>.
 
-The following terms are used throughout this documentation to denote specific parts of a stimsrv experiment:
 
-- ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
-- ***User***: Usually the experiment designer or supervisor. *Not* necessarily the person participating in the experiment.
-- ***Participant***: The person(s) participating in the experiment.
-- ***Task***: Part of an experiment, usually presenting some stimulus or user interface to the participant and expecting some kind of response from them, potentially repeatedly. (Example: A simple task to assess the particpant's visual acuity may show letters of the alphabet in decreasing size  to the participant and ask the participant to respond by clicking an on-screen button corresponding to the shown letter). Multiple tasks can be run during an experiment.
-- ***Configuration***: The structure and settings for all parts of the experiment and its tasks, defined in advance. The configuration does not change during an experiment run.
-- ***Context***: The current circumstances under which a task is run. The context may change between one task and the next, but not during a single task.
-- ***Trial***: A single run of a task. Usually, the participant is presented with a specific stimulus, and reacts with a specific response. (Example: in a single trial, above task may display the letter "B" to the participant, and wait for their response. For the next trial, a different letter may be displayed, and the text size may be adjusted depending on the participant's response.) A single task may run multiple trials before it is completed and the experiment continues with the next task.
-- ***Condition***: A set of properties that define the setting for a trial. In the example above, the condition will specify the specific letter to be shown and the font size to use, potentially among other aspects of the presentation (e.g. contrast ratio etc.).
-- ***Response***: A set of properties that define the response of the participant to the given condition, and will trigger the next condition (or the end of the task). In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed) and will be used to determine the next condition to be shown.
-- ***Event***: Events are additional data gathered during a trial which do not immediately trigger a change of condition, but may be stored and/or processed.
-- ***Result***: The result of a single trial. Contains information about the condition, the response, any events gathered during the trial plus additional information, such as timing information or the context in which a task was run.
-- ***Task results, experiment results***: The collected results for the run of a task (multiple trials), or an entire experiment run.
 
 <!--
 Why higher-order functions:
@@ -68,7 +55,6 @@ Why higher-order functions:
 - Room to add a closure for state, e.g. context => { let count = 0; return condition => ({ text: count++ }); }
 - Functional programming style, needs only a subset of JS to be taught to non-experts.
 -->
-
 
 
 ## Defining & running experiments
@@ -893,7 +879,24 @@ The [n-sided Pong example](https://github.com/floledermann/stimsrv-examples/tree
 
 
 
-## System overview
+## Terminology & system overview
+
+The following terms are used throughout this documentation to denote specific parts of a stimsrv experiment:
+
+- ***Experiment***: All aspects contributing to an experiment, including client devices, data storage and the definition of tasks that should be run.
+- ***User***: Usually the experiment designer or supervisor. *Not* necessarily the person participating in the experiment.
+- ***Participant***: The person(s) participating in the experiment.
+- ***Task***: Part of an experiment, usually presenting some stimulus or user interface to the participant and expecting some kind of response from them, potentially repeatedly. (Example: A simple task to assess the particpant's visual acuity may show letters of the alphabet in decreasing size  to the participant and ask the participant to respond by clicking an on-screen button corresponding to the shown letter). Multiple tasks can be run during an experiment.
+- ***Configuration***: The structure and settings for all parts of the experiment and its tasks, defined in advance. The configuration does not change during an experiment run.
+- ***Context***: The current circumstances under which a task is run. The context may change between one task and the next, but not during a single task.
+- ***Trial***: A single run of a task. Usually, the participant is presented with a specific stimulus, and reacts with a specific response. (Example: in a single trial, above task may display the letter "B" to the participant, and wait for their response. For the next trial, a different letter may be displayed, and the text size may be adjusted depending on the participant's response.) A single task may run multiple trials before it is completed and the experiment continues with the next task.
+- ***Condition***: A set of properties that define the setting for a trial. In the example above, the condition will specify the specific letter to be shown and the font size to use, potentially among other aspects of the presentation (e.g. contrast ratio etc.).
+- ***Response***: A set of properties that define the response of the participant to the given condition, and will trigger the next condition (or the end of the task). In the example above, the response will contain information on which button was pressed. Responses can be classified with respect to the condition (i.e. whether the correct button corresponding to the letter shown has been pressed) and will be used to determine the next condition to be shown.
+- ***Event***: Events are additional data gathered during a trial which do not immediately trigger a change of condition, but may be stored and/or processed.
+- ***Result***: The result of a single trial. Contains information about the condition, the response, any events gathered during the trial plus additional information, such as timing information or the context in which a task was run.
+- ***Task results, experiment results***: The collected results for the run of a task (multiple trials), or an entire experiment run.
+
+### System overview
 
 This graphics shows an overview of the flow of information in stimsrv.
 
