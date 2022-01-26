@@ -1,6 +1,8 @@
 <div align="center">
 
-<h1>🧪🔬📲 stimsrv 🔎🗺📈<br> A System for Distributed User Studies and Behavioural Experiments</h1>
+<h1>🧪🔬📲 stimsrv 🔎🗺📈<br>
+<br>
+A System for Distributed User Studies and Behavioural Experiments</h1>
 
 
 <a href="#design-philosophy--terminology">Philosophy&nbsp;&amp;&nbsp;Terminology</a> ·
