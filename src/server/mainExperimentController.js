@@ -170,7 +170,15 @@ function MainExperimentController(experiment, options) {
         context: context
       });
       
-      newTrial(currentController.nextCondition?.(null,null,trials));
+      let nextCondition = currentController.nextCondition?.(null,null,trials);
+      
+      if (nextCondition) {
+        newTrial(nextCondition);
+      }
+      // no condition generated - immediately jump to next task
+      else {
+        nextTask();
+      }
       
     }
     else {
