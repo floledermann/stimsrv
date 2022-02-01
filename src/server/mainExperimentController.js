@@ -277,6 +277,9 @@ function MainExperimentController(experiment, options) {
       return;
     }
     
+    currentTrial.responseTimeOffset = relativeTime(experimentTimeOffset + 
+                                                   currentTaskTimeOffset +
+                                                   currentTrial.trialTimeOffset);
     currentTrial.response = _response;
     
     let nextCondition = currentController.nextCondition?.(
