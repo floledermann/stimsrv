@@ -12,6 +12,7 @@ let defaults = {
   buttondisplay: "response",
   button: "Continue",
   store: false,  // do not store by default
+  skip: false, // hack until this is based on simpleTask
   messageStyle: {
     padding: "2em"
   },
@@ -106,7 +107,16 @@ function pause(config) {
         interfaces: interfaces
       }
     },
-    controller: nextOnResponse()
+    controller: context => {
+      if (valOrFunc(config.skip, context)) {
+        // dummy controller to skip this task
+        // this is obsolete once this is based on simpleTask
+        return {
+          nextCondition: () => null
+        }
+      }
+      return nextOnResponse()(context);
+    }
   }
 
 }
