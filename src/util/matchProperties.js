@@ -1,7 +1,7 @@
 // Return true iff each entry in template has a matching entry in obj
 function matchProperties(obj, template) {
   return Object.entries(template).every(([key, value]) => {
-    // recurs arrays and objects
+    // recurse arrays and objects
     if (Array.isArray(obj[key])) {
       return Array.isArray(value) && matchProperties(obj[key], value);
     }
