@@ -184,6 +184,9 @@ function canvasRenderer(renderFunc, options) {
           
           if (condition.backgroundIntensity) {
             ctx2d.fillStyle = condition.backgroundIntensity;
+            // not entirely sure why this clearRect() call is needed, but on some devices (Galaxy Tab)
+            // the fillRect won't overpaint a previously drawn stimulus
+            ctx2d.clearRect(0,0,width,height); 
             ctx2d.fillRect(0,0,width,height);
             if (!this.backgroundColor) this.backgroundColor = condition.backgroundIntensity; // HACK for browser-simple, refactor
           }
@@ -209,6 +212,8 @@ function canvasRenderer(renderFunc, options) {
             ctx2d.rotate(condition.rotate/180*Math.PI);
           }
           
+          // TODO: introduce optional delay with accurate timing
+          // (preload resources like images or swap out pre-rendered canvas)
           renderFunc(ctx2d, condition, context, stimsrvAPI);
           
         });
