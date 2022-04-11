@@ -43,7 +43,7 @@ function randomPick(items, options) {
 function randomRange(from, to, options) {
   
   options = Object.assign({
-    round: false,    // 100, 10, 1/true, 0.1, 0.01, ...
+    round: false,    // 100, 10, 1, true (=1), 0.1, 0.01, ...
     suffix: null,
   }, options);
   
