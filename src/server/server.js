@@ -335,8 +335,8 @@ io.on("connection", (socket) => {
   });
   
   socket.on("response", (data) => {
-    controller.response(data.response);
     console.log("Received response: " + JSON.stringify(data.response));
+    controller.response(data.response);
   });
   
   socket.on("warning", (data) => {
