@@ -126,14 +126,22 @@ function htmlButtons(config) {
           
           let el = document.createElement(config.buttonTag);
           
-          let labelWrapper = el;      
-          if (config.labelTag) {
-            labelWrapper = document.createElement(config.labelTag);
-            labelWrapper.className = config.labelClass;
-            el.appendChild(labelWrapper);
+          let labelDef = buttonDef.label;
+          if (labelDef === undefined) labelDef = buttonDef;
+          let labelStr = valOrFunc(labelDef, buttonCondition);
+          
+          debugger;
+          
+          if (labelStr !== null && labelStr !== undefined) {
+            let labelWrapper = el;      
+            if (config.labelTag) {
+              labelWrapper = document.createElement(config.labelTag);
+              labelWrapper.className = config.labelClass;
+              el.appendChild(labelWrapper);
+            }
+        
+            labelWrapper.innerHTML = labelStr;
           }
-      
-          labelWrapper.innerHTML = valOrFunc(buttonDef.label || buttonDef, buttonCondition);
           
           if (buttonDef.className) {
             el.className = buttonDef.className;
