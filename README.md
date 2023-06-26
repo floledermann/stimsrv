@@ -30,7 +30,7 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 - Utilities that help to develop new experiment components with ***little boilerplate code***, allowing researchers to focus on the core functionality of their experiments.
 - Adaption the components of an experiment to ***device contexts***, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
 - ***Timestamp synchronization*** between multiple clients for temporal precision down to a few milliseconds in local WiFi networks.
-- Storing ***experiment resuts*** including conditions, responses, timing information and warnings about potential problems as a JSON file for further processing. 
+- Storing ***experiment results*** including conditions, responses, timing information and warnings about potential problems as a JSON file for further processing. 
 - Implemented in ***JavaScript***, leveraging a modern, function-based programming style, supporting seamless transitions of code from server to client and making use of the web browser as a modern and versatile runtime environment.
 - Automatic ***packaging and distribution*** of the code of an experiment to participating clients, so you don't have to mess with JavaScript build systems.
 - Follows the design principle of ***“Simple things should be simple, complex things should be possible.”*** (Alan Kay)
