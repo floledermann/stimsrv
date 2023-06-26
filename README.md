@@ -86,7 +86,8 @@ module.exports = {
   
     pause({
       message: "Hello from stimsrv",
-      store: true  // by default, the pause task is not stored - store it so that we have some data
+      store: true  // by default, response data for the pause task is not stored
+                   // enable storage so that we have some data
     })
     
   ]
