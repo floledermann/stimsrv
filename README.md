@@ -28,7 +28,7 @@ stimsrv (***stim***ulus ***s***e***rv***er) is a system for running user studies
 - Run ***distributed experiments*** with multiple devices fulfilling different roles. For example, stimulus presentation can be performed by a desktop computer and participant feedback can be entered on a tablet connected by WiFi.
 - ***Central control*** of experiment state and unidirectional data flow ensure deterministic experiment behaviour even in complex, distributed settings.
 - Utilities that help to develop new experiment components with ***little boilerplate code***, allowing researchers to focus on the core functionality of their experiments.
-- Adaption the components of an experiment to ***device contexts***, e.g. converting real-world measurements (millimeters, angular arcs) into appropriate pixel values depending on device-specific configuration of display resolution and viewing distance.
+- Adaption of the components of an experiment to ***device contexts***, e.g. device-specific configuration of display resolution and viewing distance.
 - ***Timestamp synchronization*** between multiple clients for temporal precision down to a few milliseconds in local WiFi networks.
 - Storing ***experiment results*** including conditions, responses, timing information and warnings about potential problems as a JSON file for further processing. 
 - Implemented in ***JavaScript***, leveraging a modern, function-based programming style, supporting seamless transitions of code from server to client and making use of the web browser as a modern and versatile runtime environment.
