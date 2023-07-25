@@ -204,6 +204,30 @@ describe("Iterators", () => {
 
 
     });  
+    
+    it("Iterator items are processed recursively", () => {
+      
+      let iter = sequence([sequence([1,2]), sequence([3,4])], {loop:true})();
+      
+      let next = iter.next().value;
+      assert.equal(next, 1);
+      
+      next = iter.next().value;
+      assert.equal(next, 2);
+      
+      next = iter.next().value;
+      assert.equal(next, 3);
+
+      next = iter.next().value;
+      assert.equal(next, 4);
+      
+      next = iter.next().value;
+      assert.equal(next, 1);
+      
+      next = iter.next().value;
+      assert.equal(next, 2);
+      
+    });
 
 
   });
