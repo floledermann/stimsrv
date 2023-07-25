@@ -265,7 +265,7 @@ function MainExperimentController(experiment, options) {
     // TODO: this output is interesting to watch what the server is doing, 
     // but should not be hardcoded here
     //console.log("-------------------------------------------");
-    console.log("Condition: " + JSON.stringify(currentTrial.condition, null, 2));
+    //console.log("Condition: " + JSON.stringify(currentTrial.condition, null, 2));
   }
   
   function response(_response) {
@@ -288,7 +288,7 @@ function MainExperimentController(experiment, options) {
     );
     
     // next condition within current experiment
-    if (nextCondition) {
+    if (nextCondition !== null && nextCondition !== undefined) {
       newTrial(nextCondition);
     }
     // conditions exhausted - show next experiment
