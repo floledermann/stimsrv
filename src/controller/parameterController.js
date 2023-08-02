@@ -1,5 +1,5 @@
 
-/*
+/**
 parameterController(config)
 
 A helper to dynamically generate parameter objects, which are simple key-value pairs.

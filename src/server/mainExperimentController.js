@@ -291,7 +291,7 @@ function MainExperimentController(experiment, options) {
     if (nextCondition !== null && nextCondition !== undefined) {
       newTrial(nextCondition);
     }
-    // conditions exhausted - show next experiment
+    // conditions exhausted - show next task
     else {
       nextTask();
     }
