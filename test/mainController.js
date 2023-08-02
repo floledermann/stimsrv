@@ -9,7 +9,7 @@ const {controllerTask, controllerTasks, controllersExperiment} = require("./_uti
 
 describe("MainController", () => {
 
-  describe("Stores results after experiment", () => {
+  describe("stores results after experiment", () => {
 
     it("Controller stores results when restarting experiment", (done) => {
       
@@ -35,7 +35,9 @@ describe("MainController", () => {
       
     });
 
-    it("Stores results contents match experiment", (done) => {
+    it("Stored results contents match experiment", (done) => {
+      
+      debugger;
       
       let currentCondition = null;
       let counter = 1;
@@ -43,7 +45,15 @@ describe("MainController", () => {
       let controller = controllersExperiment(
         [
           {
-            nextCondition: () => currentCondition = (counter < 3 ? { param1: counter++ } : null)
+            nextCondition: () => {
+              // loop after 2 trials
+              if (counter >= 3) {
+                counter = 1;
+                return null;
+              }
+              currentCondition = { param1: counter++ };
+              return currentCondition;
+            }
           }
         ]
       );
@@ -57,7 +67,7 @@ describe("MainController", () => {
       
       controller.response({param2: 2});
       // at end -> loop experiment
-      assert.equal(currentCondition, null);
+      assert.equal(currentCondition.param1, 1);
       
       let resultsP = controller.getLastParticipantData();
       
